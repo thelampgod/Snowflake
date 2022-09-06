@@ -1,0 +1,65 @@
+plugins {
+    id 'java'
+}
+
+ext {
+    buildVersion = '1.0-SNAPSHOT'
+    javaVersion = '1.8'
+
+    porklibVersion = "0.5.4-SNAPSHOT"
+}
+
+group "com.github.thelampgod"
+version "$buildVersion"
+
+compileJava {
+    sourceCompatibility = targetCompatibility = "$javaVersion"
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+repositories {
+    maven {
+        name = "DaPorkchop_"
+        url = "https://maven.daporkchop.net/"
+    }
+    mavenCentral()
+}
+
+configurations {
+    shade
+    compile.extendsFrom shade
+}
+
+dependencies {
+    shade "net.daporkchop.lib:logging:$porklibVersion"
+    shade "org.apache.commons:commons-lang3:3.12.0"
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jar {
+    from {
+        configurations.shade.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }.unique()
+    } {
+        exclude "META-INF/**"
+        exclude sourceSets.main.output.asFileTree.collect {
+            return it.getPath().split("java/main").last()
+        }
+    }
+
+    manifest {
+        attributes "Implementation-Title": "thelampgod",
+                "Implementation-Version": "$buildVersion",
+                "Main-Class": "com.github.thelampgod.snowflake.Main"
+    }
+}
