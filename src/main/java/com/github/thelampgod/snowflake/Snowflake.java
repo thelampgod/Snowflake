@@ -18,8 +18,8 @@ public class Snowflake {
         logger.setLogAmount(LogAmount.DEBUG);
         logger.info("Starting Snowflake server on port " + PORT);
         this.server = new SnowflakeServer();
-        server.start(PORT);
         logger.info("Listening...");
+        server.start(PORT);
     }
 
     public SnowflakeServer getServer() {
