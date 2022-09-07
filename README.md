@@ -1,4 +1,4 @@
-w # Snowflake
+# Snowflake
 _Snowball server software_
 
 * Live coordinate sharing to configurable sets
