@@ -1,5 +1,6 @@
 package com.github.thelampgod.snowflake;
 
+import com.github.thelampgod.snowflake.util.DatabaseUtil;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.pgpainless.PGPainless;
@@ -118,6 +119,7 @@ public class SnowflakeServer {
                     if (in.readUTF().equals(secret)) {
                         client.setPubKey(pubKey);
                         client.setName(new KeyRingInfo(key).getPrimaryUserId());
+                        DatabaseUtil.insertUser(client);
 
                         out.writeUTF("Authenticated.");
                         out.flush();

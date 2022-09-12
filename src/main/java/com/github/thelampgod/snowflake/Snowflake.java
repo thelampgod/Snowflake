@@ -66,4 +66,7 @@ public class Snowflake {
         return this.server;
     }
 
+    public Database getDb() {
+        return this.database;
+    }
 }
