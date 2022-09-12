@@ -7,6 +7,11 @@ ext {
     javaVersion = '1.8'
 
     porklibVersion = "0.5.4-SNAPSHOT"
+    sqliteVersion = "3.39.3.0"
+    commonsVersion = "3.12.0"
+    pgpPainlessVersion = "1.3.6"
+
+
 }
 
 group "com.github.thelampgod"
@@ -35,8 +40,15 @@ configurations {
 
 dependencies {
     shade "net.daporkchop.lib:logging:$porklibVersion"
-    shade "org.apache.commons:commons-lang3:3.12.0"
-    shade 'org.pgpainless:pgpainless-core:1.3.6'
+    shade "org.apache.commons:commons-lang3:$commonsVersion"
+    shade 'com.google.guava:guava:31.1-jre'
+
+    //pgp
+    shade "org.pgpainless:pgpainless-core:$pgpPainlessVersion"
+
+    //database
+    shade "org.xerial:sqlite-jdbc:$sqliteVersion"
+    shade "org.apache.commons:commons-dbcp2:2.9.0"
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
