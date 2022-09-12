@@ -34,7 +34,11 @@ public class SocketClient {
 
     @Override
     public String toString() {
-        return String.format("%s (%s:%s)", this.name, this.socket.getInetAddress().getHostName(), this.socket.getPort());
+        if (isAuthenticated()) {
+            return String.format("%s (%s:%s)", this.name, this.socket.getInetAddress().getHostName(), this.socket.getPort());
+        }
+
+        return this.socket.getInetAddress().getHostName() + this.socket.getPort();
     }
 
     public boolean isAuthenticated() {
