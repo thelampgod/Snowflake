@@ -71,19 +71,6 @@ public class SnowflakeServer {
 
         private final HashSet<Integer> recipientsIds = new HashSet<>();
 
-        private enum Action {
-            LOGIN(0),
-            SEND_POSITION(1),
-            ADD_RECIPIENT(2),
-            DISCONNECT(3);
-
-            public final byte action;
-
-            Action(int action) {
-                this.action = (byte) action;
-            }
-        }
-
         public ClientHandler(Socket socket) throws IOException {
             this.client = new SocketClient(socket);
             Snowflake.INSTANCE.getServer().addClient(this.client);
@@ -112,102 +99,17 @@ public class SnowflakeServer {
         }
 
         private void doAction(byte action) throws IOException {
-            switch (parseAction(action)) {
-                case LOGIN:
-                    String pubKey = in.readUTF();
-                    PGPPublicKeyRing key = PGPainless.readKeyRing().publicKeyRing(pubKey);
-                    String secret =
-                            RandomStringUtils.random(10, 0, 0, true, true, null, new SecureRandom());
-
-                    String encryptedMessage = encrypt(secret, key);
-                    if (encryptedMessage.isEmpty())  {
-                        disconnect("Encryption fail (invalid key)");
-                        return;
-                    }
-
-                    out.writeUTF(encryptedMessage);
-                    out.flush();
-
-                    if (in.readUTF().equals(secret)) {
-                        client.setPubKey(pubKey);
-                        client.setName(new KeyRingInfo(key).getPrimaryUserId());
-                        int id = DatabaseUtil.insertUser(client);
-                        client.setId(id);
-                        this.recipientsIds.addAll(getRecipientsFromDatabase(id));
-
-                        out.writeUTF("Authenticated.");
-                        out.flush();
-
-                        logger.info(client + " authenticated.");
-                    } else {
-                        disconnect("Wrong password");
-                    }
+            switch (action) {
+                case 0:
+                    login();
                     break;
-                case SEND_POSITION:
-                    checkAuth(client);
-                    //user should add some recipients
-                    if (recipientsIds.isEmpty()) return;
-
-                    // read encrypted message and forward it to client's recipients
-                    String position = in.readUTF();
-
-                    Snowflake.INSTANCE.getServer().connectedClients.stream()
-                            .filter(c -> recipientsIds.contains(c.getId()))
-                            .forEach(c -> {
-                                try {
-                                    DataOutputStream clientOut = c.getOutputStream();
-                                    // tell client it is packet type 1 => position update
-                                    clientOut.writeByte(1);
-                                    clientOut.writeUTF(position);
-                                    clientOut.flush();
-
-                                    logger.debug(client.getName() + " sent position packet to recipient " + c.getName());
-                                    out.writeUTF(client.getName() + " sent position packet to recipient " + c.getName());
-                                    out.flush();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            });
-
+                case 1:
+                    sendPos();
                     break;
-                case ADD_RECIPIENT:
-                    checkAuth(client);
-                    //read public key that client sends and store in recipient table and add to recipient table
-                    String recipientKey = in.readUTF();
-
-                    //check connected clients first
-                    Optional<SocketClient> optRecipient = Snowflake.INSTANCE.getServer().connectedClients.stream()
-                            .filter(c -> c.getPubKey().equals(recipientKey))
-                            .findAny();
-
-                    if (optRecipient.isPresent()) {
-                        SocketClient recipient = optRecipient.get();
-                        DatabaseUtil.insertRecipient(recipient.getId(), recipientKey, client.getId());
-                        out.writeUTF("added recipient successfully");
-                        out.flush();
-                        return;
-                    }
-
-                    //not connected, check database
-                    try (Connection conn = Snowflake.INSTANCE.getDb().getConnection()) {
-                        ResultSet result =
-                                DatabaseUtil.runQuery(
-                                        "select id from users where pubkey=\"" + recipientKey + "\"", conn).getResultSet();
-                        if (result.next()) {
-                            int userId = result.getInt("id");
-                            result.close();
-
-                            DatabaseUtil.insertRecipient(userId, recipientKey, client.getId());
-                            out.writeUTF("added recipient successfully");
-                            out.flush();
-                        }
-
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-
+                case 2:
+                    addRecipient();
                     break;
-                case DISCONNECT:
+                case 3:
                     disconnect("Disconnected");
                     break;
             }
@@ -241,13 +143,98 @@ public class SnowflakeServer {
             }
         }
 
-        private Action parseAction(byte action) {
-            switch (action) {
-                case 1: return Action.SEND_POSITION;
-                case 2: return Action.ADD_RECIPIENT;
-                case 3: return Action.DISCONNECT;
+        private void login() throws IOException {
+            String pubKey = in.readUTF();
+            PGPPublicKeyRing key = PGPainless.readKeyRing().publicKeyRing(pubKey);
+            String secret =
+                    RandomStringUtils.random(10, 0, 0, true, true, null, new SecureRandom());
 
-                default: return Action.LOGIN;
+            String encryptedMessage = encrypt(secret, key);
+            if (encryptedMessage.isEmpty())  {
+                disconnect("Encryption fail (invalid key)");
+                return;
+            }
+
+            out.writeUTF(encryptedMessage);
+            out.flush();
+
+            if (in.readUTF().equals(secret)) {
+                client.setPubKey(pubKey);
+                client.setName(new KeyRingInfo(key).getPrimaryUserId());
+                int id = DatabaseUtil.insertUser(client);
+                client.setId(id);
+                this.recipientsIds.addAll(getRecipientsFromDatabase(id));
+
+                out.writeUTF("Authenticated.");
+                out.flush();
+
+                logger.info(client + " authenticated.");
+            } else {
+                disconnect("Wrong password");
+            }
+        }
+
+        private void sendPos() throws IOException {
+            checkAuth(client);
+            //user should add some recipients
+            if (recipientsIds.isEmpty()) return;
+
+            // read encrypted message and forward it to client's recipients
+            String position = in.readUTF();
+
+            Snowflake.INSTANCE.getServer().connectedClients.stream()
+                    .filter(c -> recipientsIds.contains(c.getId()))
+                    .forEach(c -> {
+                        try {
+                            DataOutputStream clientOut = c.getOutputStream();
+                            // tell client it is packet type 1 => position update
+                            clientOut.writeByte(1);
+                            clientOut.writeUTF(position);
+                            clientOut.flush();
+
+                            logger.debug(client.getName() + " sent position packet to recipient " + c.getName());
+                            out.writeUTF(client.getName() + " sent position packet to recipient " + c.getName());
+                            out.flush();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+        }
+
+        private void addRecipient() throws IOException {
+            checkAuth(client);
+            //read public key that client sends and store in recipient table and add to recipient table
+            String recipientKey = in.readUTF();
+
+            //check connected clients first
+            Optional<SocketClient> optRecipient = Snowflake.INSTANCE.getServer().connectedClients.stream()
+                    .filter(c -> c.getPubKey().equals(recipientKey))
+                    .findAny();
+
+            if (optRecipient.isPresent()) {
+                SocketClient recipient = optRecipient.get();
+                DatabaseUtil.insertRecipient(recipient.getId(), recipientKey, client.getId());
+                out.writeUTF("added recipient successfully");
+                out.flush();
+                return;
+            }
+
+            //not connected, check database
+            try (Connection conn = Snowflake.INSTANCE.getDb().getConnection()) {
+                ResultSet result =
+                        DatabaseUtil.runQuery(
+                                "select id from users where pubkey=\"" + recipientKey + "\"", conn).getResultSet();
+                if (result.next()) {
+                    int userId = result.getInt("id");
+                    result.close();
+
+                    DatabaseUtil.insertRecipient(userId, recipientKey, client.getId());
+                    out.writeUTF("added recipient successfully");
+                    out.flush();
+                }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
     }
