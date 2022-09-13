@@ -106,8 +106,16 @@ public class ClientTest {
                     out.writeUTF(decrypted);
                     out.flush();
 
+                    //"Authenticated" message
+                    System.out.println(in.readUTF());
                     out.writeByte(1);
+                    //this would be encrypted against all the recipients public keys
+                    out.writeUTF("position");
                     out.flush();
+                    if (in.readByte() == 1) {
+                        System.out.println(in.readUTF());
+                    }
+
                 } catch (EOFException e) {
                     break;
                 }

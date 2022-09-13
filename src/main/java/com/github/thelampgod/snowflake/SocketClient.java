@@ -1,20 +1,33 @@
 package com.github.thelampgod.snowflake;
 
+import java.io.*;
 import java.net.Socket;
 
 public class SocketClient {
     private final Socket socket;
+    private final DataOutputStream out;
+    private final DataInputStream in;
 
     private String name = null;
     private String pubKey = null;
     private int id;
 
-    public SocketClient(Socket socket) {
+    public SocketClient(Socket socket) throws IOException {
         this.socket = socket;
+        this.out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+        this.in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
     }
 
     public Socket getSocket() {
         return socket;
+    }
+
+    public DataOutputStream getOutputStream() {
+        return out;
+    }
+
+    public DataInputStream getInputStream() {
+        return in;
     }
 
     public String getName() {

@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS recipients (
-    id INTEGER PRIMARY KEY,
+    recipient_user_id INTEGER,
     pubkey TEXT NOT NULL,--for recipient
     user_id INTEGER, --of user that is sharing
     FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
