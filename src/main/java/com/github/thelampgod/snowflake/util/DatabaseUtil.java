@@ -51,6 +51,14 @@ public class DatabaseUtil {
     public static void insertRecipient(int recipientId, String recipientKey, int userid) {
         try (Connection conn = Snowflake.INSTANCE.getDb().getConnection()) {
 
+            ResultSet result =
+                    runQuery("select * from recipients where user_id=" + userid + " and recipient_user_id=" + recipientId, conn).getResultSet();
+            if (result.next()) {
+                //recipient already exists
+                result.close();
+                return;
+            }
+
             conn.setAutoCommit(false);
             try {
                 try (PreparedStatement statement = conn.prepareStatement(
