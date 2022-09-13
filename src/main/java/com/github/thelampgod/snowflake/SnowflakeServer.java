@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 import static com.github.thelampgod.snowflake.util.EncryptionUtil.encrypt;
 import static net.daporkchop.lib.logging.Logging.*;
@@ -115,7 +116,8 @@ public class SnowflakeServer {
                 case LOGIN:
                     String pubKey = in.readUTF();
                     PGPPublicKeyRing key = PGPainless.readKeyRing().publicKeyRing(pubKey);
-                    String secret = RandomStringUtils.random(10, 0, 0, true, true, null, new SecureRandom());
+                    String secret =
+                            RandomStringUtils.random(10, 0, 0, true, true, null, new SecureRandom());
 
                     String encryptedMessage = encrypt(secret, key);
                     if (encryptedMessage.isEmpty())  {
@@ -159,8 +161,8 @@ public class SnowflakeServer {
                                     clientOut.writeUTF(position);
                                     clientOut.flush();
 
-                                    logger.debug("Sent position packet to recipient " + c.getName());
-                                    out.writeUTF("Sent position packet to recipient " + c.getName());
+                                    logger.debug(client.getName() + " sent position packet to recipient " + c.getName());
+                                    out.writeUTF(client.getName() + " sent position packet to recipient " + c.getName());
                                     out.flush();
                                 } catch (IOException e) {
                                     e.printStackTrace();
@@ -170,8 +172,39 @@ public class SnowflakeServer {
                     break;
                 case ADD_RECIPIENT:
                     checkAuth(client);
-
                     //read public key that client sends and store in recipient table and add to recipient table
+                    String recipientKey = in.readUTF();
+
+                    //check connected clients first
+                    Optional<SocketClient> optRecipient = Snowflake.INSTANCE.getServer().connectedClients.stream()
+                            .filter(c -> c.getPubKey().equals(recipientKey))
+                            .findAny();
+
+                    if (optRecipient.isPresent()) {
+                        SocketClient recipient = optRecipient.get();
+                        DatabaseUtil.insertRecipient(recipient.getId(), recipientKey, client.getId());
+                        out.writeUTF("added recipient successfully");
+                        out.flush();
+                        return;
+                    }
+
+                    //not connected, check database
+                    try (Connection conn = Snowflake.INSTANCE.getDb().getConnection()) {
+                        ResultSet result =
+                                DatabaseUtil.runQuery(
+                                        "select id from users where pubkey=\"" + recipientKey + "\"", conn).getResultSet();
+                        if (result.next()) {
+                            int userId = result.getInt("id");
+                            result.close();
+
+                            DatabaseUtil.insertRecipient(userId, recipientKey, client.getId());
+                            out.writeUTF("added recipient successfully");
+                            out.flush();
+                        }
+
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
 
                     break;
                 case DISCONNECT:
@@ -184,7 +217,7 @@ public class SnowflakeServer {
         private List<Integer> getRecipientsFromDatabase(int id) {
             List<Integer> temp = new ArrayList<>();
             try (Connection conn = Snowflake.INSTANCE.getDb().getConnection()) {
-                ResultSet result = DatabaseUtil.runQuery("select id from recipients where user_id=" + id, conn).getResultSet();
+                ResultSet result = DatabaseUtil.runQuery("select recipient_user_id from recipients where user_id=" + id, conn).getResultSet();
                 while (result.next()) {
                     temp.add(result.getInt("recipient_user_id"));
                 }

@@ -47,4 +47,29 @@ public class DatabaseUtil {
         s.execute(query);
         return s;
     }
+
+    public static void insertRecipient(int recipientId, String recipientKey, int userid) {
+        try (Connection conn = Snowflake.INSTANCE.getDb().getConnection()) {
+
+            conn.setAutoCommit(false);
+            try {
+                try (PreparedStatement statement = conn.prepareStatement(
+                        "insert into recipients(recipient_user_id, pubkey, user_id) values(?, ?, ?)")) {
+                    statement.setInt(1, recipientId);
+                    statement.setObject(2, recipientKey);
+                    statement.setInt(3, userid);
+
+                    statement.execute();
+                }
+
+            } catch (Throwable th) {
+                conn.rollback();
+                throw th;
+            }
+            conn.commit();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

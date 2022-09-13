@@ -1,39 +1,15 @@
 import com.github.thelampgod.snowflake.util.EncryptionUtil;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.bouncycastle.openpgp.PGPException;
-import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.junit.jupiter.api.Test;
 import org.pgpainless.PGPainless;
-import org.pgpainless.decryption_verification.ConsumerOptions;
-import org.pgpainless.key.protection.SecretKeyRingProtector;
-import org.pgpainless.key.protection.UnlockSecretKey;
-import org.pgpainless.util.Passphrase;
 
 import java.io.*;
 import java.net.Socket;
-import java.security.SecureRandom;
-import java.util.Scanner;
 
-public class ClientTest {
+public class ClientTest2 {
 
     @Test
-    void sendMessageToServer() throws IOException {
-        try (Socket s = new Socket("127.0.0.1", 2147)) {
-            System.out.println("Connected to Snowflake");
-            DataOutputStream out = new DataOutputStream(new BufferedOutputStream(s.getOutputStream()));
-            DataInputStream in = new DataInputStream(new BufferedInputStream(s.getInputStream()));
-            System.out.println(in.readUTF());
-
-            out.writeUTF("Hello server");
-            out.flush();
-            System.out.println(in.readUTF());
-
-        }
-    }
-
-
-    public static void main(String[] args) throws IOException {
+    void addBobAsRecipient() throws IOException {
         try (Socket s = new Socket("127.0.0.1", 2147)) {
             System.out.println("Connected to Snowflake");
 
@@ -41,11 +17,11 @@ public class ClientTest {
             DataInputStream in = new DataInputStream(new BufferedInputStream(s.getInputStream()));
 
             out.writeByte(0);
-            out.writeUTF(BOB_CERT);
+            out.writeUTF(ALICE_CERT);
             out.flush();
             System.out.println(in.readUTF());
 
-            PGPSecretKeyRing priv = PGPainless.readKeyRing().secretKeyRing(BOB_KEY);
+            PGPSecretKeyRing priv = PGPainless.readKeyRing().secretKeyRing(ALICE_KEY);
             while (true) {
                 try {
                     String msg = in.readUTF();
@@ -61,7 +37,7 @@ public class ClientTest {
 
                     //add recipient packet
                     out.writeByte(2);
-                    out.writeUTF(ALICE_CERT);
+                    out.writeUTF(BOB_CERT);
                     out.flush();
                 } catch (EOFException e) {
                     break;
@@ -69,13 +45,6 @@ public class ClientTest {
             }
         }
     }
-
-    @Test
-    void secureRandom() {
-        String secret = RandomStringUtils.random(10, 0, 0, true, true, null, new SecureRandom());
-        System.out.println(secret);
-    }
-
 
     @Test
     void trySendPosition() throws IOException {
@@ -86,11 +55,11 @@ public class ClientTest {
             DataInputStream in = new DataInputStream(new BufferedInputStream(s.getInputStream()));
 
             out.writeByte(0);
-            out.writeUTF(BOB_CERT);
+            out.writeUTF(ALICE_CERT);
             out.flush();
             System.out.println(in.readUTF());
 
-            PGPSecretKeyRing priv = PGPainless.readKeyRing().secretKeyRing(BOB_KEY);
+            PGPSecretKeyRing priv = PGPainless.readKeyRing().secretKeyRing(ALICE_KEY);
             while (true) {
                 try {
                     String msg = in.readUTF();
@@ -117,7 +86,6 @@ public class ClientTest {
             }
         }
     }
-
 
     public static final String TEST_PRIVKEY_PASS = "test";
 
