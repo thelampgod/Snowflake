@@ -46,6 +46,7 @@ public class SnowflakeServer {
     }
 
     public void removeClient(SocketClient client) {
+        if (!(connectedClients.contains(client))) return;
         this.connectedClients.remove(client);
         try {
             client.getSocket().close();
@@ -119,12 +120,14 @@ public class SnowflakeServer {
                     if (in.readUTF().equals(secret)) {
                         client.setPubKey(pubKey);
                         client.setName(new KeyRingInfo(key).getPrimaryUserId());
-                        DatabaseUtil.insertUser(client);
+                        client.setId(DatabaseUtil.insertUser(client));
 
                         out.writeUTF("Authenticated.");
                         out.flush();
 
                         logger.info(client + " authenticated.");
+                    } else {
+                        disconnect("Wrong password");
                     }
                     break;
                 case SEND_POSITION:
@@ -155,8 +158,8 @@ public class SnowflakeServer {
         private void disconnect(String reason) throws IOException {
             out.writeUTF(reason);
             out.flush();
+            logger.info(client.toString() + " disconnected, reason: " + reason);
             Snowflake.INSTANCE.getServer().removeClient(client);
-
         }
 
         private void checkAuth(SocketClient client) throws IOException {

@@ -7,29 +7,38 @@ public class SocketClient {
 
     private String name = null;
     private String pubKey = null;
+    private int id;
 
     public SocketClient(Socket socket) {
         this.socket = socket;
+    }
+
+    public Socket getSocket() {
+        return socket;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getPubKey() {
         return pubKey;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setPubKey(String pubKey) {
         this.pubKey = pubKey;
     }
 
-    public Socket getSocket() {
-        return socket;
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override
@@ -38,7 +47,7 @@ public class SocketClient {
             return String.format("%s (%s:%s)", this.name, this.socket.getInetAddress().getHostName(), this.socket.getPort());
         }
 
-        return this.socket.getInetAddress().getHostName() + this.socket.getPort();
+        return this.socket.getInetAddress().getHostName() + ":" + this.socket.getPort();
     }
 
     public boolean isAuthenticated() {
