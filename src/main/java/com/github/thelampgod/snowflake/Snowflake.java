@@ -38,8 +38,21 @@ public class Snowflake {
 
         logger.info("Starting Snowflake server on port " + PORT);
         this.server = new SnowflakeServer();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown, "shutdown_thread"));
+
         logger.info("Listening...");
         server.start(PORT);
+    }
+
+    private void shutdown() {
+        logger.info("Shutting down");
+        server.stop();
+        try {
+            database.getConnection().close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void applySchema() throws IOException, SQLException {

@@ -26,13 +26,15 @@ public class SnowflakeServer {
             while (true) {
                 new ClientHandler(server.accept()).start();
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException ignored) {
         }
     }
 
     public void stop() {
         try {
+            for (SocketClient client : connectedClients) {
+                this.removeClient(client);
+            }
             server.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
