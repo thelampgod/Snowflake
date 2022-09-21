@@ -104,7 +104,7 @@ public class SnowflakeServer {
                     login();
                     break;
                 case 1:
-                    sendPos();
+                    sendData();
                     break;
                 case 2:
                     addRecipient();
@@ -174,26 +174,26 @@ public class SnowflakeServer {
             }
         }
 
-        private void sendPos() throws IOException {
+        private void sendData() throws IOException {
             checkAuth(client);
             //user should add some recipients
             if (recipientsIds.isEmpty()) return;
 
             // read encrypted message and forward it to client's recipients
-            String position = in.readUTF();
+            String data = in.readUTF();
 
             Snowflake.INSTANCE.getServer().connectedClients.stream()
                     .filter(c -> recipientsIds.contains(c.getId()))
                     .forEach(c -> {
                         try {
                             DataOutputStream clientOut = c.getOutputStream();
-                            // tell client it is packet type 1 => position update
+                            // tell client it is packet type 1 => data update
                             clientOut.writeByte(1);
-                            clientOut.writeUTF(position);
+                            clientOut.writeUTF(data);
                             clientOut.flush();
 
-                            logger.debug(client.getName() + " sent position packet to recipient " + c.getName());
-                            out.writeUTF(client.getName() + " sent position packet to recipient " + c.getName());
+                            logger.debug(client.getName() + " sent data packet to recipient " + c.getName());
+                            out.writeUTF(client.getName() + " sent data packet to recipient " + c.getName());
                             out.flush();
                         } catch (IOException e) {
                             e.printStackTrace();
