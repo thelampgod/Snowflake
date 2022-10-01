@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.github.thelampgod.snowflake.util.EncryptionUtil.encrypt;
+import static com.github.thelampgod.snowflake.util.Helper.*;
 import static net.daporkchop.lib.logging.Logging.*;
 
 public class SnowflakeServer {
@@ -73,7 +74,7 @@ public class SnowflakeServer {
 
         public ClientHandler(Socket socket) throws IOException {
             this.client = new SocketClient(socket);
-            Snowflake.INSTANCE.getServer().addClient(this.client);
+            getServer().addClient(this.client);
         }
 
         @Override
@@ -81,9 +82,6 @@ public class SnowflakeServer {
             try {
                 out = client.getOutputStream();
                 in = client.getInputStream();
-
-                out.writeUTF("Hello client");
-                out.flush();
 
                 while (true) {
                     try {
@@ -94,7 +92,7 @@ public class SnowflakeServer {
                     }
                 }
             } catch (IOException e) {
-                Snowflake.INSTANCE.getServer().removeClient(client);
+                getServer().removeClient(client);
             }
         }
 
@@ -110,6 +108,12 @@ public class SnowflakeServer {
                     addRecipient();
                     break;
                 case 3:
+                    removeRecipient();
+                    break;
+                case 4:
+                    getConnectedUsers();
+                    break;
+                case 5:
                     disconnect("Disconnected");
                     break;
             }
@@ -118,7 +122,7 @@ public class SnowflakeServer {
 
         private List<Integer> getRecipientsFromDatabase(int id) {
             List<Integer> temp = new ArrayList<>();
-            try (Connection conn = Snowflake.INSTANCE.getDb().getConnection()) {
+            try (Connection conn = getDb().getConnection()) {
                 ResultSet result = DatabaseUtil.runQuery("select recipient_user_id from recipients where user_id=" + id, conn).getResultSet();
                 while (result.next()) {
                     temp.add(result.getInt("recipient_user_id"));
@@ -134,7 +138,7 @@ public class SnowflakeServer {
             out.writeUTF(reason);
             out.flush();
             logger.info(client.toString() + " disconnected, reason: " + reason);
-            Snowflake.INSTANCE.getServer().removeClient(client);
+            getServer().removeClient(client);
         }
 
         private void checkAuth(SocketClient client) throws IOException {
@@ -165,9 +169,6 @@ public class SnowflakeServer {
                 client.setId(id);
                 this.recipientsIds.addAll(getRecipientsFromDatabase(id));
 
-                out.writeUTF("Authenticated.");
-                out.flush();
-
                 logger.info(client + " authenticated.");
             } else {
                 disconnect("Wrong password");
@@ -182,7 +183,7 @@ public class SnowflakeServer {
             // read encrypted message and forward it to client's recipients
             String data = in.readUTF();
 
-            Snowflake.INSTANCE.getServer().connectedClients.stream()
+            getConnectedClients().stream()
                     .filter(c -> recipientsIds.contains(c.getId()))
                     .forEach(c -> {
                         try {
@@ -207,20 +208,21 @@ public class SnowflakeServer {
             String recipientKey = in.readUTF();
 
             //check connected clients first
-            Optional<SocketClient> optRecipient = Snowflake.INSTANCE.getServer().connectedClients.stream()
+            Optional<SocketClient> optRecipient = getConnectedClients().stream()
                     .filter(c -> c.getPubKey().equals(recipientKey))
                     .findAny();
 
             if (optRecipient.isPresent()) {
                 SocketClient recipient = optRecipient.get();
                 DatabaseUtil.insertRecipient(recipient.getId(), recipientKey, client.getId());
+                recipientsIds.add(recipient.getId());
                 out.writeUTF("added recipient successfully");
                 out.flush();
                 return;
             }
 
             //not connected, check database
-            try (Connection conn = Snowflake.INSTANCE.getDb().getConnection()) {
+            try (Connection conn = getDb().getConnection()) {
                 ResultSet result =
                         DatabaseUtil.runQuery(
                                 "select id from users where pubkey=\"" + recipientKey + "\"", conn).getResultSet();
@@ -229,6 +231,7 @@ public class SnowflakeServer {
                     result.close();
 
                     DatabaseUtil.insertRecipient(userId, recipientKey, client.getId());
+                    recipientsIds.add(userId);
                     out.writeUTF("added recipient successfully");
                     out.flush();
                 }
@@ -236,6 +239,33 @@ public class SnowflakeServer {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+        }
+
+        private void removeRecipient() throws IOException {
+            checkAuth(client);
+
+            // remove via id
+            if (in.readByte() == 0) {
+                
+                int id = in.readInt();
+                recipientsIds.remove(id);
+                return;
+            }
+
+            //else remove via public key
+            String key = in.readUTF();
+            Optional<Integer> id = getConnectedClients().stream().filter(c -> c.getPubKey().equals(key)).map(SocketClient::getId).findAny();
+
+            id.ifPresent(recipientsIds::remove);
+        }
+
+        private void getConnectedUsers() throws IOException {
+            checkAuth(client);
+
+            for (SocketClient client : getConnectedClients()) {
+                
+            }
+
         }
     }
 }
