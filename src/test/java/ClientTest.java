@@ -1,19 +1,12 @@
 import com.github.thelampgod.snowflake.util.EncryptionUtil;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.bouncycastle.openpgp.PGPException;
-import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.junit.jupiter.api.Test;
 import org.pgpainless.PGPainless;
-import org.pgpainless.decryption_verification.ConsumerOptions;
-import org.pgpainless.key.protection.SecretKeyRingProtector;
-import org.pgpainless.key.protection.UnlockSecretKey;
-import org.pgpainless.util.Passphrase;
 
 import java.io.*;
 import java.net.Socket;
 import java.security.SecureRandom;
-import java.util.Scanner;
 
 public class ClientTest {
 
@@ -43,26 +36,27 @@ public class ClientTest {
             out.writeByte(0);
             out.writeUTF(BOB_CERT);
             out.flush();
-            System.out.println(in.readUTF());
 
             PGPSecretKeyRing priv = PGPainless.readKeyRing().secretKeyRing(BOB_KEY);
             while (true) {
                 try {
-                    String msg = in.readUTF();
-                    System.out.println(msg);
+                    byte[] msg = new byte[in.readInt()];
+                    in.readFully(msg);
 
                     String decrypted = EncryptionUtil.decrypt(msg, priv, "");
 
+                    System.out.println("Secret is " + decrypted);
                     out.writeUTF(decrypted);
                     out.flush();
 
-                    //"Authenticated" message
-                    System.out.println(in.readUTF());
+                    if (in.readByte() == 1) {
+                        System.out.println(in.readUTF());
+                    }
 
                     //add recipient packet
-                    out.writeByte(2);
-                    out.writeUTF(ALICE_CERT);
-                    out.flush();
+//                    out.writeByte(2);
+//                    out.writeUTF(ALICE_CERT);
+//                    out.flush();
                 } catch (EOFException e) {
                     break;
                 }
@@ -86,23 +80,20 @@ public class ClientTest {
             DataInputStream in = new DataInputStream(new BufferedInputStream(s.getInputStream()));
 
             out.writeByte(0);
-            out.writeUTF(BOB_CERT);
+            out.writeUTF(ALICE_CERT);
             out.flush();
-            System.out.println(in.readUTF());
 
-            PGPSecretKeyRing priv = PGPainless.readKeyRing().secretKeyRing(BOB_KEY);
+            PGPSecretKeyRing priv = PGPainless.readKeyRing().secretKeyRing(ALICE_KEY);
             while (true) {
                 try {
-                    String msg = in.readUTF();
-                    System.out.println(msg);
+                    byte[] msg = new byte[in.readInt()];
+                    in.readFully(msg);
 
                     String decrypted = EncryptionUtil.decrypt(msg, priv, "");
 
                     out.writeUTF(decrypted);
                     out.flush();
 
-                    //"Authenticated" message
-                    System.out.println(in.readUTF());
                     out.writeByte(1);
                     //this would be encrypted against all the recipients public keys
                     out.writeUTF("position");

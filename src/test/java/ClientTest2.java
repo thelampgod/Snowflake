@@ -8,6 +8,43 @@ import java.net.Socket;
 
 public class ClientTest2 {
 
+    public static void main(String... args) throws IOException {
+        try (Socket s = new Socket("127.0.0.1", 2147)) {
+            System.out.println("Connected to Snowflake");
+
+            DataOutputStream out = new DataOutputStream(new BufferedOutputStream(s.getOutputStream()));
+            DataInputStream in = new DataInputStream(new BufferedInputStream(s.getInputStream()));
+
+            out.writeByte(0);
+            out.writeUTF(ALICE_CERT);
+            out.flush();
+
+            PGPSecretKeyRing priv = PGPainless.readKeyRing().secretKeyRing(ALICE_KEY);
+            while (true) {
+                try {
+                    byte[] msg = new byte[in.readInt()];
+                    in.readFully(msg);
+
+                    String decrypted = EncryptionUtil.decrypt(msg, priv, "");
+
+                    out.writeUTF(decrypted);
+                    out.flush();
+
+                    out.writeByte(1);
+                    //this would be encrypted against all the recipients public keys
+                    out.writeUTF("position");
+                    out.flush();
+                    if (in.readByte() == 1) {
+                        System.out.println(in.readUTF());
+                    }
+
+                } catch (EOFException e) {
+                    break;
+                }
+            }
+        }
+    }
+
     @Test
     void addBobAsRecipient() throws IOException {
         try (Socket s = new Socket("127.0.0.1", 2147)) {
@@ -27,7 +64,7 @@ public class ClientTest2 {
                     String msg = in.readUTF();
                     System.out.println(msg);
 
-                    String decrypted = EncryptionUtil.decrypt(msg, priv, "");
+                    String decrypted = EncryptionUtil.decrypt(msg.getBytes(), priv, "");
 
                     out.writeUTF(decrypted);
                     out.flush();
@@ -57,7 +94,6 @@ public class ClientTest2 {
             out.writeByte(0);
             out.writeUTF(ALICE_CERT);
             out.flush();
-            System.out.println(in.readUTF());
 
             PGPSecretKeyRing priv = PGPainless.readKeyRing().secretKeyRing(ALICE_KEY);
             while (true) {
@@ -65,13 +101,11 @@ public class ClientTest2 {
                     String msg = in.readUTF();
                     System.out.println(msg);
 
-                    String decrypted = EncryptionUtil.decrypt(msg, priv, "");
+                    String decrypted = EncryptionUtil.decrypt(msg.getBytes(), priv, "");
 
                     out.writeUTF(decrypted);
                     out.flush();
 
-                    //"Authenticated" message
-                    System.out.println(in.readUTF());
                     out.writeByte(1);
                     //this would be encrypted against all the recipients public keys
                     out.writeUTF("position");

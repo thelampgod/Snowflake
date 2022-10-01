@@ -153,13 +153,15 @@ public class SnowflakeServer {
             String secret =
                     RandomStringUtils.random(10, 0, 0, true, true, null, new SecureRandom());
 
-            String encryptedMessage = encrypt(secret, key);
-            if (encryptedMessage.isEmpty())  {
+            logger.debug("Generated `" + secret + "` as the secret password. Client needs to respond with this.");
+            byte[] encryptedMessage = encrypt(secret, key);
+            if (encryptedMessage.length < 1)  {
                 disconnect("Encryption fail (invalid key)");
                 return;
             }
 
-            out.writeUTF(encryptedMessage);
+            out.writeInt(encryptedMessage.length);
+            out.write(encryptedMessage);
             out.flush();
 
             if (in.readUTF().equals(secret)) {
@@ -263,7 +265,7 @@ public class SnowflakeServer {
             checkAuth(client);
 
             for (SocketClient client : getConnectedClients()) {
-                
+
             }
 
         }

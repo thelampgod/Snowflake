@@ -23,11 +23,11 @@ import java.io.IOException;
 
 public class EncryptionUtil {
 
-    public static String encrypt (String secret, String key) throws IOException {
+    public static byte[] encrypt (String secret, String key) throws IOException {
         return encrypt(secret, PGPainless.readKeyRing().publicKeyRing(key));
     }
 
-    public static String encrypt(String secret, PGPPublicKeyRing key) throws IOException {
+    public static byte[] encrypt(String secret, PGPPublicKeyRing key) throws IOException {
         try {
             ByteArrayOutputStream cipher = new ByteArrayOutputStream();
 
@@ -36,23 +36,22 @@ public class EncryptionUtil {
                     .withOptions(ProducerOptions.encrypt(
                             EncryptionOptions.encryptCommunications()
                                     .addRecipient(key)
-                    ));
+                    ).setAsciiArmor(false));
 
             Streams.pipeAll(new ByteArrayInputStream(secret.getBytes()), s);
             s.close();
 
-            return cipher.toString();
+            return cipher.toByteArray();
         } catch (PGPException e) {
             logger.error("Encryption failed: " + e.getMessage());
         }
-
-        return "";
+        return new byte[0];
     }
 
-    public static String decrypt(String encrypted, PGPSecretKeyRing key, String password) throws IOException {
+    public static String decrypt(byte[] encrypted, PGPSecretKeyRing key, String password) throws IOException {
         try {
             DecryptionStream s = PGPainless.decryptAndOrVerify()
-                    .onInputStream(new ByteArrayInputStream(encrypted.getBytes()))
+                    .onInputStream(new ByteArrayInputStream(encrypted))
                     .withOptions(
                             new ConsumerOptions()
                                     .addDecryptionKey(key, SecretKeyRingProtector.unlockAnyKeyWith(Passphrase.fromPassword(password)))
