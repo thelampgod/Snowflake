@@ -1,6 +1,8 @@
 package com.github.thelampgod.snowflake;
 
 import com.github.thelampgod.snowflake.util.DatabaseUtil;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.pgpainless.PGPainless;
@@ -97,6 +99,8 @@ public class SnowflakeServer {
         }
 
         private void doAction(byte action) throws IOException {
+            logger.debug(client + " action=" + action);
+
             switch (action) {
                 case 0:
                     login();
@@ -114,6 +118,9 @@ public class SnowflakeServer {
                     getConnectedUsers();
                     break;
                 case 5:
+                    getKeyForId(in.readByte());
+                    break;
+                case 6:
                     disconnect("Disconnected");
                     break;
             }
@@ -180,7 +187,10 @@ public class SnowflakeServer {
         private void sendData() throws IOException {
             checkAuth(client);
             //user should add some recipients
-            if (recipientsIds.isEmpty()) return;
+            if (recipientsIds.isEmpty()) {
+                logger.debug(client + " has no recipients.");
+                return;
+            }
 
             // read encrypted message and forward it to client's recipients
             String data = in.readUTF();
@@ -263,11 +273,27 @@ public class SnowflakeServer {
 
         private void getConnectedUsers() throws IOException {
             checkAuth(client);
-
+            JsonObject node = new JsonObject();
+            JsonObject jsonClient = new JsonObject();
             for (SocketClient client : getConnectedClients()) {
-
+                jsonClient.addProperty("id", client.getId());
+                jsonClient.addProperty("name", client.getName());
             }
 
+            jsonClient.entrySet().forEach(entry -> node.add(entry.getKey(), entry.getValue()));
+            out.writeUTF(new GsonBuilder().setPrettyPrinting().create().toJson(node));
+            out.flush();
+        }
+
+        private void getKeyForId(byte id) throws IOException {
+            checkAuth(client);
+
+            Optional<SocketClient> user = getConnectedClients().stream().filter(c -> c.getId() == id).findAny();
+
+            if (user.isPresent()) {
+                out.writeUTF(user.get().getPubKey());
+                out.flush();
+            }
         }
     }
 }

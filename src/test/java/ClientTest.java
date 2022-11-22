@@ -49,14 +49,30 @@ public class ClientTest {
                     out.writeUTF(decrypted);
                     out.flush();
 
-                    if (in.readByte() == 1) {
-                        System.out.println(in.readUTF());
-                    }
+//                    if (in.readByte() == 1) {
+//                        System.out.println(in.readUTF());
+//                    }
 
-                    //add recipient packet
-//                    out.writeByte(2);
-//                    out.writeUTF(ALICE_CERT);
+//                    //get the pubkey for id 1
+//                    out.writeByte(5);
+//                    out.writeByte(1);
 //                    out.flush();
+//                    String inCert = in.readUTF();
+//                    System.out.println(inCert);
+//
+//                    //add recipient,
+//                    out.writeByte(2);
+//                    out.writeUTF(inCert);
+//                    out.flush();
+
+                    //send message to recipients and also read incoming
+                    out.writeByte(1);
+                    out.writeUTF("hello");
+                    out.flush();
+                    in.readByte();
+                    System.out.println(in.readUTF());
+
+
                 } catch (EOFException e) {
                     break;
                 }
