@@ -66,11 +66,11 @@ public class ClientTest {
 //                    out.flush();
 
                     //send message to recipients and also read incoming
-                    out.writeByte(1);
-                    out.writeUTF("hello");
-                    out.flush();
-                    in.readByte();
-                    System.out.println(in.readUTF());
+//                    out.writeByte(1);
+//                    out.writeUTF("hello");
+//                    out.flush();
+//                    in.readByte();
+//                    System.out.println(in.readUTF());
 
 
                 } catch (EOFException e) {

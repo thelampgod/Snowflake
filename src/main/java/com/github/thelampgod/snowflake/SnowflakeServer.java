@@ -120,7 +120,7 @@ public class SnowflakeServer {
                 case 5:
                     getKeyForId(in.readByte());
                     break;
-                case 6:
+                default:
                     disconnect("Disconnected");
                     break;
             }
@@ -155,6 +155,9 @@ public class SnowflakeServer {
         }
 
         private void login() throws IOException {
+            //dont login twice
+            if (client.isAuthenticated()) return;
+
             String pubKey = in.readUTF();
             PGPPublicKeyRing key = PGPainless.readKeyRing().publicKeyRing(pubKey);
             String secret =
@@ -274,13 +277,12 @@ public class SnowflakeServer {
         private void getConnectedUsers() throws IOException {
             checkAuth(client);
             JsonObject node = new JsonObject();
-            JsonObject jsonClient = new JsonObject();
             for (SocketClient client : getConnectedClients()) {
-                jsonClient.addProperty("id", client.getId());
-                jsonClient.addProperty("name", client.getName());
+                JsonObject jsonClient = new JsonObject();
+                jsonClient.addProperty(String.valueOf(client.getId()), client.getName());
+                jsonClient.entrySet().forEach(entry -> node.add(entry.getKey(), entry.getValue()));
             }
 
-            jsonClient.entrySet().forEach(entry -> node.add(entry.getKey(), entry.getValue()));
             out.writeUTF(new GsonBuilder().setPrettyPrinting().create().toJson(node));
             out.flush();
         }
