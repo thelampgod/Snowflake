@@ -165,7 +165,7 @@ public class SnowflakeServer {
 
             logger.debug("Generated `" + secret + "` as the secret password. Client needs to respond with this.");
             byte[] encryptedMessage = encrypt(secret, key);
-            if (encryptedMessage.length < 1)  {
+            if (encryptedMessage.length < 1) {
                 disconnect("Encryption fail (invalid key)");
                 return;
             }
@@ -219,9 +219,64 @@ public class SnowflakeServer {
 
         private void addRecipient() throws IOException {
             checkAuth(client);
-            //read public key that client sends and store in recipient table and add to recipient table
-            String recipientKey = in.readUTF();
+            //add via id
+            if (in.readByte() == 0) {
+                int id = in.readInt();
 
+                if (addViaId(id)) {
+                    out.writeUTF("Added recipient successfully");
+                    out.flush();
+                } else {
+                    out.writeUTF("Failed adding recipient");
+                    out.flush();
+                }
+            }
+
+            //else add via public key
+            String recipientKey = in.readUTF();
+            if (addViaKey(recipientKey)) {
+                out.writeUTF("Added recipient successfully");
+                out.flush();
+            } else {
+                out.writeUTF("Failed adding recipient");
+                out.flush();
+            }
+        }
+
+        private boolean addViaId(int id) {
+            //check connected clients first
+            Optional<SocketClient> optRecipient = getConnectedClients().stream()
+                    .filter(c -> c.getId() == id)
+                    .findAny();
+
+            if (optRecipient.isPresent()) {
+                SocketClient recipient = optRecipient.get();
+                DatabaseUtil.insertRecipient(recipient.getId(), recipient.getPubKey(), client.getId());
+                recipientsIds.add(recipient.getId());
+                return true;
+            }
+            //not connected, check database
+            try (Connection conn = getDb().getConnection()) {
+                ResultSet result =
+                        DatabaseUtil.runQuery(
+                                "select pubkey from users where id=\"" + id + "\"", conn).getResultSet();
+                if (result.next()) {
+                    String pubKey = result.getString("pubkey");
+                    result.close();
+
+                    DatabaseUtil.insertRecipient(id, pubKey, client.getId());
+                    recipientsIds.add(id);
+                    return true;
+                }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return false;
+            }
+            return false;
+        }
+
+        private boolean addViaKey(String recipientKey) {
             //check connected clients first
             Optional<SocketClient> optRecipient = getConnectedClients().stream()
                     .filter(c -> c.getPubKey().equals(recipientKey))
@@ -229,11 +284,9 @@ public class SnowflakeServer {
 
             if (optRecipient.isPresent()) {
                 SocketClient recipient = optRecipient.get();
-                DatabaseUtil.insertRecipient(recipient.getId(), recipientKey, client.getId());
+                DatabaseUtil.insertRecipient(recipient.getId(), recipient.getPubKey(), client.getId());
                 recipientsIds.add(recipient.getId());
-                out.writeUTF("added recipient successfully");
-                out.flush();
-                return;
+                return true;
             }
 
             //not connected, check database
@@ -247,13 +300,14 @@ public class SnowflakeServer {
 
                     DatabaseUtil.insertRecipient(userId, recipientKey, client.getId());
                     recipientsIds.add(userId);
-                    out.writeUTF("added recipient successfully");
-                    out.flush();
+                    return true;
                 }
 
             } catch (SQLException e) {
                 e.printStackTrace();
+                return false;
             }
+            return false;
         }
 
         private void removeRecipient() throws IOException {
@@ -261,7 +315,7 @@ public class SnowflakeServer {
 
             // remove via id
             if (in.readByte() == 0) {
-                
+
                 int id = in.readInt();
                 recipientsIds.remove(id);
                 return;
