@@ -128,6 +128,12 @@ public class SnowflakeServer {
                     break;
             }
 
+            if (in.readByte() != 69) {
+                logger.error("Synchronization error");
+                disconnect("Sync error");
+            }
+            out.writeByte(69);
+            out.flush();
         }
 
         private List<Integer> getRecipientsFromDatabase(int id) {
@@ -355,6 +361,12 @@ public class SnowflakeServer {
 
         private void getRecipients() throws IOException {
             checkAuth(client);
+
+            if (recipientsIds.isEmpty()) {
+                out.writeUTF("No recipients.");
+                out.flush();
+                return;
+            }
 
             StringBuilder b = new StringBuilder();
             for (int id : recipientsIds) {
