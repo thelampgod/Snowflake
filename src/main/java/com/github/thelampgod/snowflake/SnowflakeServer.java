@@ -118,6 +118,9 @@ public class SnowflakeServer {
                     getConnectedUsers();
                     break;
                 case 5:
+                    getRecipients();
+                    break;
+                case 6:
                     getKeyForId(in.readByte());
                     break;
                 default:
@@ -347,6 +350,18 @@ public class SnowflakeServer {
             }
 
             out.writeUTF(new GsonBuilder().setPrettyPrinting().create().toJson(node));
+            out.flush();
+        }
+
+        private void getRecipients() throws IOException {
+            checkAuth(client);
+
+            StringBuilder b = new StringBuilder();
+            for (int id : recipientsIds) {
+                b.append(id).append(", ");
+            }
+
+            out.writeUTF(b.substring(0,b.length()-2));
             out.flush();
         }
 
