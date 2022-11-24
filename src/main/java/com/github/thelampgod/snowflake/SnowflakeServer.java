@@ -230,6 +230,7 @@ public class SnowflakeServer {
                     out.writeUTF("Failed adding recipient");
                     out.flush();
                 }
+                return;
             }
 
             //else add via public key
@@ -317,15 +318,23 @@ public class SnowflakeServer {
             if (in.readByte() == 0) {
 
                 int id = in.readInt();
+                DatabaseUtil.removeRecipient(id, client.getId());
                 recipientsIds.remove(id);
+
+                out.writeUTF("Removed recipient successfully");
+                out.flush();
                 return;
             }
 
             //else remove via public key
             String key = in.readUTF();
-            Optional<Integer> id = getConnectedClients().stream().filter(c -> c.getPubKey().equals(key)).map(SocketClient::getId).findAny();
+            Optional<Integer> id = DatabaseUtil.removeRecipient(key, client.getId());
 
-            id.ifPresent(recipientsIds::remove);
+            if (id.isPresent()) {
+                recipientsIds.remove(id.get());
+                out.writeUTF("Removed recipient successfully");
+                out.flush();
+            }
         }
 
         private void getConnectedUsers() throws IOException {

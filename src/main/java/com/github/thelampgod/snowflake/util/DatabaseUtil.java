@@ -4,6 +4,7 @@ import com.github.thelampgod.snowflake.Snowflake;
 import com.github.thelampgod.snowflake.SocketClient;
 
 import java.sql.*;
+import java.util.Optional;
 
 public class DatabaseUtil {
 
@@ -48,11 +49,11 @@ public class DatabaseUtil {
         return s;
     }
 
-    public static void insertRecipient(int recipientId, String recipientKey, int userid) {
+    public static void insertRecipient(int recipientId, String recipientKey, int userId) {
         try (Connection conn = Snowflake.INSTANCE.getDb().getConnection()) {
 
             ResultSet result =
-                    runQuery("select * from recipients where user_id=" + userid + " and recipient_user_id=" + recipientId, conn).getResultSet();
+                    runQuery("select * from recipients where user_id=" + userId + " and recipient_user_id=" + recipientId, conn).getResultSet();
             if (result.next()) {
                 //recipient already exists
                 result.close();
@@ -65,7 +66,7 @@ public class DatabaseUtil {
                         "insert into recipients(recipient_user_id, pubkey, user_id) values(?, ?, ?)")) {
                     statement.setInt(1, recipientId);
                     statement.setObject(2, recipientKey);
-                    statement.setInt(3, userid);
+                    statement.setInt(3, userId);
 
                     statement.execute();
                 }
@@ -79,5 +80,60 @@ public class DatabaseUtil {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void removeRecipient(int recipientId, int userId) {
+        try (Connection conn = Snowflake.INSTANCE.getDb().getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                try (PreparedStatement statement = conn.prepareStatement(
+                        "delete from recipients where `recipient_user_id`=? AND `user_id`=?")) {
+                    statement.setInt(1, recipientId);
+                    statement.setInt(2, userId);
+
+                    statement.execute();
+                }
+
+            } catch (Throwable th) {
+                conn.rollback();
+                throw th;
+            }
+            conn.commit();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static Optional<Integer> removeRecipient(String recipientKey, int userId) {
+        Optional<Integer> id = Optional.empty();
+        try (Connection conn = Snowflake.INSTANCE.getDb().getConnection()) {
+            ResultSet result = runQuery("select recipient_user_id from recipients where `pubkey`=\"" + recipientKey + "\"", conn).getResultSet();
+            if (result.next()) {
+                id = Optional.of(result.getInt("id"));
+            }
+
+            conn.setAutoCommit(false);
+            try {
+                try (PreparedStatement statement = conn.prepareStatement(
+                        "delete from recipients where `pubkey`=? AND `user_id`=?")) {
+                    statement.setObject(1, recipientKey);
+                    statement.setInt(2, userId);
+
+                    statement.execute();
+                }
+
+            } catch (Throwable th) {
+                conn.rollback();
+                throw th;
+            }
+            conn.commit();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return id;
     }
 }
