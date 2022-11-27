@@ -85,6 +85,19 @@ public class SnowflakeServer {
                 out = client.getOutputStream();
                 in = client.getInputStream();
 
+                boolean receiver = in.readBoolean();
+                String secret = in.readUTF();
+                client.setLinker(secret);
+
+                if (receiver) {
+                    client.setReceiver(true);
+                    logger.debug("Receiver connected " + client);
+                    // keep the thread alive, so it is ready to send packets
+                    while (true) {
+                    }
+                }
+
+                logger.debug("Talker connected " + client);
                 while (true) {
                     try {
                         byte action = in.readByte();
@@ -127,13 +140,6 @@ public class SnowflakeServer {
                     disconnect("Disconnected");
                     break;
             }
-
-            if (in.readByte() != 69) {
-                logger.error("Synchronization error");
-                disconnect("Sync error");
-            }
-            out.writeByte(69);
-            out.flush();
         }
 
         private List<Integer> getRecipientsFromDatabase(int id) {
@@ -184,11 +190,23 @@ public class SnowflakeServer {
             out.flush();
 
             if (in.readUTF().equals(secret)) {
+                String name = new KeyRingInfo(key).getPrimaryUserId();
+
                 client.setPubKey(pubKey);
-                client.setName(new KeyRingInfo(key).getPrimaryUserId());
+                client.setName(name);
                 int id = DatabaseUtil.insertUser(client);
                 client.setId(id);
                 this.recipientsIds.addAll(getRecipientsFromDatabase(id));
+
+                getConnectedClients().stream()
+                        .filter(c -> c.getLinkString().equals(client.getLinkString()))
+                        .filter(SocketClient::isReceiver)
+                        .forEach(c -> {
+                            c.setPubKey(pubKey);
+                            c.setName(name);
+                            c.setId(id);
+                            logger.info(c + " authenticated.");
+                        });
 
                 logger.info(client + " authenticated.");
             } else {
@@ -209,6 +227,7 @@ public class SnowflakeServer {
 
             getConnectedClients().stream()
                     .filter(c -> recipientsIds.contains(c.getId()))
+                    .filter(SocketClient::isReceiver)
                     .forEach(c -> {
                         try {
                             DataOutputStream clientOut = c.getOutputStream();
@@ -218,8 +237,6 @@ public class SnowflakeServer {
                             clientOut.flush();
 
                             logger.debug(client.getName() + " sent data packet to recipient " + c.getName());
-                            out.writeUTF(client.getName() + " sent data packet to recipient " + c.getName());
-                            out.flush();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -373,7 +390,7 @@ public class SnowflakeServer {
                 b.append(id).append(", ");
             }
 
-            out.writeUTF(b.substring(0,b.length()-2));
+            out.writeUTF(b.substring(0, b.length() - 2));
             out.flush();
         }
 

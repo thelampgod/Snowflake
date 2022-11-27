@@ -11,6 +11,8 @@ public class SocketClient {
     private String name = null;
     private String pubKey = null;
     private int id;
+    private boolean receiver = false;
+    private String linkString;
 
     public SocketClient(Socket socket) throws IOException {
         this.socket = socket;
@@ -65,5 +67,21 @@ public class SocketClient {
 
     public boolean isAuthenticated() {
         return this.name != null && this.pubKey != null;
+    }
+
+    public void setReceiver(boolean receiver) {
+        this.receiver = receiver;
+    }
+
+    public boolean isReceiver() {
+        return this.receiver;
+    }
+
+    public void setLinker(String secret) {
+        this.linkString = secret;
+    }
+
+    public String getLinkString() {
+        return linkString;
     }
 }
