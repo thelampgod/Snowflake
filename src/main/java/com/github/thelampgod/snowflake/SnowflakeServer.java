@@ -1,6 +1,7 @@
 package com.github.thelampgod.snowflake;
 
 import com.github.thelampgod.snowflake.util.DatabaseUtil;
+import com.google.common.collect.Sets;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -15,10 +16,7 @@ import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.github.thelampgod.snowflake.util.EncryptionUtil.encrypt;
 import static com.github.thelampgod.snowflake.util.Helper.*;
@@ -27,7 +25,7 @@ import static net.daporkchop.lib.logging.Logging.*;
 public class SnowflakeServer {
     private ServerSocket server;
 
-    public final HashSet<SocketClient> connectedClients = new HashSet<>();
+    public final Set<SocketClient> connectedClients = Sets.newConcurrentHashSet();
 
     public void start(int port) {
         try {
@@ -57,14 +55,17 @@ public class SnowflakeServer {
     }
 
     public void removeClient(SocketClient client) {
-        if (!(connectedClients.contains(client))) return;
-        this.connectedClients.remove(client);
-        try {
-            client.getSocket().close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        logger.debug(client + " disconnected.");
+        connectedClients.stream()
+                .filter(c -> c.getId() == client.getId())
+                .forEach(c -> {
+                    connectedClients.remove(c);
+                    logger.debug(c + " disconnected.");
+                    try {
+                        client.getSocket().close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
     }
 
     private static class ClientHandler extends Thread {

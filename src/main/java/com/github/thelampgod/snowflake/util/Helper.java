@@ -5,11 +5,11 @@ import com.github.thelampgod.snowflake.SnowflakeServer;
 import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.database.Database;
 
-import java.util.HashSet;
+import java.util.Set;
 
 public class Helper {
 
-    public static HashSet<SocketClient> getConnectedClients() {
+    public static Set<SocketClient> getConnectedClients() {
         return getServer().connectedClients;
     }
 
