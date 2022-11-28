@@ -120,7 +120,7 @@ public class SnowflakeServer {
                     login();
                     break;
                 case 1:
-                    sendData();
+                    sendMessage();
                     break;
                 case 2:
                     addRecipient();
@@ -215,7 +215,7 @@ public class SnowflakeServer {
             }
         }
 
-        private void sendData() throws IOException {
+        private void sendMessage() throws IOException {
             checkAuth(client);
             //user should add some recipients
             if (recipientsIds.isEmpty()) {
@@ -232,12 +232,14 @@ public class SnowflakeServer {
                     .forEach(c -> {
                         try {
                             DataOutputStream clientOut = c.getOutputStream();
-                            // tell client it is packet type 1 => data update
+                            // tell client it is packet id 1 => message packet
                             clientOut.writeByte(1);
+                            // write sender name
+                            clientOut.writeUTF(client.getName());
                             clientOut.writeUTF(data);
                             clientOut.flush();
 
-                            logger.debug(client.getName() + " sent data packet to recipient " + c.getName());
+                            logger.debug(client.getName() + " sent message packet to recipient " + c.getName());
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
