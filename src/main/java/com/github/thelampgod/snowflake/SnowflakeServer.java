@@ -250,7 +250,8 @@ public class SnowflakeServer {
             }
 
             // read message and forward it to client's recipients
-            String data = in.readUTF();
+            byte[] message = new byte[in.readInt()];
+            in.readFully(message);
 
             getConnectedClients().stream()
                     .filter(c -> recipientsIds.contains(c.getId()))
@@ -262,7 +263,8 @@ public class SnowflakeServer {
                             clientOut.writeByte(packetId);
                             // write sender name
                             clientOut.writeUTF(client.getName());
-                            clientOut.writeUTF(data);
+                            clientOut.writeInt(message.length);
+                            clientOut.write(message);
                             clientOut.flush();
 
                             logger.debug(client.getName() + " sent packet to recipient " + c.getName());
