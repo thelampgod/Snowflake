@@ -466,6 +466,7 @@ public class SnowflakeServer {
             Optional<SocketClient> user = getConnectedClients().stream().filter(c -> c.getId() == id).findAny();
 
             if (user.isPresent()) {
+                out.writeInt(id);
                 out.writeUTF(user.get().getPubKey());
                 out.flush();
             }
