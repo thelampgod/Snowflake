@@ -215,6 +215,9 @@ public class SnowflakeServer {
                         });
 
                 logger.info(client + " authenticated.");
+
+                out.writeUTF("Successfully authenticated");
+                out.flush();
             } else {
                 disconnect("Wrong password");
             }
