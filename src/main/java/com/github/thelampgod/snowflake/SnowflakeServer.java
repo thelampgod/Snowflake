@@ -120,7 +120,7 @@ public class SnowflakeServer {
                     login();
                     break;
                 case 1:
-                    sendMessage();
+                    sendMessagePlain();
                     break;
                 case 2:
                     addRecipient();
@@ -137,6 +137,11 @@ public class SnowflakeServer {
                 case 6:
                     getKeyForId(in.readByte());
                     break;
+                case 7:
+                    sendEncryptedData();
+                    break;
+                case 8:
+                    sendLocationPlain();
                 default:
                     disconnect("Disconnected");
                     break;
@@ -215,15 +220,33 @@ public class SnowflakeServer {
             }
         }
 
-        private void sendMessage() throws IOException {
+        private void sendMessagePlain() throws IOException {
             checkAuth(client);
+
+            //plain message packet
+            sendMessage(1);
+        }
+
+        /**
+         * The same as plain message except with id to notify it is encrypted, client should encrypt his message himself
+         * <p>
+         * un-encrypted message should be a JSON string with a packet id "id" and the data that packet contains,
+         * excluding sender. For a message packet it would be "id": 1, "message":"<message>", for a location packet,
+         * "id": 2, "posX": <posX>, etc.
+         */
+        private void sendEncryptedData() throws IOException {
+            checkAuth(client);
+            sendMessage(3);
+        }
+
+        private void sendMessage(int packetId) throws IOException {
             //user should add some recipients
             if (recipientsIds.isEmpty()) {
                 logger.debug(client + " has no recipients.");
                 return;
             }
 
-            // read encrypted message and forward it to client's recipients
+            // read message and forward it to client's recipients
             String data = in.readUTF();
 
             getConnectedClients().stream()
@@ -232,18 +255,55 @@ public class SnowflakeServer {
                     .forEach(c -> {
                         try {
                             DataOutputStream clientOut = c.getOutputStream();
-                            // tell client it is packet id 1 => message packet
-                            clientOut.writeByte(1);
+                            // tell client if it is a plain message or encrypted message (id 1/3)
+                            clientOut.writeByte(packetId);
                             // write sender name
                             clientOut.writeUTF(client.getName());
                             clientOut.writeUTF(data);
                             clientOut.flush();
 
-                            logger.debug(client.getName() + " sent message packet to recipient " + c.getName());
+                            logger.debug(client.getName() + " sent packet to recipient " + c.getName());
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     });
+        }
+
+        private void sendLocationPlain() throws IOException {
+            checkAuth(client);
+
+            //user should add some recipients
+            if (recipientsIds.isEmpty()) {
+                logger.debug(client + " has no recipients.");
+                return;
+            }
+
+            double posX = in.readDouble();
+            double posY = in.readDouble();
+            double posZ = in.readDouble();
+
+            getConnectedClients().stream()
+                    .filter(c -> recipientsIds.contains(c.getId()))
+                    .filter(SocketClient::isReceiver)
+                    .forEach(c -> {
+                        try {
+                            DataOutputStream clientOut = c.getOutputStream();
+                            // id 2 for plain location packet
+                            clientOut.writeByte(2);
+                            // write sender name
+                            clientOut.writeUTF(client.getName());
+                            // write location
+                            clientOut.writeDouble(posX);
+                            clientOut.writeDouble(posY);
+                            clientOut.writeDouble(posZ);
+                            clientOut.flush();
+
+                            logger.debug(client.getName() + " sent location packet to recipient " + c.getName());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+
         }
 
         private void addRecipient() throws IOException {
