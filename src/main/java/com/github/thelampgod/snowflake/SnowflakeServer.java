@@ -26,12 +26,15 @@ public class SnowflakeServer {
     private ServerSocket server;
 
     public final Set<SocketClient> connectedClients = Sets.newConcurrentHashSet();
+    Set<ClientHandler> threads = new HashSet<>();
 
     public void start(int port) {
         try {
             server = new ServerSocket(port);
             while (true) {
-                new ClientHandler(server.accept()).start();
+                ClientHandler thread = new ClientHandler(server.accept());
+                threads.add(thread);
+                thread.start();
             }
         } catch (IOException ignored) {
         }
@@ -66,10 +69,17 @@ public class SnowflakeServer {
                         e.printStackTrace();
                     }
                 });
+        threads.stream()
+                .filter(th -> th.client.getId() == client.getId())
+                .forEach(th -> {
+                    th.isRunning = false;
+                });
+
     }
 
     private static class ClientHandler extends Thread {
         private final SocketClient client;
+        public boolean isRunning = true;
         private DataOutputStream out;
         private DataInputStream in;
 
@@ -94,12 +104,13 @@ public class SnowflakeServer {
                     client.setReceiver(true);
                     logger.debug("Receiver connected " + client);
                     // keep the thread alive, so it is ready to send packets
-                    while (true) {
+                    while (isRunning) {
+                        Thread.sleep(1000);
                     }
                 }
 
                 logger.debug("Talker connected " + client);
-                while (true) {
+                while (isRunning) {
                     try {
                         byte action = in.readByte();
                         this.doAction(action);
@@ -107,7 +118,7 @@ public class SnowflakeServer {
                         break;
                     }
                 }
-            } catch (IOException e) {
+            } catch (Throwable th) {
                 getServer().removeClient(client);
             }
         }
