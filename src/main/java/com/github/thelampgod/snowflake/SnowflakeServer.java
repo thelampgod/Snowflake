@@ -107,6 +107,7 @@ public class SnowflakeServer {
                     while (isRunning) {
                         Thread.sleep(1000);
                     }
+                    return;
                 }
 
                 logger.debug("Talker connected " + client);
@@ -153,6 +154,7 @@ public class SnowflakeServer {
                     break;
                 case 8:
                     sendLocationPlain();
+                    break;
                 default:
                     disconnect("Disconnected");
                     break;
