@@ -478,11 +478,24 @@ public class SnowflakeServer {
         private void getKeyForId(byte id) throws IOException {
             checkAuth(client);
 
-            Optional<SocketClient> user = getConnectedClients().stream().filter(c -> c.getId() == id).findAny();
+            String key = "";
+            try (Connection conn = getDb().getConnection()) {
+                ResultSet result = DatabaseUtil.runQuery("select pubkey from users where id=" + id, conn).getResultSet();
+                while (result.next()) {
+                    key = result.getString("pubkey");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
 
-            if (user.isPresent()) {
+            if (!key.isEmpty()) {
                 out.writeInt(id);
-                out.writeUTF(user.get().getPubKey());
+                out.writeUTF(key);
+                out.flush();
+            } else {
+                // write invalid
+                out.writeInt(-1);
+                out.writeUTF("");
                 out.flush();
             }
         }
