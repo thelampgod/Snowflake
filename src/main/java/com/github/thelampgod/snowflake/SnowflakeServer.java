@@ -307,15 +307,13 @@ public class SnowflakeServer {
             byte[] message = new byte[in.readInt()];
             in.readFully(message);
 
-            Optional<SocketClient> receiver = getConnectedClients().stream()
-                    .filter(c -> recipientsIds.contains(c.getId()))
-                    .filter(SocketClient::isReceiver)
-                    .findAny();
-
-            if (receiver.isPresent()) {
-                SocketClient r = receiver.get();
+            HashSet<Integer> sentTo = Sets.newHashSet();
+            for (SocketClient receiver : getConnectedClients()) {
+                if (!recipientsIds.contains(receiver.getId())) continue;
+                if (!receiver.isReceiver() || sentTo.contains(receiver.getId())) continue;
+                sentTo.add(receiver.getId());
                 try {
-                    DataOutputStream clientOut = r.getOutputStream();
+                    DataOutputStream clientOut = receiver.getOutputStream();
                     // tell client if it is a plain message or encrypted message (id 1/3)
                     clientOut.writeByte(packetId);
                     // write sender name
@@ -324,9 +322,9 @@ public class SnowflakeServer {
                     clientOut.write(message);
                     clientOut.flush();
 
-                    logger.debug(client.getName() + " sent packet to recipient " + r.getName());
+                    logger.debug(client.getName() + " sent packet to recipient " + receiver.getName());
                 } catch (IOException e) {
-                    getServer().removeClient(r);
+                    getServer().removeClient(receiver);
                     e.printStackTrace();
                 }
             }
@@ -346,15 +344,13 @@ public class SnowflakeServer {
             double posY = in.readDouble();
             double posZ = in.readDouble();
 
-            Optional<SocketClient> receiver = getConnectedClients().stream()
-                    .filter(c -> recipientsIds.contains(c.getId()))
-                    .filter(SocketClient::isReceiver)
-                    .findAny();
-
-            if (receiver.isPresent()) {
-                SocketClient r = receiver.get();
+            HashSet<Integer> sentTo = Sets.newHashSet();
+            for (SocketClient receiver : getConnectedClients()) {
+                if (!recipientsIds.contains(receiver.getId())) continue;
+                if (!receiver.isReceiver() || sentTo.contains(receiver.getId())) continue;
+                sentTo.add(receiver.getId());
                 try {
-                    DataOutputStream clientOut = r.getOutputStream();
+                    DataOutputStream clientOut = receiver.getOutputStream();
                     // id 2 for plain location packet
                     clientOut.writeByte(2);
                     // write sender name
@@ -365,9 +361,9 @@ public class SnowflakeServer {
                     clientOut.writeDouble(posZ);
                     clientOut.flush();
 
-                    logger.debug(client.getName() + " sent location packet to recipient " + r.getName());
+                    logger.debug(client.getName() + " sent location packet to recipient " + receiver.getName());
                 } catch (IOException e) {
-                    getServer().removeClient(r);
+                    getServer().removeClient(receiver);
                     e.printStackTrace();
                 }
             }
