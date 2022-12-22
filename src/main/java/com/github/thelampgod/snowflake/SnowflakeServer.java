@@ -75,6 +75,28 @@ public class SnowflakeServer {
                     th.isRunning = false;
                 });
 
+        try {
+            sendDisconnectMessage(client);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendDisconnectMessage(SocketClient client) throws IOException {
+        HashSet<Integer> sentTo = Sets.newHashSet();
+        for (SocketClient receiver : getConnectedClients()) {
+            if (!receiver.isReceiver() || sentTo.contains(receiver.getId())) continue;
+            sentTo.add(receiver.getId());
+            String message = client + " disconnected.";
+
+            DataOutputStream out = receiver.getOutputStream();
+            out.writeByte(1);
+            out.writeUTF("Snowflake");
+            out.writeInt(message.length());
+            out.write(message.getBytes());
+            out.flush();
+        }
+
     }
 
     private static class ClientHandler extends Thread {
@@ -228,12 +250,30 @@ public class SnowflakeServer {
                         });
 
                 logger.info(client + " authenticated.");
+                sendAuthMessage(client);
 
                 out.writeUTF("Successfully authenticated");
                 out.flush();
             } else {
                 disconnect("Wrong password");
             }
+        }
+
+        private void sendAuthMessage(SocketClient client) throws IOException {
+            HashSet<Integer> sentTo = Sets.newHashSet();
+            for (SocketClient receiver : getConnectedClients()) {
+                if (!receiver.isReceiver() || sentTo.contains(receiver.getId())) continue;
+                sentTo.add(receiver.getId());
+                String message = client + " connected.";
+
+                DataOutputStream out = receiver.getOutputStream();
+                out.writeByte(1);
+                out.writeUTF("Snowflake");
+                out.writeInt(message.length());
+                out.write(message.getBytes());
+                out.flush();
+            }
+
         }
 
         private void sendMessagePlain() throws IOException {
@@ -266,25 +306,30 @@ public class SnowflakeServer {
             byte[] message = new byte[in.readInt()];
             in.readFully(message);
 
-            getConnectedClients().stream()
+            Optional<SocketClient> receiver = getConnectedClients().stream()
                     .filter(c -> recipientsIds.contains(c.getId()))
                     .filter(SocketClient::isReceiver)
-                    .forEach(c -> {
-                        try {
-                            DataOutputStream clientOut = c.getOutputStream();
-                            // tell client if it is a plain message or encrypted message (id 1/3)
-                            clientOut.writeByte(packetId);
-                            // write sender name
-                            clientOut.writeUTF(client.getName());
-                            clientOut.writeInt(message.length);
-                            clientOut.write(message);
-                            clientOut.flush();
+                    .findAny();
 
-                            logger.debug(client.getName() + " sent packet to recipient " + c.getName());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    });
+            if (receiver.isPresent()) {
+                SocketClient r = receiver.get();
+                try {
+                    DataOutputStream clientOut = r.getOutputStream();
+                    // tell client if it is a plain message or encrypted message (id 1/3)
+                    clientOut.writeByte(packetId);
+                    // write sender name
+                    clientOut.writeUTF(client.getName());
+                    clientOut.writeInt(message.length);
+                    clientOut.write(message);
+                    clientOut.flush();
+
+                    logger.debug(client.getName() + " sent packet to recipient " + r.getName());
+                } catch (IOException e) {
+                    getServer().removeClient(r);
+                    e.printStackTrace();
+                }
+            }
+
         }
 
         private void sendLocationPlain() throws IOException {
@@ -300,27 +345,31 @@ public class SnowflakeServer {
             double posY = in.readDouble();
             double posZ = in.readDouble();
 
-            getConnectedClients().stream()
+            Optional<SocketClient> receiver = getConnectedClients().stream()
                     .filter(c -> recipientsIds.contains(c.getId()))
                     .filter(SocketClient::isReceiver)
-                    .forEach(c -> {
-                        try {
-                            DataOutputStream clientOut = c.getOutputStream();
-                            // id 2 for plain location packet
-                            clientOut.writeByte(2);
-                            // write sender name
-                            clientOut.writeUTF(client.getName());
-                            // write location
-                            clientOut.writeDouble(posX);
-                            clientOut.writeDouble(posY);
-                            clientOut.writeDouble(posZ);
-                            clientOut.flush();
+                    .findAny();
 
-                            logger.debug(client.getName() + " sent location packet to recipient " + c.getName());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    });
+            if (receiver.isPresent()) {
+                SocketClient r = receiver.get();
+                try {
+                    DataOutputStream clientOut = r.getOutputStream();
+                    // id 2 for plain location packet
+                    clientOut.writeByte(2);
+                    // write sender name
+                    clientOut.writeUTF(client.getName());
+                    // write location
+                    clientOut.writeDouble(posX);
+                    clientOut.writeDouble(posY);
+                    clientOut.writeDouble(posZ);
+                    clientOut.flush();
+
+                    logger.debug(client.getName() + " sent location packet to recipient " + r.getName());
+                } catch (IOException e) {
+                    getServer().removeClient(r);
+                    e.printStackTrace();
+                }
+            }
 
         }
 
