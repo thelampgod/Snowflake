@@ -87,7 +87,7 @@ public class SnowflakeServer {
         for (SocketClient receiver : getConnectedClients()) {
             if (!receiver.isReceiver() || sentTo.contains(receiver.getId())) continue;
             sentTo.add(receiver.getId());
-            String message = client + " disconnected.";
+            String message = client.getName() + " disconnected.";
 
             DataOutputStream out = receiver.getOutputStream();
             out.writeByte(1);
@@ -264,7 +264,7 @@ public class SnowflakeServer {
             for (SocketClient receiver : getConnectedClients()) {
                 if (!receiver.isReceiver() || sentTo.contains(receiver.getId())) continue;
                 sentTo.add(receiver.getId());
-                String message = client + " connected.";
+                String message = client.getName() + " connected.";
 
                 DataOutputStream out = receiver.getOutputStream();
                 out.writeByte(1);
