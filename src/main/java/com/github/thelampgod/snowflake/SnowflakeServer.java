@@ -132,6 +132,7 @@ public class SnowflakeServer {
                     return;
                 }
 
+                logger.info(client + " connected.");
                 logger.debug("Talker connected " + client);
                 while (isRunning) {
                     try {
@@ -246,7 +247,7 @@ public class SnowflakeServer {
                             c.setPubKey(pubKey);
                             c.setName(name);
                             c.setId(id);
-                            logger.info(c + " authenticated.");
+                            logger.debug(c + " authenticated.");
                         });
 
                 logger.info(client + " authenticated.");

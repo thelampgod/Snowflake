@@ -5,6 +5,7 @@ import net.daporkchop.lib.logging.LogAmount;
 
 import java.io.IOException;
 import java.net.URL;
+
 import com.google.common.io.Resources;
 
 import java.nio.charset.StandardCharsets;
@@ -21,11 +22,13 @@ public class Snowflake {
     private final SnowflakeServer server;
     private final Database database;
 
-    public Snowflake() {
+    public Snowflake(String[] args) {
         if (INSTANCE == null) {
             INSTANCE = this;
         }
-        logger.setLogAmount(LogAmount.DEBUG);
+        if (args != null && args.length > 0 && args[0].equals("--debug")) {
+            logger.setLogAmount(LogAmount.DEBUG);
+        }
 
         try {
             logger.info("Connecting to database...");
