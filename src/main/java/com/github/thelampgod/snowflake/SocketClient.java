@@ -7,12 +7,15 @@ public class SocketClient {
     private final Socket socket;
     private final DataOutputStream out;
     private final DataInputStream in;
+    public boolean responded = true;
 
     private String name = null;
     private String pubKey = null;
     private int id;
     private boolean receiver = false;
     private String linkString;
+
+    private long now;
 
     public SocketClient(Socket socket) throws IOException {
         this.socket = socket;
@@ -83,5 +86,13 @@ public class SocketClient {
 
     public String getLinkString() {
         return linkString;
+    }
+
+    public void setNow(long now) {
+        this.now = now;
+    }
+
+    public long getNow() {
+        return now;
     }
 }

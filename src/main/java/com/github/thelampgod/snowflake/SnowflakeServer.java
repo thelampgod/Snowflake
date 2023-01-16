@@ -26,7 +26,7 @@ public class SnowflakeServer {
     private ServerSocket server;
 
     public final Set<SocketClient> connectedClients = Sets.newConcurrentHashSet();
-    Set<ClientHandler> threads = new HashSet<>();
+    Set<ClientHandler> threads = Sets.newConcurrentHashSet();
 
     public void start(int port) {
         try {
@@ -73,7 +73,10 @@ public class SnowflakeServer {
                 .filter(th -> th.client.getId() == client.getId())
                 .forEach(th -> {
                     th.isRunning = false;
+                    threads.remove(th);
                 });
+
+        logger.info(client + " disconnected.");
 
         try {
             sendDisconnectMessage(client);
@@ -127,7 +130,8 @@ public class SnowflakeServer {
                     logger.debug("Receiver connected " + client);
                     // keep the thread alive, so it is ready to send packets
                     while (isRunning) {
-                        Thread.sleep(1000);
+                        Thread.sleep(15000);
+                        sendKeepAlive();
                     }
                     return;
                 }
@@ -145,6 +149,18 @@ public class SnowflakeServer {
             } catch (Throwable th) {
                 getServer().removeClient(client);
             }
+        }
+
+        private void sendKeepAlive() throws IOException {
+            if (!client.responded) {
+                disconnect("Timed out.");
+            }
+            client.responded = false;
+            logger.debug("sending keepalive to " + client);
+            client.setNow(System.currentTimeMillis());
+            out.writeByte(4);
+            out.writeLong(client.getNow());
+            out.flush();
         }
 
         private void doAction(byte action) throws IOException {
@@ -178,10 +194,34 @@ public class SnowflakeServer {
                 case 8:
                     sendLocationPlain();
                     break;
+                case 9:
+                    keepAliveResponse();
+                    break;
                 default:
                     disconnect("Disconnected");
                     break;
             }
+        }
+
+        private void keepAliveResponse() throws IOException {
+            long now = 0;
+            long response = in.readLong();
+            Optional<SocketClient> receiver = getConnectedClients().stream()
+                            .filter(SocketClient::isReceiver)
+                            .filter(c -> c.getId() == client.getId()).findAny();
+
+            if (receiver.isPresent()) {
+                now = receiver.get().getNow();
+            } else {
+                disconnect("No receiver?");
+            }
+
+            if (response != now) {
+                disconnect(String.format("Failed keepalive, expected %d, got %d", now, response));
+                return;
+            }
+            receiver.get().responded = true;
+            logger.debug(client + " keepalive response in " + (System.currentTimeMillis() - now) + "ms");
         }
 
         private List<Integer> getRecipientsFromDatabase(int id) {
@@ -198,14 +238,12 @@ public class SnowflakeServer {
             return temp;
         }
 
-        private void disconnect(String reason) throws IOException {
-            out.writeUTF(reason);
-            out.flush();
+        private void disconnect(String reason) {
             logger.info(client.toString() + " disconnected, reason: " + reason);
             getServer().removeClient(client);
         }
 
-        private void checkAuth(SocketClient client) throws IOException {
+        private void checkAuth(SocketClient client) {
             if (!client.isAuthenticated()) {
                 disconnect("Not authenticated");
             }
