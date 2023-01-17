@@ -154,6 +154,7 @@ public class SnowflakeServer {
         private void sendKeepAlive() throws IOException {
             if (!client.responded) {
                 disconnect("Timed out.");
+                return;
             }
             client.responded = false;
             logger.debug("sending keepalive to " + client);
