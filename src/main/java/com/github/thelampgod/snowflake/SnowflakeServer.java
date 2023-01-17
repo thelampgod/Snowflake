@@ -59,7 +59,7 @@ public class SnowflakeServer {
 
     public void removeClient(SocketClient client) {
         connectedClients.stream()
-                .filter(c -> c.getId() == client.getId())
+                .filter(c -> c.getLinkString() == null || c.getLinkString().equals(client.getLinkString()))
                 .forEach(c -> {
                     connectedClients.remove(c);
                     logger.debug(c + " disconnected.");
@@ -70,7 +70,7 @@ public class SnowflakeServer {
                     }
                 });
         threads.stream()
-                .filter(th -> th.client.getId() == client.getId())
+                .filter(th -> th.client.getLinkString() == null || th.client.getLinkString().equals(client.getLinkString()))
                 .forEach(th -> {
                     th.isRunning = false;
                     threads.remove(th);
@@ -209,7 +209,7 @@ public class SnowflakeServer {
             long response = in.readLong();
             Optional<SocketClient> receiver = getConnectedClients().stream()
                             .filter(SocketClient::isReceiver)
-                            .filter(c -> c.getId() == client.getId()).findAny();
+                            .filter(c -> c.getLinkString().equals(client.getLinkString())).findAny();
 
             if (receiver.isPresent()) {
                 now = receiver.get().getNow();
