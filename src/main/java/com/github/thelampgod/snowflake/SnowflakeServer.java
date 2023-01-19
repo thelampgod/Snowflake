@@ -378,6 +378,7 @@ public class SnowflakeServer {
             double posX = in.readDouble();
             double posY = in.readDouble();
             double posZ = in.readDouble();
+            byte dimensionId = in.readByte();
 
             HashSet<Integer> sentTo = Sets.newHashSet();
             for (SocketClient receiver : getConnectedClients()) {
@@ -394,6 +395,8 @@ public class SnowflakeServer {
                     clientOut.writeDouble(posX);
                     clientOut.writeDouble(posY);
                     clientOut.writeDouble(posZ);
+                    //write dimension id
+                    clientOut.writeByte(dimensionId);
                     clientOut.flush();
 
                     logger.debug(client.getName() + " sent location packet to recipient " + receiver.getName());
