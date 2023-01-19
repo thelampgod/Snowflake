@@ -90,13 +90,11 @@ public class SnowflakeServer {
         for (SocketClient receiver : getConnectedClients()) {
             if (!receiver.isReceiver() || sentTo.contains(receiver.getId())) continue;
             sentTo.add(receiver.getId());
-            String message = client.getName() + " disconnected.";
 
             DataOutputStream out = receiver.getOutputStream();
-            out.writeByte(1);
-            out.writeUTF("Snowflake");
-            out.writeInt(message.length());
-            out.write(message.getBytes());
+            out.writeByte(6); //disconnect packet id
+            out.writeInt(client.getId());
+            out.writeUTF(client.getName());
             out.flush();
         }
 
@@ -304,13 +302,11 @@ public class SnowflakeServer {
             for (SocketClient receiver : getConnectedClients()) {
                 if (!receiver.isReceiver() || sentTo.contains(receiver.getId())) continue;
                 sentTo.add(receiver.getId());
-                String message = client.getName() + " connected.";
 
                 DataOutputStream out = receiver.getOutputStream();
-                out.writeByte(1);
-                out.writeUTF("Snowflake");
-                out.writeInt(message.length());
-                out.write(message.getBytes());
+                out.writeByte(5); //connect packet id
+                out.writeInt(client.getId());
+                out.writeUTF(client.getName());
                 out.flush();
             }
 
