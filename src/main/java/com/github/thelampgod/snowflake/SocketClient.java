@@ -9,7 +9,7 @@ public class SocketClient {
     private final DataInputStream in;
     public boolean responded = true;
 
-    private String name = null;
+    private String name = "not_authenticated_user";
     private String pubKey = null;
     private int id;
     private boolean receiver = false;
