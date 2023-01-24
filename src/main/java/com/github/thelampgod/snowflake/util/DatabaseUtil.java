@@ -4,7 +4,11 @@ import com.github.thelampgod.snowflake.Snowflake;
 import com.github.thelampgod.snowflake.SocketClient;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+
+import static com.github.thelampgod.snowflake.util.Helper.getDb;
 
 public class DatabaseUtil {
 
@@ -135,5 +139,19 @@ public class DatabaseUtil {
         }
 
         return id;
+    }
+
+    public static List<Integer> getRecipientsFromDatabase(int id) {
+        List<Integer> temp = new ArrayList<>();
+        try (Connection conn = getDb().getConnection()) {
+            ResultSet result = DatabaseUtil.runQuery("select recipient_user_id from recipients where user_id=" + id, conn).getResultSet();
+            while (result.next()) {
+                temp.add(result.getInt("recipient_user_id"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return temp;
     }
 }

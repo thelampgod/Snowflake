@@ -5,22 +5,30 @@ import java.net.Socket;
 
 public class SocketClient {
     private final Socket socket;
+    private final ClientHandler connection;
+    private String secret;
     private final DataOutputStream out;
     private final DataInputStream in;
     public boolean responded = true;
 
     private String name = "not_authenticated_user";
     private String pubKey = null;
+    private boolean authenticated = false;
     private int id;
     private boolean receiver = false;
     private String linkString;
 
     private long now;
 
-    public SocketClient(Socket socket) throws IOException {
+    public SocketClient(Socket socket, ClientHandler connection) throws IOException {
         this.socket = socket;
+        this.connection = connection;
         this.out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
         this.in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+    }
+
+    public static SocketClient Snowflake() throws IOException {
+        return new SocketClient(null, null);
     }
 
     public Socket getSocket() {
@@ -68,8 +76,12 @@ public class SocketClient {
         return this.socket.getInetAddress().getHostName() + ":" + this.socket.getPort();
     }
 
+    public void setAuthenticated(boolean authenticated) {
+        this.authenticated = authenticated;
+    }
+
     public boolean isAuthenticated() {
-        return this.name != null && this.pubKey != null;
+        return authenticated && this.name != null && this.pubKey != null;
     }
 
     public void setReceiver(boolean receiver) {
@@ -94,5 +106,17 @@ public class SocketClient {
 
     public long getNow() {
         return now;
+    }
+
+    public ClientHandler getConnection() {
+        return this.connection;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
+
+    public String getSecret() {
+        return this.secret;
     }
 }
