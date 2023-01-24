@@ -250,37 +250,6 @@ public class ClientHandler extends Thread {
 
     }
 
-    private void getConnectedUsers() throws IOException {
-        checkAuth(client);
-        JsonObject node = new JsonObject();
-        for (SocketClient client : getConnectedClients()) {
-            JsonObject jsonClient = new JsonObject();
-            jsonClient.addProperty(String.valueOf(client.getId()), client.getName());
-            jsonClient.entrySet().forEach(entry -> node.add(entry.getKey(), entry.getValue()));
-        }
-
-        out.writeUTF(new GsonBuilder().setPrettyPrinting().create().toJson(node));
-        out.flush();
-    }
-
-    private void getRecipients() throws IOException {
-        checkAuth(client);
-
-        if (recipientsIds.isEmpty()) {
-            out.writeUTF("No recipients.");
-            out.flush();
-            return;
-        }
-
-        StringBuilder b = new StringBuilder();
-        for (int id : recipientsIds) {
-            b.append(id).append(", ");
-        }
-
-        out.writeUTF(b.substring(0, b.length() - 2));
-        out.flush();
-    }
-
     private void getKeyForId(byte id) throws IOException {
         checkAuth(client);
 
