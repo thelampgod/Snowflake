@@ -139,9 +139,6 @@ public class ClientHandler extends Thread {
         logger.debug(client + " action=" + action);
 
         switch (action) {
-            case 3:
-                removeRecipient();
-                break;
             case 4:
                 getConnectedUsers();
                 break;
@@ -251,32 +248,6 @@ public class ClientHandler extends Thread {
             }
         }
 
-    }
-
-    private void removeRecipient() throws IOException {
-        checkAuth(client);
-
-        // remove via id
-        if (in.readByte() == 0) {
-
-            int id = in.readInt();
-            DatabaseUtil.removeRecipient(id, client.getId());
-            recipientsIds.remove(id);
-
-            out.writeUTF("Removed recipient successfully");
-            out.flush();
-            return;
-        }
-
-        //else remove via public key
-        String key = in.readUTF();
-        Optional<Integer> id = DatabaseUtil.removeRecipient(key, client.getId());
-
-        if (id.isPresent()) {
-            recipientsIds.remove(id.get());
-            out.writeUTF("Removed recipient successfully");
-            out.flush();
-        }
     }
 
     private void getConnectedUsers() throws IOException {
