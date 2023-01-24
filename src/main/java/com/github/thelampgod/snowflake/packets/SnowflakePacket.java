@@ -2,6 +2,7 @@ package com.github.thelampgod.snowflake.packets;
 
 import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.packets.impl.incoming.*;
+import com.github.thelampgod.snowflake.packets.impl.outgoing.DisconnectPacket;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -43,7 +44,7 @@ public abstract class SnowflakePacket {
             case 10:
                 return new HandshakeResponsePacket(in, sender);
             default:
-                throw new RuntimeException("Unknown packet type " + id);
+                return new DisconnectPacket("Unknown packet type " + id, sender);
         }
     }
 

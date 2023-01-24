@@ -46,7 +46,7 @@ public class LoginPacket extends SnowflakePacket {
         logger.debug("Generated `" + secret + "` as the secret password. Client needs to respond with this.");
         byte[] encryptedMessage = encrypt(secret, key);
         if (encryptedMessage.length < 1) {
-            client.getConnection().sendPacket(new DisconnectPacket("Encryption fail (invalid key)"));
+            client.getConnection().sendPacket(new DisconnectPacket("Encryption fail (invalid key)", client));
             return;
         }
 
