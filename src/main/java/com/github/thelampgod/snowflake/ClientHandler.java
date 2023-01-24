@@ -139,9 +139,6 @@ public class ClientHandler extends Thread {
         logger.debug(client + " action=" + action);
 
         switch (action) {
-            case 8:
-                sendLocationPlain();
-                break;
             case 9:
                 keepAliveResponse();
                 break;
@@ -197,46 +194,5 @@ public class ClientHandler extends Thread {
             out.flush();
         }
 
-    }
-
-    private void sendLocationPlain() throws IOException {
-        checkAuth(client);
-
-        //user should add some recipients
-        if (recipientsIds.isEmpty()) {
-            logger.debug(client + " has no recipients.");
-            return;
-        }
-
-        double posX = in.readDouble();
-        double posY = in.readDouble();
-        double posZ = in.readDouble();
-        byte dimensionId = in.readByte();
-
-        HashSet<Integer> sentTo = Sets.newHashSet();
-        for (SocketClient receiver : getConnectedClients()) {
-            if (!recipientsIds.contains(receiver.getId())) continue;
-            if (!receiver.isReceiver() || sentTo.contains(receiver.getId())) continue;
-            sentTo.add(receiver.getId());
-            try {
-                DataOutputStream clientOut = receiver.getOutputStream();
-                // id 2 for plain location packet
-                clientOut.writeByte(2);
-                // write sender name
-                clientOut.writeUTF(client.getName());
-                // write location
-                clientOut.writeDouble(posX);
-                clientOut.writeDouble(posY);
-                clientOut.writeDouble(posZ);
-                //write dimension id
-                clientOut.writeByte(dimensionId);
-                clientOut.flush();
-
-                logger.debug(client.getName() + " sent location packet to recipient " + receiver.getName());
-            } catch (IOException e) {
-                getServer().removeClient(receiver);
-                e.printStackTrace();
-            }
-        }
     }
 }

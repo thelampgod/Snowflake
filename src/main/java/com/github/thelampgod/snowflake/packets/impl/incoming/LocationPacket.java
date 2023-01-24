@@ -6,6 +6,9 @@ import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Set;
+
+import static com.github.thelampgod.snowflake.util.Helper.getConnectedClients;
 
 public class LocationPacket extends SnowflakePacket {
     private final double posX;
@@ -23,14 +26,22 @@ public class LocationPacket extends SnowflakePacket {
 
     @Override
     public void writeData(DataOutputStream out) throws IOException {
-
+        out.writeByte(2);
+        out.writeUTF(this.getSender().getName());
+        out.writeDouble(posX);
+        out.writeDouble(posY);
+        out.writeDouble(posZ);
+        out.writeByte(dimensionId);
     }
 
     @Override
     public void handle() {
-        final SocketClient sender = this.getSender();
-        if (!sender.isAuthenticated()) return;
+        Set<Integer> recipients = this.getSender().getConnection().recipientsIds;
+        for (SocketClient receiver : getConnectedClients()) {
+            if (!recipients.contains(receiver.getId())) continue;
+            if (!receiver.isReceiver()) continue;
 
-
+            receiver.getConnection().sendPacket(this);
+        }
     }
 }
