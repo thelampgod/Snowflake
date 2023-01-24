@@ -139,15 +139,6 @@ public class ClientHandler extends Thread {
         logger.debug(client + " action=" + action);
 
         switch (action) {
-            case 4:
-                getConnectedUsers();
-                break;
-            case 5:
-                getRecipients();
-                break;
-            case 6:
-                getKeyForId(in.readByte());
-                break;
             case 8:
                 sendLocationPlain();
                 break;
@@ -246,32 +237,6 @@ public class ClientHandler extends Thread {
                 getServer().removeClient(receiver);
                 e.printStackTrace();
             }
-        }
-
-    }
-
-    private void getKeyForId(byte id) throws IOException {
-        checkAuth(client);
-
-        String key = "";
-        try (Connection conn = getDb().getConnection()) {
-            ResultSet result = DatabaseUtil.runQuery("select pubkey from users where id=" + id, conn).getResultSet();
-            while (result.next()) {
-                key = result.getString("pubkey");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        if (!key.isEmpty()) {
-            out.writeInt(id);
-            out.writeUTF(key);
-            out.flush();
-        } else {
-            // write invalid
-            out.writeInt(-1);
-            out.writeUTF("");
-            out.flush();
         }
     }
 }
