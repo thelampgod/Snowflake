@@ -139,9 +139,6 @@ public class ClientHandler extends Thread {
         logger.debug(client + " action=" + action);
 
         switch (action) {
-            case 2:
-                addRecipient();
-                break;
             case 3:
                 removeRecipient();
                 break;
@@ -254,100 +251,6 @@ public class ClientHandler extends Thread {
             }
         }
 
-    }
-
-    private void addRecipient() throws IOException {
-        checkAuth(client);
-        //add via id
-        if (in.readByte() == 0) {
-            int id = in.readInt();
-
-            if (addViaId(id)) {
-                out.writeUTF("Added recipient successfully");
-                out.flush();
-            } else {
-                out.writeUTF("Failed adding recipient");
-                out.flush();
-            }
-            return;
-        }
-
-        //else add via public key
-        String recipientKey = in.readUTF();
-        if (addViaKey(recipientKey)) {
-            out.writeUTF("Added recipient successfully");
-            out.flush();
-        } else {
-            out.writeUTF("Failed adding recipient");
-            out.flush();
-        }
-    }
-
-    private boolean addViaId(int id) {
-        //check connected clients first
-        Optional<SocketClient> optRecipient = getConnectedClients().stream()
-                .filter(c -> c.getId() == id)
-                .findAny();
-
-        if (optRecipient.isPresent()) {
-            SocketClient recipient = optRecipient.get();
-            DatabaseUtil.insertRecipient(recipient.getId(), recipient.getPubKey(), client.getId());
-            recipientsIds.add(recipient.getId());
-            return true;
-        }
-        //not connected, check database
-        try (Connection conn = getDb().getConnection()) {
-            ResultSet result =
-                    DatabaseUtil.runQuery(
-                            "select pubkey from users where id=\"" + id + "\"", conn).getResultSet();
-            if (result.next()) {
-                String pubKey = result.getString("pubkey");
-                result.close();
-
-                DatabaseUtil.insertRecipient(id, pubKey, client.getId());
-                recipientsIds.add(id);
-                return true;
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return false;
-    }
-
-    private boolean addViaKey(String recipientKey) {
-        //check connected clients first
-        Optional<SocketClient> optRecipient = getConnectedClients().stream()
-                .filter(c -> c.getPubKey().equals(recipientKey))
-                .findAny();
-
-        if (optRecipient.isPresent()) {
-            SocketClient recipient = optRecipient.get();
-            DatabaseUtil.insertRecipient(recipient.getId(), recipient.getPubKey(), client.getId());
-            recipientsIds.add(recipient.getId());
-            return true;
-        }
-
-        //not connected, check database
-        try (Connection conn = getDb().getConnection()) {
-            ResultSet result =
-                    DatabaseUtil.runQuery(
-                            "select id from users where pubkey=\"" + recipientKey + "\"", conn).getResultSet();
-            if (result.next()) {
-                int userId = result.getInt("id");
-                result.close();
-
-                DatabaseUtil.insertRecipient(userId, recipientKey, client.getId());
-                recipientsIds.add(userId);
-                return true;
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return false;
     }
 
     private void removeRecipient() throws IOException {

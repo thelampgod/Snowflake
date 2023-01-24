@@ -2,7 +2,7 @@ package com.github.thelampgod.snowflake.packets.impl.incoming;
 
 import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
-import com.github.thelampgod.snowflake.packets.impl.outgoing.AuthSuccessPacket;
+import com.github.thelampgod.snowflake.packets.impl.outgoing.PlainMessagePacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.DisconnectPacket;
 import com.github.thelampgod.snowflake.util.DatabaseUtil;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
@@ -57,7 +57,7 @@ public class HandshakeResponsePacket extends SnowflakePacket {
             logger.info(client + " authenticated.");
             client.getConnection().sendAuthMessage(client);
 
-            client.getConnection().sendPacket(new AuthSuccessPacket());
+            client.getConnection().sendPacket(new PlainMessagePacket("Successfully authenticated"));
         } else {
             client.getConnection().sendPacket(new DisconnectPacket("Wrong password"));
         }

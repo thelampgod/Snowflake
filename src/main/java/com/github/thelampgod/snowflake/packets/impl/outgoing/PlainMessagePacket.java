@@ -6,15 +6,16 @@ import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class AuthSuccessPacket extends SnowflakePacket {
-
-    public AuthSuccessPacket() throws IOException {
+public class PlainMessagePacket extends SnowflakePacket {
+    private final String message;
+    public PlainMessagePacket(String message) throws IOException {
         super(SocketClient.Snowflake());
+        this.message = message;
     }
 
     @Override
     public void writeData(DataOutputStream out) throws IOException {
-        out.writeUTF("Successfully authenticated");
+        out.writeUTF(message);
     }
 
     @Override
