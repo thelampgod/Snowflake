@@ -2,6 +2,7 @@ package com.github.thelampgod.snowflake.packets.impl.incoming;
 
 import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
+import com.github.thelampgod.snowflake.packets.impl.outgoing.ConnectionPacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.PlainMessagePacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.DisconnectPacket;
 import com.github.thelampgod.snowflake.util.DatabaseUtil;
@@ -55,11 +56,20 @@ public class HandshakeResponsePacket extends SnowflakePacket {
                     });
 
             logger.info(client + " authenticated.");
-            client.getConnection().sendAuthMessage(client);
+            sendConnectionMsg();
+
 
             client.getConnection().sendPacket(new PlainMessagePacket("Successfully authenticated"));
         } else {
             client.getConnection().sendPacket(new DisconnectPacket("Wrong password"));
+        }
+    }
+
+    private void sendConnectionMsg() throws IOException {
+        for (SocketClient receiver : getConnectedClients()) {
+            if (!receiver.isReceiver()) continue;
+
+            receiver.getConnection().sendPacket(new ConnectionPacket.Connect(this.getSender().getId(), this.getSender().getName()));
         }
     }
 }

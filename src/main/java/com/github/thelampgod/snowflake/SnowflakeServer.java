@@ -1,5 +1,6 @@
 package com.github.thelampgod.snowflake;
 
+import com.github.thelampgod.snowflake.packets.impl.outgoing.ConnectionPacket;
 import com.google.common.collect.Sets;
 
 import java.io.*;
@@ -65,6 +66,7 @@ public class SnowflakeServer {
         logger.info(client + " disconnected.");
 
         try {
+
             sendDisconnectMessage(client);
         } catch (IOException e) {
             e.printStackTrace();
@@ -72,16 +74,10 @@ public class SnowflakeServer {
     }
 
     private void sendDisconnectMessage(SocketClient client) throws IOException {
-        HashSet<Integer> sentTo = Sets.newHashSet();
         for (SocketClient receiver : getConnectedClients()) {
-            if (!receiver.isReceiver() || sentTo.contains(receiver.getId())) continue;
-            sentTo.add(receiver.getId());
+            if (!receiver.isReceiver()) continue;
 
-            DataOutputStream out = receiver.getOutputStream();
-            out.writeByte(6); //disconnect packet id
-            out.writeInt(client.getId());
-            out.writeUTF(client.getName());
-            out.flush();
+            receiver.getConnection().sendPacket(new ConnectionPacket.Disconnect(client.getId(), client.getName()));
         }
 
     }

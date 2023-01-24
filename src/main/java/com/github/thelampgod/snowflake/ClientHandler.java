@@ -174,25 +174,5 @@ public class ClientHandler extends Thread {
         getServer().removeClient(client);
     }
 
-    private void checkAuth(SocketClient client) {
-        if (!client.isAuthenticated()) {
-            disconnect("Not authenticated");
-        }
-    }
-
-
-    public void sendAuthMessage(SocketClient client) throws IOException {
-        HashSet<Integer> sentTo = Sets.newHashSet();
-        for (SocketClient receiver : getConnectedClients()) {
-            if (!receiver.isReceiver() || sentTo.contains(receiver.getId())) continue;
-            sentTo.add(receiver.getId());
-
-            DataOutputStream out = receiver.getOutputStream();
-            out.writeByte(5); //connect packet id
-            out.writeInt(client.getId());
-            out.writeUTF(client.getName());
-            out.flush();
-        }
-
     }
 }
