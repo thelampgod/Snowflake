@@ -139,9 +139,6 @@ public class ClientHandler extends Thread {
         logger.debug(client + " action=" + action);
 
         switch (action) {
-            case 1:
-                sendMessagePlain();
-                break;
             case 2:
                 addRecipient();
                 break;
@@ -156,9 +153,6 @@ public class ClientHandler extends Thread {
                 break;
             case 6:
                 getKeyForId(in.readByte());
-                break;
-            case 7:
-                sendEncryptedData();
                 break;
             case 8:
                 sendLocationPlain();
@@ -216,60 +210,6 @@ public class ClientHandler extends Thread {
             out.writeInt(client.getId());
             out.writeUTF(client.getName());
             out.flush();
-        }
-
-    }
-
-    private void sendMessagePlain() throws IOException {
-        checkAuth(client);
-
-        //plain message packet
-        sendMessage(1);
-    }
-
-    /**
-     * The same as plain message except with id to notify it is encrypted, client should encrypt his message himself
-     * <p>
-     * un-encrypted message should be a JSON string with a packet id "id" and the data that packet contains,
-     * excluding sender. For a message packet it would be "id": 1, "message":"<message>", for a location packet,
-     * "id": 2, "posX": <posX>, etc.
-     */
-    private void sendEncryptedData() throws IOException {
-        checkAuth(client);
-        sendMessage(3);
-    }
-
-    private void sendMessage(int packetId) throws IOException {
-        //user should add some recipients
-        if (recipientsIds.isEmpty()) {
-            logger.debug(client + " has no recipients.");
-            return;
-        }
-
-        // read message and forward it to client's recipients
-        byte[] message = new byte[in.readInt()];
-        in.readFully(message);
-
-        HashSet<Integer> sentTo = Sets.newHashSet();
-        for (SocketClient receiver : getConnectedClients()) {
-            if (!recipientsIds.contains(receiver.getId())) continue;
-            if (!receiver.isReceiver() || sentTo.contains(receiver.getId())) continue;
-            sentTo.add(receiver.getId());
-            try {
-                DataOutputStream clientOut = receiver.getOutputStream();
-                // tell client if it is a plain message or encrypted message (id 1/3)
-                clientOut.writeByte(packetId);
-                // write sender name
-                clientOut.writeUTF(client.getName());
-                clientOut.writeInt(message.length);
-                clientOut.write(message);
-                clientOut.flush();
-
-                logger.debug(client.getName() + " sent packet to recipient " + receiver.getName());
-            } catch (IOException e) {
-                getServer().removeClient(receiver);
-                e.printStackTrace();
-            }
         }
 
     }
