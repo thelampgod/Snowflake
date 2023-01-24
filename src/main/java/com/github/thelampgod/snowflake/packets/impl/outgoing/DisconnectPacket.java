@@ -19,7 +19,7 @@ public class DisconnectPacket extends SnowflakePacket {
 
     @Override
     public void writeData(DataOutputStream out) throws IOException {
-        out.writeByte(-99);
+        out.writeByte(7);
         out.writeUTF(reason);
         getServer().removeClient(this.getSender());
         logger.debug(this.getSender() + " disconnected. Reason: " + reason);
