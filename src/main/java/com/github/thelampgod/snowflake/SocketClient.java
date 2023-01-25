@@ -4,11 +4,11 @@ import java.io.*;
 import java.net.Socket;
 
 public class SocketClient {
-    private final Socket socket;
-    private final ClientHandler connection;
+    private Socket socket;
+    private ClientHandler connection;
     private String secret;
-    private final DataOutputStream out;
-    private final DataInputStream in;
+    private DataOutputStream out;
+    private DataInputStream in;
     public boolean responded = true;
 
     private String name = "not_authenticated_user";
@@ -27,8 +27,11 @@ public class SocketClient {
         this.in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
     }
 
+    public SocketClient() {
+    }
+
     public static SocketClient Snowflake() throws IOException {
-        return new SocketClient(null, null);
+        return new SocketClient();
     }
 
     public Socket getSocket() {

@@ -4,11 +4,9 @@ import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.DisconnectPacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.HandshakeStartPacket;
-import com.github.thelampgod.snowflake.util.DatabaseUtil;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.pgpainless.PGPainless;
-import org.pgpainless.key.info.KeyRingInfo;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -16,7 +14,6 @@ import java.io.IOException;
 import java.security.SecureRandom;
 
 import static com.github.thelampgod.snowflake.util.EncryptionUtil.encrypt;
-import static com.github.thelampgod.snowflake.util.Helper.getConnectedClients;
 import static net.daporkchop.lib.logging.Logging.logger;
 
 public class LoginPacket extends SnowflakePacket {

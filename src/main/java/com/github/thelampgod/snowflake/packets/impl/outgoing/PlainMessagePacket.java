@@ -15,6 +15,7 @@ public class PlainMessagePacket extends SnowflakePacket {
 
     @Override
     public void writeData(DataOutputStream out) throws IOException {
+        out.writeByte(9);
         out.writeUTF(message);
     }
 

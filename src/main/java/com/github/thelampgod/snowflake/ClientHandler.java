@@ -6,7 +6,6 @@ import com.github.thelampgod.snowflake.packets.impl.outgoing.DisconnectPacket;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.*;
@@ -56,14 +55,12 @@ public class ClientHandler extends Thread {
             logger.info(client + " connected.");
             logger.debug("Talker connected " + client);
             while (isRunning) {
-                try {
-                    SnowflakePacket packet = SnowflakePacket.fromId(in.readByte(), in, client);
-                    packet.handle();
-                } catch (EOFException e) {
-                    break;
-                }
+                SnowflakePacket packet = SnowflakePacket.fromId(in.readByte(), in, client);
+                packet.handle();
+                logger.debug("Received a " + packet.getClass().getSimpleName() + " from " + client);
             }
         } catch (Throwable th) {
+            th.printStackTrace();
             getServer().removeClient(client);
         }
     }
@@ -97,11 +94,22 @@ public class ClientHandler extends Thread {
     }
 
     private void dispatchPacket(SnowflakePacket packet) throws IOException {
+        logger.debug("Sending a " + packet.getClass().getSimpleName() + " to " + client);
         packet.writeData(out);
         out.flush();
     }
 
-    public void sendPacket(SnowflakePacket packet) {
+    public void sendPacket(SnowflakePacket packet) throws IOException {
+        if (!this.client.isReceiver()) {
+            for (SocketClient receiver : getConnectedClients()) {
+                if (!receiver.isReceiver()) continue;
+                if (receiver.getLinkString().equals(this.client.getLinkString())) {
+                    receiver.getConnection().sendPacket(packet);
+                    return;
+                }
+            }
+        }
+
         readWriteLock.writeLock().lock();
 
         try {
@@ -119,8 +127,7 @@ public class ClientHandler extends Thread {
         client.responded = false;
         logger.debug("sending keepalive to " + client);
         client.setNow(System.currentTimeMillis());
-
-        this.sendPacket(new KeepAlivePacket(client.getNow()));
+        this.dispatchPacket(new KeepAlivePacket(client.getNow()));
     }
 }
 

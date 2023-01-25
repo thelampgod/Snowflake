@@ -15,12 +15,12 @@ public class HandshakeStartPacket extends SnowflakePacket {
 
     @Override
     public void writeData(DataOutputStream out) throws IOException {
+        out.writeByte(8);
         out.writeInt(this.encryptedSecret.length);
         out.write(encryptedSecret);
     }
 
     @Override
     public void handle() throws IOException {
-
     }
 }
