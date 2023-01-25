@@ -2,6 +2,7 @@ package com.github.thelampgod.snowflake;
 
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 import com.github.thelampgod.snowflake.packets.impl.incoming.KeepAlivePacket;
+import com.github.thelampgod.snowflake.packets.impl.incoming.LocationPacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.DisconnectPacket;
 
 import java.io.DataInputStream;
@@ -83,8 +84,14 @@ public class ClientHandler extends Thread {
         readWriteLock.readLock().lock();
 
         try {
+            Set<Integer> ids = new HashSet<>();
             while (!outboundPacketsQueue.isEmpty()) {
-                this.dispatchPacket(outboundPacketsQueue.poll());
+                SnowflakePacket packet = outboundPacketsQueue.poll();
+                if (packet instanceof LocationPacket) {
+                    if (ids.contains(packet.getSender().getId())) continue;
+                    ids.add(packet.getSender().getId());
+                }
+                this.dispatchPacket(packet);
             }
 
         } finally {
@@ -110,6 +117,7 @@ public class ClientHandler extends Thread {
             }
         }
 
+        flushOutboundQueue();
         readWriteLock.writeLock().lock();
 
         try {
