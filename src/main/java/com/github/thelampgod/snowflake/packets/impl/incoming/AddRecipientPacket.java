@@ -36,6 +36,7 @@ public class AddRecipientPacket extends SnowflakePacket {
 
     @Override
     public void handle() throws IOException {
+        super.handle();
         if (key.isEmpty()) {
             if (addViaId(id)) {
                 this.getSender().getConnection().sendPacket(new PlainMessagePacket("Added recipient successfully"));

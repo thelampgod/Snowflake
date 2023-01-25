@@ -21,6 +21,7 @@ public class ListRecipientsPacket extends SnowflakePacket {
 
     @Override
     public void handle() throws IOException {
+        super.handle();
         final SocketClient client = this.getSender();
         Set<Integer> recipients = client.getConnection().recipientsIds;
         if (recipients.isEmpty()) {

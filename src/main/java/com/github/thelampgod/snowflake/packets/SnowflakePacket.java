@@ -3,6 +3,7 @@ package com.github.thelampgod.snowflake.packets;
 import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.packets.impl.incoming.*;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.DisconnectPacket;
+import com.github.thelampgod.snowflake.packets.impl.outgoing.PlainMessagePacket;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -50,5 +51,9 @@ public abstract class SnowflakePacket {
 
     public abstract void writeData(DataOutputStream out) throws IOException;
 
-    public abstract void handle() throws IOException;
+    public void handle() throws IOException {
+        if (!this.getSender().isAuthenticated()) {
+            this.getSender().getConnection().sendPacket(new PlainMessagePacket("Not authenticated."));
+        }
+    }
 }

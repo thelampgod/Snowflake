@@ -36,6 +36,7 @@ public class LocationPacket extends SnowflakePacket {
 
     @Override
     public void handle() throws IOException {
+        super.handle();
         Set<Integer> recipients = this.getSender().getConnection().recipientsIds;
         for (SocketClient receiver : getConnectedClients()) {
             if (!recipients.contains(receiver.getId())) continue;

@@ -30,6 +30,7 @@ public class RemoveRecipientPacket extends SnowflakePacket {
 
     @Override
     public void handle() throws IOException {
+        super.handle();
         final SocketClient client = this.getSender();
         if (key.isEmpty()) {
             DatabaseUtil.removeRecipient(id, client.getId());

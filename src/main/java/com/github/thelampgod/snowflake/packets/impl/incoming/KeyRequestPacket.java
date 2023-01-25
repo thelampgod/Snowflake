@@ -28,6 +28,7 @@ public class KeyRequestPacket extends SnowflakePacket {
 
     @Override
     public void handle() throws IOException {
+        super.handle();
         String key = "";
         try (Connection conn = getDb().getConnection()) {
             ResultSet result = DatabaseUtil.runQuery("select pubkey from users where id=" + id, conn).getResultSet();

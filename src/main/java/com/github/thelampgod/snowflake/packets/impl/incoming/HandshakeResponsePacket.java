@@ -70,6 +70,7 @@ public class HandshakeResponsePacket extends SnowflakePacket {
     private void sendConnectionMsg() throws IOException {
         for (SocketClient receiver : getConnectedClients()) {
             if (!receiver.isReceiver()) continue;
+            if (!receiver.isAuthenticated()) continue;
 
             receiver.getConnection().sendPacket(new ConnectionPacket.Connect(this.getSender().getId(), this.getSender().getName()));
         }
