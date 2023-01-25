@@ -3,6 +3,7 @@ package com.github.thelampgod.snowflake.packets.impl.incoming;
 import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.PlainMessagePacket;
+import com.github.thelampgod.snowflake.packets.impl.outgoing.RecipientsPacket;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -27,11 +28,6 @@ public class ListRecipientsPacket extends SnowflakePacket {
             return;
         }
 
-        StringBuilder b = new StringBuilder();
-        for (int id : recipients) {
-            b.append(id).append(", ");
-        }
-
-        client.getConnection().sendPacket(new PlainMessagePacket(b.substring(0, b.length() - 2)));
+        client.getConnection().sendPacket(new RecipientsPacket(recipients));
     }
 }

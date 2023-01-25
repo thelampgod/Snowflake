@@ -5,21 +5,23 @@ import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Set;
 
-public class KeyResponsePacket extends SnowflakePacket {
-    private final int id;
-    private final String key;
-    public KeyResponsePacket(int id, String key) throws IOException {
+public class RecipientsPacket extends SnowflakePacket {
+    private final Set<Integer> recipients;
+
+    public RecipientsPacket(Set<Integer> recipients) throws IOException {
         super(SocketClient.Snowflake());
-        this.id = id;
-        this.key = key;
+        this.recipients = recipients;
     }
 
     @Override
     public void writeData(DataOutputStream out) throws IOException {
-        out.writeByte(10);
-        out.writeInt(id);
-        out.writeUTF(key);
+        out.writeByte(11);
+        out.writeByte(recipients.size());
+        for (int id : recipients) {
+            out.writeInt(id);
+        }
     }
 
     @Override
