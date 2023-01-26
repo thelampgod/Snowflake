@@ -72,7 +72,7 @@ public class ClientHandler extends Thread {
                 while (isRunning) {
                     flushOutboundQueue();
 
-                    Thread.sleep(50); // 20 tps
+                    Thread.sleep(25); // 40 tps
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -85,13 +85,10 @@ public class ClientHandler extends Thread {
 
         try {
             Set<Integer> ids = new HashSet<>();
-            int i = 0;
             while (!outboundPacketsQueue.isEmpty()) {
                 SnowflakePacket packet = outboundPacketsQueue.poll();
                 if (packet instanceof LocationPacket) {
-                    if (ids.contains(packet.getSender().getId())) {
-                        if (i++ >= 2) continue;
-                    }
+                    if (ids.contains(packet.getSender().getId())) continue;
                     ids.add(packet.getSender().getId());
                 }
                 this.dispatchPacket(packet);
@@ -120,7 +117,6 @@ public class ClientHandler extends Thread {
             }
         }
 
-        flushOutboundQueue();
         readWriteLock.writeLock().lock();
 
         try {
