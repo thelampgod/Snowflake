@@ -27,7 +27,7 @@ public class LocationPacket extends SnowflakePacket {
     @Override
     public void writeData(DataOutputStream out) throws IOException {
         out.writeByte(2);
-        out.writeUTF(this.getSender().getName());
+        out.writeInt(this.getSender().getId());
         out.writeDouble(posX);
         out.writeDouble(posY);
         out.writeDouble(posZ);

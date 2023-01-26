@@ -24,7 +24,7 @@ public class MessagePacket extends SnowflakePacket {
     @Override
     public void writeData(DataOutputStream out) throws IOException {
         out.writeByte((encrypted) ? 3 : 1);
-        out.writeUTF(this.getSender().getName());
+        out.writeInt(this.getSender().getId());
         out.writeInt(message.length);
         out.write(message);
     }
