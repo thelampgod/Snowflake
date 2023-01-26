@@ -67,7 +67,9 @@ public class SnowflakeServer {
 
         try {
 
-            sendDisconnectMessage(client);
+            if (!client.isReceiver()) {
+                sendDisconnectMessage(client);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
