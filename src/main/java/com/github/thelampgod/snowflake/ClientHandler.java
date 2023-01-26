@@ -85,10 +85,13 @@ public class ClientHandler extends Thread {
 
         try {
             Set<Integer> ids = new HashSet<>();
+            int i = 0;
             while (!outboundPacketsQueue.isEmpty()) {
                 SnowflakePacket packet = outboundPacketsQueue.poll();
                 if (packet instanceof LocationPacket) {
-                    if (ids.contains(packet.getSender().getId())) continue;
+                    if (ids.contains(packet.getSender().getId())) {
+                        if (i++ >= 2) continue;
+                    }
                     ids.add(packet.getSender().getId());
                 }
                 this.dispatchPacket(packet);
