@@ -42,6 +42,10 @@ public class Snowflake {
         logger.info("Starting Snowflake server on port " + PORT);
         this.server = new SnowflakeServer();
 
+        final Thread terminalConsoleHandler = new Thread(() -> new TerminalConsole(this).start(), "Terminal console handler");
+        terminalConsoleHandler.setDaemon(true);
+        terminalConsoleHandler.start();
+
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown, "shutdown_thread"));
 
         logger.info("Listening...");
