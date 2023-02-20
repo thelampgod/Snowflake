@@ -4,6 +4,7 @@ import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 import com.github.thelampgod.snowflake.packets.impl.incoming.KeepAlivePacket;
 import com.github.thelampgod.snowflake.packets.impl.incoming.LocationPacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.DisconnectPacket;
+import com.github.thelampgod.snowflake.packets.impl.outgoing.MultiPacketPacket;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -81,19 +82,24 @@ public class ClientHandler extends Thread {
     }
 
     private void flushOutboundQueue() throws IOException {
+        boolean multiPacket = outboundPacketsQueue.size() > 2;
         readWriteLock.readLock().lock();
 
         try {
-            Set<Integer> ids = new HashSet<>();
-            while (!outboundPacketsQueue.isEmpty()) {
-                SnowflakePacket packet = outboundPacketsQueue.poll();
-                if (packet instanceof LocationPacket) {
-                    if (ids.contains(packet.getSender().getId())) continue;
-                    ids.add(packet.getSender().getId());
-                }
-                this.dispatchPacket(packet);
-            }
+            if (multiPacket) {
+                this.dispatchPacket(new MultiPacketPacket(outboundPacketsQueue));
+            } else {
 
+                Set<Integer> ids = new HashSet<>();
+                while (!outboundPacketsQueue.isEmpty()) {
+                    SnowflakePacket packet = outboundPacketsQueue.poll();
+                    if (packet instanceof LocationPacket) {
+                        if (ids.contains(packet.getSender().getId())) continue;
+                        ids.add(packet.getSender().getId());
+                    }
+                    this.dispatchPacket(packet);
+                }
+            }
         } finally {
             readWriteLock.readLock().unlock();
         }
