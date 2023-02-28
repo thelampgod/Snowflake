@@ -44,6 +44,8 @@ public abstract class SnowflakePacket {
                 return new KeepAlivePacket(in, sender);
             case 10:
                 return new HandshakeResponsePacket(in, sender);
+            case 11:
+                return new ChunkPacket(in, sender);
             default:
                 return new DisconnectPacket("Unknown packet type " + id, sender);
         }
