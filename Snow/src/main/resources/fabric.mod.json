@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "snow",
+  "version": "${version}",
+  "name": "Snow",
+  "description": "Live coordinate sharing mod",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/snow/icon.png",
+  "environment": "client",
+  "entrypoints": {},
+  "mixins": [
+    "snow.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

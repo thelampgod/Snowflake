@@ -7,7 +7,6 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.util.*;
 import static com.github.thelampgod.snowflake.util.Helper.*;
-import static net.daporkchop.lib.logging.Logging.*;
 
 public class SnowflakeServer {
     private ServerSocket server;
@@ -41,7 +40,7 @@ public class SnowflakeServer {
 
     public void addClient(SocketClient client) {
         this.connectedClients.add(client);
-        logger.debug(client.toString() + " connected.");
+        getLog().debug(client.toString() + " connected.");
     }
 
     public void removeClient(SocketClient client) {
@@ -49,7 +48,7 @@ public class SnowflakeServer {
                 .filter(c -> c.getLinkString() == null || c.getLinkString().equals(client.getLinkString()))
                 .forEach(c -> {
                     connectedClients.remove(c);
-                    logger.debug(c + " disconnected.");
+                    getLog().debug(c + " disconnected.");
                     try {
                         c.getSocket().close();
                     } catch (IOException e) {
@@ -63,7 +62,7 @@ public class SnowflakeServer {
                     threads.remove(th);
                 });
 
-        logger.info(client + " disconnected.");
+        getLog().info(client + " disconnected.");
 
         try {
 

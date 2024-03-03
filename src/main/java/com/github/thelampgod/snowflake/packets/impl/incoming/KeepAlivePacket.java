@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import static com.github.thelampgod.snowflake.util.Helper.getConnectedClients;
-import static net.daporkchop.lib.logging.Logging.logger;
+import static com.github.thelampgod.snowflake.util.Helper.getLog;
 
 public class KeepAlivePacket extends SnowflakePacket {
     private final long timestamp;
@@ -50,7 +50,7 @@ public class KeepAlivePacket extends SnowflakePacket {
             return;
         }
         receiver.get().responded = true;
-        logger.debug(this.getSender() + " keepalive response in " + (System.currentTimeMillis() - now) + "ms");
+        getLog().debug(this.getSender() + " keepalive response in " + (System.currentTimeMillis() - now) + "ms");
 
     }
 }

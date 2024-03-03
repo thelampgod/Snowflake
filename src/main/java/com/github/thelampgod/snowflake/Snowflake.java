@@ -1,19 +1,24 @@
 package com.github.thelampgod.snowflake;
 
 import com.github.thelampgod.snowflake.database.Database;
-import net.daporkchop.lib.logging.LogAmount;
 
 import java.io.IOException;
 import java.net.URL;
 
 import com.google.common.io.Resources;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.MessageFactory;
+import org.apache.logging.log4j.message.ParameterizedNoReferenceMessageFactory;
+import org.apache.logging.log4j.simple.SimpleLogger;
+import org.apache.logging.log4j.status.StatusLogger;
+import org.apache.logging.log4j.util.PropertiesUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import static net.daporkchop.lib.logging.Logging.*;
 
 public class Snowflake {
     public static Snowflake INSTANCE;
@@ -22,12 +27,17 @@ public class Snowflake {
     private final SnowflakeServer server;
     private final Database database;
 
+    public final Logger logger = new SimpleLogger("Snowflake", Level.INFO,
+            true, false, true, false,
+            "hh:mm:ss",
+            ParameterizedNoReferenceMessageFactory.INSTANCE, new PropertiesUtil("log4j2.StatusLogger.properties"), System.err);
+
     public Snowflake(String[] args) {
         if (INSTANCE == null) {
             INSTANCE = this;
         }
         if (args != null && args.length > 0 && args[0].equals("--debug")) {
-            logger.setLogAmount(LogAmount.DEBUG);
+//            StatusLogger.getLogger().setLevel(Level.DEBUG);
         }
 
         try {
@@ -52,7 +62,7 @@ public class Snowflake {
         server.start(PORT);
     }
 
-    private void shutdown() {
+    public void shutdown() {
         logger.info("Shutting down");
         server.stop();
         try {

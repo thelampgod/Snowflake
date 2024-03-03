@@ -16,7 +16,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import static com.github.thelampgod.snowflake.util.Helper.getConnectedClients;
-import static net.daporkchop.lib.logging.Logging.logger;
+import static com.github.thelampgod.snowflake.util.Helper.getLog;
 
 public class HandshakeResponsePacket extends SnowflakePacket {
     private final String secret;
@@ -53,10 +53,10 @@ public class HandshakeResponsePacket extends SnowflakePacket {
                         c.setName(name);
                         c.setId(id);
                         c.setAuthenticated(true);
-                        logger.debug(c + " authenticated.");
+                        getLog().debug(c + " authenticated.");
                     });
 
-            logger.info(client + " authenticated.");
+            getLog().info(client + " authenticated.");
             sendConnectionMsg();
 
 

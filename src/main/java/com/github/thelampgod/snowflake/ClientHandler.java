@@ -15,7 +15,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.github.thelampgod.snowflake.util.Helper.*;
-import static net.daporkchop.lib.logging.Logging.logger;
 
 public class ClientHandler extends Thread {
     final SocketClient client;
@@ -45,7 +44,7 @@ public class ClientHandler extends Thread {
             if (receiver) {
                 runSendTick();
                 client.setReceiver(true);
-                logger.debug("Receiver connected " + client);
+                getLog().debug("Receiver connected " + client);
                 // keep the thread alive, so it is ready to send packets
                 while (isRunning) {
                     Thread.sleep(15000);
@@ -54,12 +53,12 @@ public class ClientHandler extends Thread {
                 return;
             }
 
-            logger.info(client + " connected.");
-            logger.debug("Talker connected " + client);
+            getLog().info(client + " connected.");
+            getLog().debug("Talker connected " + client);
             while (isRunning) {
                 SnowflakePacket packet = SnowflakePacket.fromId(in.readByte(), in, client);
                 packet.handle();
-                logger.debug("Received a " + packet.getClass().getSimpleName() + " from " + client);
+                getLog().debug("Received a " + packet.getClass().getSimpleName() + " from " + client);
             }
         } catch (Throwable th) {
             th.printStackTrace();
@@ -107,7 +106,7 @@ public class ClientHandler extends Thread {
     }
 
     private void dispatchPacket(SnowflakePacket packet) throws IOException {
-        logger.debug("Sending a " + packet.getClass().getSimpleName() + " to " + client);
+        getLog().debug("Sending a " + packet.getClass().getSimpleName() + " to " + client);
         packet.writeData(out);
         out.flush();
     }
@@ -138,7 +137,7 @@ public class ClientHandler extends Thread {
             return;
         }
         client.responded = false;
-        logger.debug("sending keepalive to " + client);
+        getLog().debug("sending keepalive to " + client);
         client.setNow(System.currentTimeMillis());
         this.dispatchPacket(new KeepAlivePacket(client.getNow()));
     }

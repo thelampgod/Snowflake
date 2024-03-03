@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.security.SecureRandom;
 
 import static com.github.thelampgod.snowflake.util.EncryptionUtil.encrypt;
-import static net.daporkchop.lib.logging.Logging.logger;
+import static com.github.thelampgod.snowflake.util.Helper.getLog;
 
 public class LoginPacket extends SnowflakePacket {
     private final String pubKey;
@@ -40,7 +40,7 @@ public class LoginPacket extends SnowflakePacket {
         String secret =
                 RandomStringUtils.random(10, 0, 0, true, true, null, new SecureRandom());
 
-        logger.debug("Generated `" + secret + "` as the secret password. Client needs to respond with this.");
+        getLog().debug("Generated `" + secret + "` as the secret password. Client needs to respond with this.");
         byte[] encryptedMessage = encrypt(secret, key);
         if (encryptedMessage.length < 1) {
             client.getConnection().sendPacket(new DisconnectPacket("Encryption fail (invalid key)", client));

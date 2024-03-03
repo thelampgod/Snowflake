@@ -13,7 +13,7 @@ import org.pgpainless.encryption_signing.ProducerOptions;
 import org.pgpainless.key.protection.SecretKeyRingProtector;
 import org.pgpainless.util.Passphrase;
 
-import static net.daporkchop.lib.logging.Logging.*;
+import static com.github.thelampgod.snowflake.util.Helper.getLog;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -41,7 +41,7 @@ public class EncryptionUtil {
 
             return cipher.toByteArray();
         } catch (PGPException e) {
-            logger.error("Encryption failed: " + e.getMessage());
+            getLog().error("Encryption failed: " + e.getMessage());
         }
         return new byte[0];
     }
@@ -61,7 +61,7 @@ public class EncryptionUtil {
             return out.toString();
 
         } catch (PGPException e) {
-            logger.error("Decryption failed: " + e.getMessage());
+            getLog().error("Decryption failed: " + e.getMessage());
         }
 
         return "";

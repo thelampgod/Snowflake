@@ -21,6 +21,10 @@ public class TerminalConsole extends SimpleTerminalConsole {
 
     @Override
     protected void runCommand(String command) {
+        if (command.equals("stop") || command.equals("shutdown")) {
+            new Thread(snowflake::shutdown).start();
+        }
+
         try {
             for (SocketClient client : snowflake.getServer().connectedClients) {
                 if (!client.isReceiver()) return;

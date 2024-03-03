@@ -4,7 +4,8 @@ import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import static net.daporkchop.lib.logging.Logging.*;
+
+import static com.github.thelampgod.snowflake.util.Helper.getLog;
 
 public class Database {
 
@@ -20,7 +21,7 @@ public class Database {
         db.setUrl(url);
         db.setInitialSize(1);
 
-        logger.info("Connected to database.");
+        getLog().info("Connected to database.");
         return db;
     }
 
