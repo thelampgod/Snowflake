@@ -7,12 +7,9 @@ import java.net.URL;
 
 import com.google.common.io.Resources;
 import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.message.MessageFactory;
 import org.apache.logging.log4j.message.ParameterizedNoReferenceMessageFactory;
 import org.apache.logging.log4j.simple.SimpleLogger;
-import org.apache.logging.log4j.status.StatusLogger;
 import org.apache.logging.log4j.util.PropertiesUtil;
 
 import java.nio.charset.StandardCharsets;
@@ -27,7 +24,7 @@ public class Snowflake {
     private final SnowflakeServer server;
     private final Database database;
 
-    public final Logger logger = new SimpleLogger("Snowflake", Level.INFO,
+    public final Logger logger = new SimpleLogger("Snowflake", Level.DEBUG,
             true, false, true, false,
             "hh:mm:ss",
             ParameterizedNoReferenceMessageFactory.INSTANCE, new PropertiesUtil("log4j2.StatusLogger.properties"), System.err);

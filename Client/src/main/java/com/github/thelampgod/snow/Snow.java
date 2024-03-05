@@ -6,10 +6,16 @@ import net.fabricmc.api.ModInitializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
+
 @Environment(EnvType.CLIENT)
 public class Snow implements ModInitializer {
     public static final Snow instance = new Snow();
     private final Logger LOGGER = LogManager.getLogger("Snow");
+
+    private static final String IP = "127.0.0.1";
+    private static final int PORT = 2147;
+    private static ServerManager serverManager;
     @Override
     public void onInitialize() {
         LOGGER.info("Loading...");
@@ -21,12 +27,28 @@ public class Snow implements ModInitializer {
     }
 
     private void init() {
+        serverManager = new ServerManager(IP, PORT);
     }
 
     private void shutdown() {
         LOGGER.info("Shutting down...");
         long now = System.currentTimeMillis();
-        //shut down
+        try {
+            serverManager.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         LOGGER.info("Shutdown in {}ms", System.currentTimeMillis() - now);
+    }
+
+    public Logger getLog() {
+        return LOGGER;
+    }
+
+    public static synchronized ServerManager getServerManager() {
+        if (serverManager == null) {
+            serverManager = new ServerManager(IP, PORT);
+        }
+        return serverManager;
     }
 }

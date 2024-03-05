@@ -9,7 +9,11 @@
   "license": "All-Rights-Reserved",
   "icon": "assets/snow/icon.png",
   "environment": "client",
-  "entrypoints": {},
+  "entrypoints": {
+    "main": [
+      "com.github.thelampgod.snow.Snow"
+    ]
+  },
   "mixins": [
     "snow.mixins.json"
   ],
