@@ -15,9 +15,16 @@ public class DatabaseUtil {
     public static int insertUser(SocketClient client) {
         try (Connection conn = Snowflake.INSTANCE.getDb().getConnection()) {
             // if already exists then return the id
-            ResultSet result = runQuery("select id from users where pubkey=\"" + client.getPubKey() + "\"", conn).getResultSet();
-            if (result.next()) {
-                return result.getInt("id");
+
+            try (PreparedStatement statement = conn.prepareStatement("select id from users where pubkey=?")) {
+                statement.setString(1, client.getPubKey());
+
+                statement.execute();
+                ResultSet result = statement.getResultSet();
+
+                if (result.next()) {
+                    return result.getInt("id");
+                }
             }
 
             int insertedId;

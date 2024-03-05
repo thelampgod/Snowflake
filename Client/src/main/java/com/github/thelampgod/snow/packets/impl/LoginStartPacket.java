@@ -6,16 +6,17 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class LoginStartPacket extends SnowflakePacket {
-  private final String key;
+  private final byte[] key;
 
-  public LoginStartPacket(String key) {
+  public LoginStartPacket(byte[] key) {
     this.key = key;
   }
 
   @Override
   public void writeData(DataOutputStream out) throws IOException {
     out.writeByte(0);
-    out.writeUTF(key);
+    out.writeInt(key.length);
+    out.write(key);
   }
 
   @Override

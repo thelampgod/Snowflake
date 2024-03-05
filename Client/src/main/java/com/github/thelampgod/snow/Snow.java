@@ -1,8 +1,10 @@
 package com.github.thelampgod.snow;
 
+import com.github.thelampgod.snow.commands.impl.AuthenticateCommand;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,6 +29,10 @@ public class Snow implements ModInitializer {
     }
 
     private void init() {
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+            dispatcher.register(AuthenticateCommand.register());
+        });
+
         serverManager = new ServerManager(IP, PORT);
     }
 

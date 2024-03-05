@@ -62,8 +62,8 @@ public class SocketClient {
         this.name = name;
     }
 
-    public void setPubKey(String pubKey) {
-        this.pubKey = pubKey;
+    public void setPubKey(byte[] pubKey) {
+        this.pubKey = new String(pubKey);
     }
 
     public void setId(int id) {

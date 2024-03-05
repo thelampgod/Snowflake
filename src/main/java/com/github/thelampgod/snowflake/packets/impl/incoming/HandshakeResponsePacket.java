@@ -7,9 +7,6 @@ import com.github.thelampgod.snowflake.packets.impl.outgoing.ConnectionPacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.PlainMessagePacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.DisconnectPacket;
 import com.github.thelampgod.snowflake.util.DatabaseUtil;
-import org.bouncycastle.openpgp.PGPPublicKeyRing;
-import org.pgpainless.PGPainless;
-import org.pgpainless.key.info.KeyRingInfo;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -36,8 +33,9 @@ public class HandshakeResponsePacket extends SnowflakePacket {
         final SocketClient client = this.getSender();
         if (this.secret.equals(client.getSecret())) {
             String pubKey = client.getPubKey();
-            PGPPublicKeyRing key = PGPainless.readKeyRing().publicKeyRing(pubKey);
-            String name = new KeyRingInfo(key).getPrimaryUserId();
+//            PGPPublicKeyRing key = PGPainless.readKeyRing().publicKeyRing(pubKey);
+            //TODO: name
+            String name = "test";
 
             client.setName(name);
             int id = DatabaseUtil.insertUser(client);
@@ -49,7 +47,7 @@ public class HandshakeResponsePacket extends SnowflakePacket {
                     .filter(c -> c.getLinkString().equals(client.getLinkString()))
                     .filter(SocketClient::isReceiver)
                     .forEach(c -> {
-                        c.setPubKey(pubKey);
+                        c.setPubKey(pubKey.getBytes());
                         c.setName(name);
                         c.setId(id);
                         c.setAuthenticated(true);
