@@ -7,15 +7,18 @@ import java.io.IOException;
 
 public class HandshakeResponsePacket extends SnowflakePacket {
   private final String secret;
+  private final String name;
 
-  public HandshakeResponsePacket(String secret) {
+  public HandshakeResponsePacket(String secret, String name) {
     this.secret = secret;
+    this.name = name;
   }
 
   @Override
   public void writeData(DataOutputStream out) throws IOException {
     out.writeByte(10);
     out.writeUTF(secret);
+    out.writeUTF(name);
   }
 
   @Override

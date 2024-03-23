@@ -17,10 +17,12 @@ import static com.github.thelampgod.snowflake.util.Helper.getLog;
 
 public class HandshakeResponsePacket extends SnowflakePacket {
     private final String secret;
+    private final String name;
 
     public HandshakeResponsePacket(DataInputStream in, SocketClient sender) throws IOException {
         super(sender);
         this.secret = in.readUTF();
+        this.name = in.readUTF();
     }
 
     @Override
@@ -32,10 +34,8 @@ public class HandshakeResponsePacket extends SnowflakePacket {
     public void handle() throws IOException {
         final SocketClient client = this.getSender();
         if (this.secret.equals(client.getSecret())) {
-            String pubKey = client.getPubKey();
-//            PGPPublicKeyRing key = PGPainless.readKeyRing().publicKeyRing(pubKey);
-            //TODO: name
-            String name = "test";
+            final String pubKey = client.getPubKey();
+            final String name = this.name;
 
             client.setName(name);
             int id = DatabaseUtil.insertUser(client);

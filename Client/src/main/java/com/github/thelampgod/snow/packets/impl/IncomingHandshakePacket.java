@@ -1,14 +1,13 @@
 package com.github.thelampgod.snow.packets.impl;
 
-import com.github.thelampgod.snow.EncryptionUtil;
 import com.github.thelampgod.snow.ServerManager;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.packets.SnowflakePacket;
+import net.minecraft.network.encryption.NetworkEncryptionUtils;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
 
 import static com.github.thelampgod.snow.Helper.mc;
 
@@ -29,12 +28,10 @@ public class IncomingHandshakePacket extends SnowflakePacket {
   public void handle() {
     final ServerManager man = Snow.instance.getServerManager();
     try {
-      String decrypted = new String(EncryptionUtil.decrypt(encryptedSecret, mc.getProfileKeys().fetchKeyPair().get().get().privateKey()));
+      final String decrypted = new String(NetworkEncryptionUtils.decrypt(mc.getProfileKeys().fetchKeyPair().get().get().privateKey(), encryptedSecret));
 
       System.out.println("Secret is " + decrypted);
-      man.sendPacket(new HandshakeResponsePacket(decrypted));
-    } catch (IOException e) {
-      e.printStackTrace();
+      man.sendPacket(new HandshakeResponsePacket(decrypted, mc.getSession().getUsername()));
     } catch (Exception e) {
         throw new RuntimeException(e);
     }

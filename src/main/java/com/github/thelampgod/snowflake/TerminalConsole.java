@@ -23,6 +23,7 @@ public class TerminalConsole extends SimpleTerminalConsole {
     protected void runCommand(String command) {
         if (command.equals("stop") || command.equals("shutdown")) {
             new Thread(snowflake::shutdown).start();
+            return;
         }
 
         try {
