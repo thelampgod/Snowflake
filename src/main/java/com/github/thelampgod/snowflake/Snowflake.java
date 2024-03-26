@@ -5,6 +5,7 @@ import com.github.thelampgod.snowflake.database.Database;
 import java.io.IOException;
 import java.net.URL;
 
+import com.github.thelampgod.snowflake.groups.GroupManager;
 import com.google.common.io.Resources;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
@@ -22,6 +23,8 @@ public class Snowflake {
     private static final int PORT = 2147;
 
     private final SnowflakeServer server;
+
+    private final GroupManager groupManager;
     private final Database database;
 
     public final Logger logger = new SimpleLogger("Snowflake", Level.DEBUG,
@@ -36,6 +39,8 @@ public class Snowflake {
         if (args != null && args.length > 0 && args[0].equals("--debug")) {
 //            StatusLogger.getLogger().setLevel(Level.DEBUG);
         }
+
+        groupManager = new GroupManager();
 
         try {
             logger.info("Connecting to database...");
@@ -95,5 +100,9 @@ public class Snowflake {
 
     public Database getDb() {
         return this.database;
+    }
+
+    public GroupManager getGroupManager() {
+        return groupManager;
     }
 }
