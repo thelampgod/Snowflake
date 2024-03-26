@@ -33,6 +33,5 @@ public class GroupInfoPacket extends SnowflakePacket {
     @Override
     public void handle() {
         Snow.instance.getGroupManager().add(new Group(name, id, isOwner, users));
-
     }
 }

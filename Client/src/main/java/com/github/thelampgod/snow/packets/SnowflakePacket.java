@@ -47,6 +47,10 @@ public abstract class SnowflakePacket {
 //        return new ChunkPacket(in);
       case 16:
         return new GroupInfoPacket(in);
+      case 17:
+        return new GroupPasswordPacket(in);
+      case 18:
+        return new GroupConnectionPacket(in);
       default:
         throw new RuntimeException("Unknown packet type " + id);
     }

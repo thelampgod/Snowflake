@@ -82,4 +82,12 @@ public class SnowflakeServer {
         }
 
     }
+
+    public SocketClient getClientReceiver(int clientId) {
+        return this.connectedClients.stream()
+                .filter(client -> client.getId() == clientId)
+                .filter(SocketClient::isReceiver)
+                .findAny()
+                .orElseGet(null);
+    }
 }

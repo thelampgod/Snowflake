@@ -6,9 +6,21 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.concurrent.ExecutionException;
+
 public class Helper {
 
     public static MinecraftClient mc = MinecraftClient.getInstance();
+
+    public static PrivateKey getPrivateKey() throws ExecutionException, InterruptedException {
+        return mc.getProfileKeys().fetchKeyPair().get().get().privateKey();
+    }
+
+    public static PublicKey getPublicKey() throws ExecutionException, InterruptedException {
+        return mc.getProfileKeys().fetchKeyPair().get().get().publicKey().data().key();
+    }
 
     public static void printModMessage(String msg) {
         MutableText prefix = Text.literal("[Snow] ").formatted(Formatting.LIGHT_PURPLE);

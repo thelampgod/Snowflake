@@ -1,6 +1,7 @@
 package com.github.thelampgod.snowflake.packets;
 
 import com.github.thelampgod.snowflake.SocketClient;
+import com.github.thelampgod.snowflake.packets.impl.incoming.GroupInvitePacket;
 import com.github.thelampgod.snowflake.packets.impl.incoming.*;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.DisconnectPacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.PlainMessagePacket;
@@ -48,6 +49,8 @@ public abstract class SnowflakePacket {
                 return new ChunkPacket(in, sender);
             case 12:
                 return new CreateGroupPacket(in, sender);
+            case 13:
+                return new GroupInvitePacket(in, sender);
             default:
                 return new DisconnectPacket("Unknown packet type " + id, sender);
         }

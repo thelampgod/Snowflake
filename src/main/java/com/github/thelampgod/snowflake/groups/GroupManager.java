@@ -32,4 +32,11 @@ public class GroupManager {
 
         return temp;
     }
+
+    public Group get(int groupId) {
+        return groups.stream()
+                .filter(group -> group.getId() == groupId)
+                .findAny()
+                .orElseGet(null);
+    }
 }
