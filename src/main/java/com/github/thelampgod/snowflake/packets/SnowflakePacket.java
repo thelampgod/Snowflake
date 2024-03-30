@@ -51,6 +51,8 @@ public abstract class SnowflakePacket {
                 return new CreateGroupPacket(in, sender);
             case 13:
                 return new GroupInvitePacket(in, sender);
+            case 14:
+                return new GroupPasswordUpdatePacket(in, sender);
             default:
                 return new DisconnectPacket("Unknown packet type " + id, sender);
         }

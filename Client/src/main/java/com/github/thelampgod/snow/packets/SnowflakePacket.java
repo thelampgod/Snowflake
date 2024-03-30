@@ -50,7 +50,18 @@ public abstract class SnowflakePacket {
       case 17:
         return new GroupPasswordPacket(in);
       case 18:
-        return new GroupConnectionPacket(in);
+        switch (in.readByte()) {
+          case 0:
+            return new GroupConnectionPacket.Added(in);
+          case 1:
+            return new GroupConnectionPacket.Removed(in);
+          case 2:
+            return new GroupConnectionPacket.Joined(in);
+          case 3:
+            return new GroupConnectionPacket.Left(in);
+        }
+      case 19:
+        return new GroupPasswordUpdatePacket(in);
       default:
         throw new RuntimeException("Unknown packet type " + id);
     }

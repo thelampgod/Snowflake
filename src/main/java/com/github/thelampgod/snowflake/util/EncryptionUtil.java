@@ -2,8 +2,11 @@ package com.github.thelampgod.snowflake.util;
 
 
 import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 
 import static com.github.thelampgod.snowflake.util.Helper.getLog;
 

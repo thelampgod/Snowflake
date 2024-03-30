@@ -45,4 +45,12 @@ public class Group {
     public Set<Integer> getUsers() {
         return users;
     }
+
+    public boolean isOwner() {
+        return isOwner;
+    }
+
+    public byte[] getPassword() {
+        return password;
+    }
 }
