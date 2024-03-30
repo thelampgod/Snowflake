@@ -1,9 +1,9 @@
 package com.github.thelampgod.snow.commands.impl;
 
 import com.github.thelampgod.snow.Snow;
-import com.github.thelampgod.snow.packets.impl.ListUsersPacket;
-import com.github.thelampgod.snow.packets.impl.LoginStartPacket;
-import com.github.thelampgod.snow.packets.impl.OutgoingMessagePacket;
+import com.github.thelampgod.snow.packets.impl.outgoing.ListUsersPacket;
+import com.github.thelampgod.snow.packets.impl.outgoing.LoginStartPacket;
+import com.github.thelampgod.snow.packets.impl.outgoing.OutgoingMessagePacket;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;

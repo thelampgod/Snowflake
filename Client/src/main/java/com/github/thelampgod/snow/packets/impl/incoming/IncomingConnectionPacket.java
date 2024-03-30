@@ -1,4 +1,4 @@
-package com.github.thelampgod.snow.packets.impl;
+package com.github.thelampgod.snow.packets.impl.incoming;
 
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.packets.SnowflakePacket;
