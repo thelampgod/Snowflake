@@ -12,10 +12,10 @@ import java.io.IOException;
 
 import static com.github.thelampgod.snow.Helper.mc;
 
-public class IncomingHandshakePacket extends SnowflakePacket {
+public class HandshakePacket extends SnowflakePacket {
   private final byte[] encryptedSecret;
 
-  public IncomingHandshakePacket(DataInputStream in) throws IOException {
+  public HandshakePacket(DataInputStream in) throws IOException {
     encryptedSecret = new byte[in.readInt()];
     in.readFully(encryptedSecret);
   }

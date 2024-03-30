@@ -2,6 +2,7 @@ package com.github.thelampgod.snow.packets.impl.incoming;
 
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.packets.SnowflakePacket;
+import com.github.thelampgod.snow.users.User;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -22,6 +23,6 @@ public class KeyResponsePacket extends SnowflakePacket {
 
   @Override
   public void handle() {
-    Snow.instance.getServerManager().addRecipient(id, key);
+    Snow.instance.getUserManager().get(id).setKey(key);
   }
 }

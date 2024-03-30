@@ -8,9 +8,9 @@ import java.io.IOException;
 
 import static com.github.thelampgod.snow.Helper.printModMessage;
 
-public class IncomingPlainMessagePacket extends SnowflakePacket {
+public class PlainMessagePacket extends SnowflakePacket {
   private final String message;
-  public IncomingPlainMessagePacket(DataInputStream in) throws IOException {
+  public PlainMessagePacket(DataInputStream in) throws IOException {
     this.message = in.readUTF();
   }
 

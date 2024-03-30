@@ -2,6 +2,7 @@ package com.github.thelampgod.snow.packets.impl.incoming;
 
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.packets.SnowflakePacket;
+import com.github.thelampgod.snow.users.User;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -11,13 +12,13 @@ import java.io.IOException;
 
 import static com.github.thelampgod.snow.Helper.printModMessage;
 
-public class IncomingConnectionPacket extends SnowflakePacket {
+public class ConnectionPacket extends SnowflakePacket {
   private final boolean connect;
   private final int id;
   private final String user;
 
 
-  public IncomingConnectionPacket(boolean connect, int id, String user) {
+  public ConnectionPacket(boolean connect, int id, String user) {
     this.connect = connect;
     this.id = id;
     this.user = user;
@@ -44,7 +45,7 @@ public class IncomingConnectionPacket extends SnowflakePacket {
   }
 
 
-  public static class Connect extends IncomingConnectionPacket {
+  public static class Connect extends ConnectionPacket {
 
     public Connect(DataInputStream in) throws IOException {
       this(in.readInt(), in.readUTF());
@@ -61,12 +62,12 @@ public class IncomingConnectionPacket extends SnowflakePacket {
               .append(Text.literal(" connected").formatted(Formatting.GREEN)
               ));
 
-      Snow.instance.getServerManager().addUser(this.getId(), this.getUser());
+      Snow.instance.getUserManager().add(new User(this.getUser(), this.getId(), ""));
     }
 
   }
 
-  public static class Disconnect extends IncomingConnectionPacket {
+  public static class Disconnect extends ConnectionPacket {
 
     public Disconnect(DataInputStream in) throws IOException {
       this(in.readInt(), in.readUTF());
@@ -80,10 +81,10 @@ public class IncomingConnectionPacket extends SnowflakePacket {
     public void handle() {
       printModMessage(
               Text.literal(this.getUser()).formatted(Formatting.ITALIC)
-                      .append(Text.literal(" connected").formatted(Formatting.RED)
+                      .append(Text.literal(" disconnected").formatted(Formatting.RED)
                       ));
 
-      Snow.instance.getServerManager().removeUser(this.getId());
+      Snow.instance.getUserManager().remove(this.getId());
     }
   }
 }

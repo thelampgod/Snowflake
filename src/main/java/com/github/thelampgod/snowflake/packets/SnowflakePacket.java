@@ -25,28 +25,14 @@ public abstract class SnowflakePacket {
         switch (id) {
             case 0:
                 return new LoginPacket(in, sender);
-            case 1:
-                return new MessagePacket.Plain(in, sender);
-            case 2:
-                return new AddRecipientPacket(in, sender);
-            case 3:
-                return new RemoveRecipientPacket(in, sender);
             case 4:
                 return new ListUsersPacket(sender);
-            case 5:
-                return new ListRecipientsPacket(sender);
             case 6:
                 return new KeyRequestPacket(in, sender);
-            case 7:
-                return new MessagePacket.Encrypted(in, sender);
-            case 8:
-                return new LocationPacket(in, sender);
             case 9:
                 return new KeepAlivePacket(in, sender);
             case 10:
                 return new HandshakeResponsePacket(in, sender);
-            case 11:
-                return new ChunkPacket(in, sender);
             case 12:
                 return new CreateGroupPacket(in, sender);
             case 13:

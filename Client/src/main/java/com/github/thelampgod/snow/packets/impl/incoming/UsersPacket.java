@@ -1,8 +1,9 @@
 package com.github.thelampgod.snow.packets.impl.incoming;
 
-import com.github.thelampgod.snow.ServerManager;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.packets.SnowflakePacket;
+import com.github.thelampgod.snow.users.User;
+import com.github.thelampgod.snow.users.UserManager;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -10,10 +11,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class IncomingUsersPacket extends SnowflakePacket {
+public class UsersPacket extends SnowflakePacket {
   private final Map<Integer, String> idToNameMap = new HashMap<>();
 
-  public IncomingUsersPacket(DataInputStream in) throws IOException {
+  public UsersPacket(DataInputStream in) throws IOException {
     byte numUsers = in.readByte();
     for (int i = 0; i < numUsers; ++i) {
       idToNameMap.put(in.readInt(), in.readUTF());
@@ -27,7 +28,7 @@ public class IncomingUsersPacket extends SnowflakePacket {
 
   @Override
   public void handle() {
-    final ServerManager man = Snow.instance.getServerManager();
-    idToNameMap.forEach(man::addUser);
+    final UserManager man = Snow.instance.getUserManager();
+    idToNameMap.forEach((id, name) -> man.add(new User(name, id, "")));
   }
 }

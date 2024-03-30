@@ -22,8 +22,6 @@ public class ServerManager {
 
     private static String sharedSecret = null;
 
-    private final Map<Integer, String> recipientsKeys = Maps.newConcurrentMap();
-
     private final Map<Integer, String> connectedUsers = Maps.newConcurrentMap();
 
     private boolean isRunning = true;
@@ -71,36 +69,9 @@ public class ServerManager {
         threads.clear();
     }
 
-    public Map<Integer, String> getRecipientKeyMap() {
-        return recipientsKeys;
-    }
 
     public boolean isConnected() {
         return threads.stream().anyMatch(ServerHandler::isRunning);
-    }
-
-    public void addRecipient(int id, String key) {
-        this.recipientsKeys.put(id, key);
-    }
-
-    public void removeRecipient(int id) {
-        this.recipientsKeys.remove(id);
-    }
-
-    public Map<Integer, String> getConnectedUsers() {
-        return connectedUsers;
-    }
-
-    public void addUser(int id, String user) {
-        connectedUsers.put(id, user);
-    }
-
-    public void removeUser(int id) {
-        connectedUsers.remove(id);
-    }
-
-    public String getUser(int id) {
-        return connectedUsers.get(id);
     }
 
     public void receiveComm(Comm comm) throws InterruptedException {

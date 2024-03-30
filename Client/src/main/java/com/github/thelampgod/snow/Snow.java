@@ -2,6 +2,7 @@ package com.github.thelampgod.snow;
 
 import com.github.thelampgod.snow.commands.impl.AuthenticateCommand;
 import com.github.thelampgod.snow.groups.GroupManager;
+import com.github.thelampgod.snow.users.UserManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
@@ -21,6 +22,7 @@ public class Snow implements ModInitializer {
     private static ServerManager serverManager;
 
     private GroupManager groupManager;
+    private UserManager userManager;
     @Override
     public void onInitialize() {
         LOGGER.info("Loading...");
@@ -37,6 +39,7 @@ public class Snow implements ModInitializer {
         });
 
         groupManager = new GroupManager();
+        userManager = new UserManager();
         serverManager = new ServerManager(IP, PORT);
     }
 
@@ -64,5 +67,9 @@ public class Snow implements ModInitializer {
 
     public GroupManager getGroupManager() {
         return groupManager;
+    }
+
+    public UserManager getUserManager() {
+        return userManager;
     }
 }

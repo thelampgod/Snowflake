@@ -3,7 +3,6 @@ package com.github.thelampgod.snow.packets.impl.incoming;
 import com.github.thelampgod.snow.ServerManager;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.packets.SnowflakePacket;
-import com.github.thelampgod.snow.packets.impl.outgoing.ListRecipientsPacket;
 import com.github.thelampgod.snow.packets.impl.outgoing.ListUsersPacket;
 
 import java.io.DataOutputStream;
@@ -19,9 +18,8 @@ public class AuthSuccessPacket extends SnowflakePacket {
 
   @Override
   public void handle() {
-    final ServerManager man = Snow.instance.getServerManager();
+    final ServerManager man = Snow.getServerManager();
 
     man.sendPacket(new ListUsersPacket());
-    man.sendPacket(new ListRecipientsPacket());
   }
 }
