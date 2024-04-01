@@ -2,6 +2,7 @@ package com.github.thelampgod.snow.packets;
 
 import com.github.thelampgod.snow.packets.impl.*;
 import com.github.thelampgod.snow.packets.impl.incoming.*;
+import com.github.thelampgod.snow.packets.impl.GroupRemovePacket;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -47,6 +48,8 @@ public abstract class SnowflakePacket {
         }
       case 19:
         return new GroupPasswordUpdatePacket(in);
+      case 20:
+        return new GroupRemovePacket(in);
       default:
         throw new RuntimeException("Unknown packet type " + id);
     }

@@ -11,7 +11,7 @@ public class GroupManager {
 
     public void add(Group group) {
         groups.add(group);
-        if(group.getId() == -1) {
+        if (group.getId() == -1) {
             group.setId(groups.size() + 1);
         }
     }
