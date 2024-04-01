@@ -23,9 +23,4 @@ public class UsersPacket extends SnowflakePacket {
             out.writeUTF(entry.getValue());
         }
     }
-
-    @Override
-    public void handle() throws IOException {
-
-    }
 }

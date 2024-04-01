@@ -34,15 +34,10 @@ public class GroupPasswordUpdatePacket extends SnowflakePacket {
 
     @Override
     public void handle() throws IOException {
-        super.handle();
-
-        final Group group = Snowflake.INSTANCE.getGroupManager().get(groupId);
-
-        if (group.getOwnerId() != this.getSender().getId()) {
-            this.getSender().getConnection().sendPacket(new PlainMessagePacket("You are not the owner of this group."));
+        if (!super.isAuthenticated() || !super.isOwner(groupId)) {
             return;
         }
-
+        final Group group = Snowflake.INSTANCE.getGroupManager().get(groupId);
 
         for (int user : group.getUsers()) {
             final ClientHandler client = Snowflake.INSTANCE.getServer().getClientReceiver(user).getConnection();

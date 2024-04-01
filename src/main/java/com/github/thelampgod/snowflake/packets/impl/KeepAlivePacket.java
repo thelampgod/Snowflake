@@ -40,7 +40,6 @@ public class KeepAlivePacket extends SnowflakePacket {
         if (receiver.isPresent()) {
             now = receiver.get().getNow();
         } else {
-
             this.getSender().getConnection().sendPacket(new DisconnectPacket("No receiver?", this.getSender()));
         }
 

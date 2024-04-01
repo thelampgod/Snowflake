@@ -21,9 +21,4 @@ public class KeyResponsePacket extends SnowflakePacket {
         out.writeInt(id);
         out.writeUTF(key);
     }
-
-    @Override
-    public void handle() throws IOException {
-
-    }
 }

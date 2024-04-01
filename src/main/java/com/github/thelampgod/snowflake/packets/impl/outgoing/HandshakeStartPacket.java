@@ -19,8 +19,4 @@ public class HandshakeStartPacket extends SnowflakePacket {
         out.writeInt(this.encryptedSecret.length);
         out.write(encryptedSecret);
     }
-
-    @Override
-    public void handle() throws IOException {
-    }
 }

@@ -25,10 +25,6 @@ public class ConnectionPacket extends SnowflakePacket {
         out.writeUTF(name);
     }
 
-    @Override
-    public void handle() throws IOException {
-
-    }
 
     public static class Connect extends ConnectionPacket {
         public Connect(int id, String name) throws IOException {

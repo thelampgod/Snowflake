@@ -18,9 +18,4 @@ public class PlainMessagePacket extends SnowflakePacket {
         out.writeByte(9);
         out.writeUTF(message);
     }
-
-    @Override
-    public void handle() throws IOException {
-
-    }
 }

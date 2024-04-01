@@ -16,9 +16,4 @@ public class AuthSuccessPacket extends SnowflakePacket {
     public void writeData(DataOutputStream out) throws IOException {
         out.writeByte(13);
     }
-
-    @Override
-    public void handle() throws IOException {
-
-    }
 }

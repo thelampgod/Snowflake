@@ -1,6 +1,8 @@
 package com.github.thelampgod.snowflake.packets;
 
+import com.github.thelampgod.snowflake.Snowflake;
 import com.github.thelampgod.snowflake.SocketClient;
+import com.github.thelampgod.snowflake.groups.Group;
 import com.github.thelampgod.snowflake.packets.impl.GroupPasswordUpdatePacket;
 import com.github.thelampgod.snowflake.packets.impl.GroupRemovePacket;
 import com.github.thelampgod.snowflake.packets.impl.KeepAlivePacket;
@@ -54,8 +56,22 @@ public abstract class SnowflakePacket {
     public abstract void writeData(DataOutputStream out) throws IOException;
 
     public void handle() throws IOException {
+    }
+
+    public boolean isAuthenticated() throws IOException {
         if (!this.getSender().isAuthenticated()) {
             this.getSender().getConnection().sendPacket(new PlainMessagePacket("Not authenticated."));
+            return false;
         }
+        return true;
+    }
+
+    public boolean isOwner(int groupId) throws IOException {
+        final Group group = Snowflake.INSTANCE.getGroupManager().get(groupId);
+        if (group.getOwnerId() != this.getSender().getId()) {
+            this.getSender().getConnection().sendPacket(new PlainMessagePacket("You are not the owner of this group."));
+            return false;
+        }
+        return true;
     }
 }

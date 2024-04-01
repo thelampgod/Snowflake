@@ -25,7 +25,10 @@ public class CreateGroupPacket extends SnowflakePacket {
 
     @Override
     public void handle() throws IOException {
-        super.handle();
+        if (!super.isAuthenticated()) {
+            return;
+        }
+
         final Group group = new Group(this.name, this.getSender().getId());
         Snowflake.INSTANCE.getGroupManager().add(group);
 

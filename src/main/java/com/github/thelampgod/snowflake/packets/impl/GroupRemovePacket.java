@@ -19,13 +19,10 @@ public class GroupRemovePacket extends SnowflakePacket {
 
     @Override
     public void handle() throws IOException {
-        super.handle();
-
-        final Group group = Snowflake.INSTANCE.getGroupManager().get(groupId);
-        if (group.getOwnerId() != this.getSender().getId()) {
-            this.getSender().getConnection().sendPacket(new PlainMessagePacket("You are not the owner of this group."));
+        if (!super.isAuthenticated() || !super.isOwner(groupId)) {
             return;
         }
+        final Group group = Snowflake.INSTANCE.getGroupManager().get(groupId);
 
         for (int clientId : group.getUsers()) {
             SocketClient client = Snowflake.INSTANCE.getServer().getClientReceiver(clientId);

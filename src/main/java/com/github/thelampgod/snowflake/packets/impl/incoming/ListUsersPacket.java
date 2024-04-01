@@ -28,7 +28,10 @@ public class ListUsersPacket extends SnowflakePacket {
 
     @Override
     public void handle() throws IOException {
-        super.handle();
+        if (!super.isAuthenticated()) {
+            return;
+        }
+
         JsonObject node = new JsonObject();
         final Map<Integer, String> idToNameMap = new HashMap<>();
         for (SocketClient client : getConnectedClients()) {
