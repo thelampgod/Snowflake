@@ -1,17 +1,11 @@
 package com.github.thelampgod.snow.packets;
 
-import com.github.thelampgod.snow.EncryptionUtil;
 import com.github.thelampgod.snow.packets.impl.*;
 import com.github.thelampgod.snow.packets.impl.incoming.*;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.security.PrivateKey;
-
-import static com.github.thelampgod.snow.Helper.mc;
 
 public abstract class SnowflakePacket {
   public static SnowflakePacket fromId(byte id, DataInputStream in) throws Exception {

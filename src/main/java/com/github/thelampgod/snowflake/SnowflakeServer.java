@@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
 import java.io.*;
 import java.net.ServerSocket;
 import java.util.*;
+
 import static com.github.thelampgod.snowflake.util.Helper.*;
 
 public class SnowflakeServer {
@@ -65,10 +66,7 @@ public class SnowflakeServer {
         getLog().info(client + " disconnected.");
 
         try {
-
-            if (!client.isReceiver()) {
-                sendDisconnectMessage(client);
-            }
+            sendDisconnectMessage(client);
         } catch (IOException e) {
             e.printStackTrace();
         }
