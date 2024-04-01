@@ -103,17 +103,18 @@ public class ClientHandler extends Thread {
         getLog().debug("Sending a " + packet.getClass().getSimpleName() + " to " + client);
         packet.writeData(out);
         out.flush();
+
+        if (packet instanceof DisconnectPacket disconnect) {
+            getServer().removeClient(disconnect.getSender());
+            getLog().debug(disconnect.getSender() + " disconnected. Reason: " + disconnect.getReason());
+        }
     }
 
     public void sendPacket(SnowflakePacket packet) throws IOException {
         if (!this.client.isReceiver()) {
-            for (SocketClient receiver : getConnectedClients()) {
-                if (!receiver.isReceiver()) continue;
-                if (receiver.getLinkString().equals(this.client.getLinkString())) {
-                    receiver.getConnection().sendPacket(packet);
-                    return;
-                }
-            }
+            final SocketClient receiver = Snowflake.INSTANCE.getServer().getClientReceiver(this.client.getId());
+            receiver.getConnection().sendPacket(packet);
+            return;
         }
 
         readWriteLock.writeLock().lock();
@@ -131,7 +132,6 @@ public class ClientHandler extends Thread {
             return;
         }
         client.responded = false;
-        getLog().debug("sending keepalive to " + client);
         client.setNow(System.currentTimeMillis());
         this.dispatchPacket(new KeepAlivePacket(client.getNow()));
     }
