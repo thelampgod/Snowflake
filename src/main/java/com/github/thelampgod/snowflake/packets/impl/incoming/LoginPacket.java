@@ -2,7 +2,7 @@ package com.github.thelampgod.snowflake.packets.impl.incoming;
 
 import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
-import com.github.thelampgod.snowflake.packets.impl.outgoing.DisconnectPacket;
+import com.github.thelampgod.snowflake.packets.impl.DisconnectPacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.HandshakeStartPacket;
 import org.apache.commons.lang3.RandomStringUtils;
 

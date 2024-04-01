@@ -1,9 +1,12 @@
 package com.github.thelampgod.snowflake.packets;
 
 import com.github.thelampgod.snowflake.SocketClient;
+import com.github.thelampgod.snowflake.packets.impl.GroupPasswordUpdatePacket;
+import com.github.thelampgod.snowflake.packets.impl.GroupRemovePacket;
+import com.github.thelampgod.snowflake.packets.impl.KeepAlivePacket;
 import com.github.thelampgod.snowflake.packets.impl.incoming.GroupInvitePacket;
 import com.github.thelampgod.snowflake.packets.impl.incoming.*;
-import com.github.thelampgod.snowflake.packets.impl.outgoing.DisconnectPacket;
+import com.github.thelampgod.snowflake.packets.impl.DisconnectPacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.PlainMessagePacket;
 
 import java.io.DataInputStream;

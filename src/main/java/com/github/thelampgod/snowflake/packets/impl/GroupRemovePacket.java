@@ -1,4 +1,4 @@
-package com.github.thelampgod.snowflake.packets.impl.incoming;
+package com.github.thelampgod.snowflake.packets.impl;
 
 import com.github.thelampgod.snowflake.Snowflake;
 import com.github.thelampgod.snowflake.SocketClient;

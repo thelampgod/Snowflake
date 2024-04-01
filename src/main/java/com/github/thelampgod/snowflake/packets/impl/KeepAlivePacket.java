@@ -1,8 +1,7 @@
-package com.github.thelampgod.snowflake.packets.impl.incoming;
+package com.github.thelampgod.snowflake.packets.impl;
 
 import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
-import com.github.thelampgod.snowflake.packets.impl.outgoing.DisconnectPacket;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
