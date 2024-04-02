@@ -7,8 +7,9 @@ import com.github.thelampgod.snow.packets.impl.GroupRemovePacket;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 
-public abstract class SnowflakePacket {
+public abstract class SnowflakePacket implements Serializable {
   public static SnowflakePacket fromId(byte id, DataInputStream in) throws Exception {
     switch (id) {
       case 4:
@@ -50,6 +51,8 @@ public abstract class SnowflakePacket {
         return new GroupPasswordUpdatePacket(in);
       case 20:
         return new GroupRemovePacket(in);
+      case 21:
+        return new EncryptedDataPacket(in);
       default:
         throw new RuntimeException("Unknown packet type " + id);
     }
@@ -58,4 +61,5 @@ public abstract class SnowflakePacket {
   public abstract void writeData(DataOutputStream out) throws IOException;
 
   public abstract void handle();
+
 }

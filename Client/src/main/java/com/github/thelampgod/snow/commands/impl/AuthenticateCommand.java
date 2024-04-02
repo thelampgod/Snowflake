@@ -1,8 +1,10 @@
 package com.github.thelampgod.snow.commands.impl;
 
 import com.github.thelampgod.snow.Snow;
+import com.github.thelampgod.snow.packets.impl.EncryptedDataPacket;
 import com.github.thelampgod.snow.packets.impl.outgoing.ListUsersPacket;
 import com.github.thelampgod.snow.packets.impl.outgoing.LoginStartPacket;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -21,16 +23,18 @@ public class AuthenticateCommand {
                         .executes(AuthenticateCommand::authenticate))
                 .then(ClientCommandManager.literal("list")
                         .executes(AuthenticateCommand::list))
-                /*.then(ClientCommandManager.literal("send")
-                        .then(ClientCommandManager.argument("message", StringArgumentType.string())
-                        .executes(AuthenticateCommand::sendMessage)))*/;
+                .then(ClientCommandManager.literal("send")
+                        .then(ClientCommandManager.argument("group", IntegerArgumentType.integer())
+                                .then(ClientCommandManager.argument("message", StringArgumentType.string())
+                                        .executes(AuthenticateCommand::sendMessage))));
     }
 
-//    private static int sendMessage(CommandContext<FabricClientCommandSource> ctx) {
-//        final String message = ctx.getArgument("message", String.class);
-//        Snow.getServerManager().sendPacket(new GroupMessagePacket(groupId, message));
-//        return 1;
-//    }
+    private static int sendMessage(CommandContext<FabricClientCommandSource> ctx) {
+        final int groupId = ctx.getArgument("group", Integer.class);
+        final String message = ctx.getArgument("message", String.class);
+//        Snow.getServerManager().sendPacket(new EncryptedDataPacket(groupId, new MessagePacket(groupId, message)));
+        return 1;
+    }
 
     private static int list(CommandContext<FabricClientCommandSource> ctx) {
         Snow.getServerManager().sendPacket(new ListUsersPacket());
