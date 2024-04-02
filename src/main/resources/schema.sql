@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS groups (
     id INTEGER PRIMARY KEY,
-    name COLLATE NO CASE NOT NULL,
+    name COLLATE NOCASE NOT NULL,
     owner_id INTEGER NOT NULL,
 
     -- Delete deleted group reference in users table on group delete

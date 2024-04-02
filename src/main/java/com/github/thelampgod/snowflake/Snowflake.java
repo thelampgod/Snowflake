@@ -21,9 +21,7 @@ import java.sql.Statement;
 public class Snowflake {
     public static Snowflake INSTANCE;
     private static final int PORT = 2147;
-
     private final SnowflakeServer server;
-
     private final GroupManager groupManager;
     private final Database database;
 

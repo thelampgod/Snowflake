@@ -87,7 +87,7 @@ public class DatabaseUtil {
 
         try (Connection conn = db.getConnection()) {
             ResultSet result = DatabaseUtil.runQuery(
-                    "select (name, id, owner_id, user_id) from groups join group_users on id=group_id", conn).getResultSet();
+                    "select id, name, owner_id, user_id from groups join group_users on id=group_id", conn).getResultSet();
             while (result.next()) {
                 Group group = new Group(
                         result.getString("name"),
