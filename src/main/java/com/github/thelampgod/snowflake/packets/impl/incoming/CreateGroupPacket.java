@@ -5,6 +5,7 @@ import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.groups.Group;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.GroupInfoPacket;
+import com.github.thelampgod.snowflake.util.DatabaseUtil;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -30,6 +31,8 @@ public class CreateGroupPacket extends SnowflakePacket {
         }
 
         final Group group = new Group(this.name, this.getSender().getId());
+        int groupId = DatabaseUtil.insertGroup(group, Snowflake.INSTANCE.getDb());
+        group.setId(groupId);
         Snowflake.INSTANCE.getGroupManager().add(group);
 
         this.getSender().getConnection().sendPacket(new GroupInfoPacket(group.getName(), group.getId(), true, group.getUsers()));

@@ -1,16 +1,17 @@
 package com.github.thelampgod.snowflake.packets.impl.incoming;
 
+import com.github.thelampgod.snowflake.Snowflake;
 import com.github.thelampgod.snowflake.SocketClient;
+import com.github.thelampgod.snowflake.groups.Group;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
-import com.github.thelampgod.snowflake.packets.impl.outgoing.AuthSuccessPacket;
-import com.github.thelampgod.snowflake.packets.impl.outgoing.ConnectionPacket;
-import com.github.thelampgod.snowflake.packets.impl.outgoing.PlainMessagePacket;
+import com.github.thelampgod.snowflake.packets.impl.outgoing.*;
 import com.github.thelampgod.snowflake.packets.impl.DisconnectPacket;
 import com.github.thelampgod.snowflake.util.DatabaseUtil;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Set;
 
 import static com.github.thelampgod.snowflake.util.Helper.getConnectedClients;
 import static com.github.thelampgod.snowflake.util.Helper.getLog;
@@ -41,7 +42,6 @@ public class HandshakeResponsePacket extends SnowflakePacket {
             int id = DatabaseUtil.insertUser(client);
             client.setId(id);
             client.setAuthenticated(true);
-            client.getConnection().recipientsIds.addAll(DatabaseUtil.getRecipientsFromDatabase(id));
 
             getConnectedClients().stream()
                     .filter(c -> c.getLinkString().equals(client.getLinkString()))
@@ -57,6 +57,17 @@ public class HandshakeResponsePacket extends SnowflakePacket {
             getLog().info(client + " authenticated.");
             sendConnectionMsg();
 
+            final Set<Group> userGroups = Snowflake.INSTANCE.getGroupManager().findUserGroups(client.getId());
+
+
+
+            for (Group group : userGroups) {
+                client.getConnection().sendPacket(new GroupInfoPacket(group.getName(), group.getId(), group.getOwnerId() == client.getId(), group.getUsers()));
+                for (int groupUsersIds : group.getUsers()) {
+                    final SocketClient groupUser = Snowflake.INSTANCE.getServer().getClientReceiver(groupUsersIds);
+                    groupUser.getConnection().sendPacket(new GroupConnectionPacket.Joined(group.getId(), client.getId()));
+                }
+            }
 
             client.getConnection().sendPacket(new PlainMessagePacket("Successfully authenticated"));
             client.getConnection().sendPacket(new AuthSuccessPacket());

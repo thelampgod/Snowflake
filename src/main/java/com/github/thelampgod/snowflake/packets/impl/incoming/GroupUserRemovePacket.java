@@ -6,6 +6,7 @@ import com.github.thelampgod.snowflake.groups.Group;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.GroupConnectionPacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.PlainMessagePacket;
+import com.github.thelampgod.snowflake.util.DatabaseUtil;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -32,6 +33,7 @@ public class GroupUserRemovePacket extends SnowflakePacket {
         }
         final Group group = Snowflake.INSTANCE.getGroupManager().get(groupId);
         group.removeUser(clientId);
+        DatabaseUtil.removeUserFromGroup(clientId, group, Snowflake.INSTANCE.getDb());
 
         for (int clientId : group.getUsers()) {
             final SocketClient user = Snowflake.INSTANCE.getServer().getClientReceiver(clientId);

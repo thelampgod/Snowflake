@@ -40,8 +40,6 @@ public class Snowflake {
 //            StatusLogger.getLogger().setLevel(Level.DEBUG);
         }
 
-        groupManager = new GroupManager();
-
         try {
             logger.info("Connecting to database...");
             this.database = new Database("jdbc:sqlite:snowflake.db");
@@ -50,6 +48,9 @@ public class Snowflake {
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
         }
+
+        groupManager = new GroupManager();
+        groupManager.load(this.database);
 
         logger.info("Starting Snowflake server on port " + PORT);
         this.server = new SnowflakeServer();

@@ -2,20 +2,17 @@ package com.github.thelampgod.snowflake.util;
 
 import com.github.thelampgod.snowflake.Snowflake;
 import com.github.thelampgod.snowflake.SocketClient;
+import com.github.thelampgod.snowflake.database.Database;
+import com.github.thelampgod.snowflake.groups.Group;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static com.github.thelampgod.snowflake.util.Helper.getDb;
+import java.util.*;
 
 public class DatabaseUtil {
 
     public static int insertUser(SocketClient client) {
         try (Connection conn = Snowflake.INSTANCE.getDb().getConnection()) {
             // if already exists then return the id
-
             try (PreparedStatement statement = conn.prepareStatement("select id from users where pubkey=?")) {
                 statement.setString(1, client.getPubKey());
 
@@ -38,8 +35,6 @@ public class DatabaseUtil {
                 // get inserted id
                 ResultSet r = runQuery("select last_insert_rowid() AS last_id", conn).getResultSet();
                 insertedId = r.getInt("last_id");
-
-
             } catch (Throwable th) {
                 conn.rollback();
                 throw th;
@@ -60,105 +55,110 @@ public class DatabaseUtil {
         return s;
     }
 
-    public static void insertRecipient(int recipientId, String recipientKey, int userId) {
-        try (Connection conn = Snowflake.INSTANCE.getDb().getConnection()) {
-
-            ResultSet result =
-                    runQuery("select * from recipients where user_id=" + userId + " and recipient_user_id=" + recipientId, conn).getResultSet();
-            if (result.next()) {
-                //recipient already exists
-                result.close();
-                return;
-            }
-
+    public static int insertGroup(Group group, Database db) {
+        int insertedId = -1;
+        try (Connection conn = db.getConnection()) {
             conn.setAutoCommit(false);
             try {
                 try (PreparedStatement statement = conn.prepareStatement(
-                        "insert into recipients(recipient_user_id, pubkey, user_id) values(?, ?, ?)")) {
-                    statement.setInt(1, recipientId);
-                    statement.setObject(2, recipientKey);
-                    statement.setInt(3, userId);
+                        "insert into groups(name, owner_id) values(?, ?)")) {
+                    statement.setObject(1, group.getName());
+                    statement.setInt(2, group.getOwnerId());
 
                     statement.execute();
                 }
+                ResultSet r = runQuery("select last_insert_rowid() AS last_id", conn).getResultSet();
+                insertedId = r.getInt("last_id");
 
             } catch (Throwable th) {
                 conn.rollback();
                 throw th;
             }
             conn.commit();
-
+            return insertedId;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return insertedId;
     }
 
-    public static void removeRecipient(int recipientId, int userId) {
-        try (Connection conn = Snowflake.INSTANCE.getDb().getConnection()) {
-            conn.setAutoCommit(false);
-            try {
-                try (PreparedStatement statement = conn.prepareStatement(
-                        "delete from recipients where `recipient_user_id`=? AND `user_id`=?")) {
-                    statement.setInt(1, recipientId);
-                    statement.setInt(2, userId);
+    public static Collection<? extends Group> getGroupsFromDb(Database db) {
+        List<Group> temp = new ArrayList<>();
 
-                    statement.execute();
-                }
-
-            } catch (Throwable th) {
-                conn.rollback();
-                throw th;
-            }
-            conn.commit();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public static Optional<Integer> removeRecipient(String recipientKey, int userId) {
-        Optional<Integer> id = Optional.empty();
-        try (Connection conn = Snowflake.INSTANCE.getDb().getConnection()) {
-            ResultSet result = runQuery("select recipient_user_id from recipients where `pubkey`=\"" + recipientKey + "\"", conn).getResultSet();
-            if (result.next()) {
-                id = Optional.of(result.getInt("id"));
-            }
-
-            conn.setAutoCommit(false);
-            try {
-                try (PreparedStatement statement = conn.prepareStatement(
-                        "delete from recipients where `pubkey`=? AND `user_id`=?")) {
-                    statement.setObject(1, recipientKey);
-                    statement.setInt(2, userId);
-
-                    statement.execute();
-                }
-
-            } catch (Throwable th) {
-                conn.rollback();
-                throw th;
-            }
-            conn.commit();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return id;
-    }
-
-    public static List<Integer> getRecipientsFromDatabase(int id) {
-        List<Integer> temp = new ArrayList<>();
-        try (Connection conn = getDb().getConnection()) {
-            ResultSet result = DatabaseUtil.runQuery("select recipient_user_id from recipients where user_id=" + id, conn).getResultSet();
+        try (Connection conn = db.getConnection()) {
+            ResultSet result = DatabaseUtil.runQuery(
+                    "select (name, id, owner_id, user_id) from groups join group_users on id=group_id", conn).getResultSet();
             while (result.next()) {
-                temp.add(result.getInt("recipient_user_id"));
+                Group group = new Group(
+                        result.getString("name"),
+                        result.getInt("id"),
+                        result.getInt("owner_id"));
+                group.addUser(result.getInt("user_id"));
+                temp.add(group);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return temp;
+    }
+
+    public static void removeGroup(Group group, Database db) {
+        try (Connection conn = db.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                try (PreparedStatement statement = conn.prepareStatement("delete from groups where id=?")) {
+                    statement.setInt(1, group.getId());
+                    statement.execute();
+                }
+            } catch (Throwable th) {
+                conn.rollback();
+                throw th;
+            }
+            conn.commit();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void addUserToGroup(int clientId, Group group, Database db) {
+        try (Connection conn = db.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                try (PreparedStatement statement = conn.prepareStatement("insert into group_users(user_id, group_id) values(?,?)")) {
+                    statement.setInt(1, clientId);
+                    statement.setInt(2, group.getId());
+                    statement.execute();
+                }
+            } catch (Throwable th) {
+                conn.rollback();
+                throw th;
+            }
+            conn.commit();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void removeUserFromGroup(int clientId, Group group, Database db) {
+        try (Connection conn = db.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                try (PreparedStatement statement = conn.prepareStatement("delete from group_users where user_id=? and group_id=?")) {
+                    statement.setInt(1, clientId);
+                    statement.setInt(2, group.getId());
+                    statement.execute();
+                }
+            } catch (Throwable th) {
+                conn.rollback();
+                throw th;
+            }
+            conn.commit();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

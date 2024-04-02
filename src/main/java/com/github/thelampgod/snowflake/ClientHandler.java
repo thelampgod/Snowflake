@@ -20,8 +20,6 @@ public class ClientHandler extends Thread {
     public boolean isRunning = true;
     private DataOutputStream out;
     private DataInputStream in;
-
-    public final HashSet<Integer> recipientsIds = new HashSet<>();
     private final Queue<SnowflakePacket> outboundPacketsQueue = new ConcurrentLinkedQueue<>();
     private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 

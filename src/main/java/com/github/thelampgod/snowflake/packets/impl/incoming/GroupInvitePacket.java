@@ -9,6 +9,7 @@ import com.github.thelampgod.snowflake.packets.impl.outgoing.GroupConnectionPack
 import com.github.thelampgod.snowflake.packets.impl.outgoing.GroupPasswordPacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.GroupInfoPacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.PlainMessagePacket;
+import com.github.thelampgod.snowflake.util.DatabaseUtil;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -38,10 +39,11 @@ public class GroupInvitePacket extends SnowflakePacket {
             return;
         }
         final Group group = Snowflake.INSTANCE.getGroupManager().get(groupId);
+        group.addUser(clientId);
+        DatabaseUtil.addUserToGroup(clientId, group, Snowflake.INSTANCE.getDb());
 
         final ClientHandler invitedUser = Snowflake.INSTANCE.getServer().getClientReceiver(clientId).getConnection();
 
-        group.addUser(clientId);
         invitedUser.sendPacket(new GroupInfoPacket(group.getName(), group.getId(), false, group.getUsers()));
         invitedUser.sendPacket(new GroupPasswordPacket(group.getId(), this.decryptKey));
 

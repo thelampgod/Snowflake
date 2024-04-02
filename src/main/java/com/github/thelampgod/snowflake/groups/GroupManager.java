@@ -1,6 +1,8 @@
 package com.github.thelampgod.snowflake.groups;
 
 import com.github.thelampgod.snowflake.SocketClient;
+import com.github.thelampgod.snowflake.database.Database;
+import com.github.thelampgod.snowflake.util.DatabaseUtil;
 import com.google.common.collect.Sets;
 
 import java.util.Set;
@@ -11,9 +13,6 @@ public class GroupManager {
 
     public void add(Group group) {
         groups.add(group);
-        if (group.getId() == -1) {
-            group.setId(groups.size() + 1);
-        }
     }
 
     public void remove(Group group) {
@@ -39,4 +38,9 @@ public class GroupManager {
                 .findAny()
                 .orElseGet(null);
     }
+
+    public void load(Database database) {
+        groups.addAll(DatabaseUtil.getGroupsFromDb(database));
+    }
+
 }
