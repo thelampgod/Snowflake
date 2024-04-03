@@ -2,9 +2,6 @@ package com.github.thelampgod.snow.packets.impl;
 
 import com.github.thelampgod.snow.packets.WrappedPacket;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 public class MessagePacket extends WrappedPacket {
 
     // Meant for group or user
@@ -17,16 +14,6 @@ public class MessagePacket extends WrappedPacket {
         this.group = group;
         this.id = id;
         this.message = message;
-    }
-
-    @Override
-    public void writeData(DataOutputStream out) throws IOException {
-        throw new UnsupportedOperationException("MessagePacket cannot be sent on its own, should be wrapped in an EncryptedDataPacket");
-    }
-
-    @Override
-    public void handle() {
-
     }
 
     public static class Group extends MessagePacket {

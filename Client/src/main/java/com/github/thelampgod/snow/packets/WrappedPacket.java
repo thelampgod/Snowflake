@@ -3,7 +3,7 @@ package com.github.thelampgod.snow.packets;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class WrappedPacket extends SnowflakePacket {
+public abstract class WrappedPacket extends SnowflakePacket {
     private int sender;
 
     public int getSender() {
@@ -16,7 +16,8 @@ public class WrappedPacket extends SnowflakePacket {
 
     @Override
     public void writeData(DataOutputStream out) throws IOException {
-
+        throw new UnsupportedOperationException(
+                this.getClass().getSimpleName() + " cannot be sent on its own, should be wrapped in an EncryptedDataPacket");
     }
 
     @Override
