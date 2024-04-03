@@ -2,6 +2,7 @@ package com.github.thelampgod.snow;
 
 import com.github.thelampgod.snow.groups.Group;
 import com.github.thelampgod.snow.packets.SnowflakePacket;
+import com.github.thelampgod.snow.packets.WrappedPacket;
 import com.github.thelampgod.snow.users.User;
 import org.apache.logging.log4j.core.tools.Generate;
 
@@ -78,13 +79,13 @@ public class EncryptionUtil {
         return bos.toByteArray();
     }
 
-    public static SnowflakePacket toPacket(byte[] bytes) throws Exception {
+    public static WrappedPacket toPacket(byte[] bytes) throws Exception {
         ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
         ObjectInputStream ois = new ObjectInputStream(bis);
-        return (SnowflakePacket) ois.readObject();
+        return (WrappedPacket) ois.readObject();
     }
 
-    public static byte[] encryptPacket(SnowflakePacket packet, boolean forGroup, int id) throws Exception {
+    public static byte[] encryptPacket(WrappedPacket packet, boolean forGroup, int id) throws Exception {
         if (forGroup) {
             return encryptPacketForGroup(packet, id);
         }
@@ -92,7 +93,7 @@ public class EncryptionUtil {
         return encryptPacketForUser(packet, id);
     }
 
-    private static byte[] encryptPacketForUser(SnowflakePacket packet, int userId) throws Exception {
+    private static byte[] encryptPacketForUser(WrappedPacket packet, int userId) throws Exception {
         final User user = Snow.instance.getUserManager().get(userId);
 
         byte[] packetBytes = toBytes(packet);
@@ -100,7 +101,7 @@ public class EncryptionUtil {
         return encrypt(packetBytes, user.getKey());
     }
 
-    public static byte[] encryptPacketForGroup(SnowflakePacket packet, int groupId) throws Exception {
+    public static byte[] encryptPacketForGroup(WrappedPacket packet, int groupId) throws Exception {
         final Group group = Snow.instance.getGroupManager().get(groupId);
 
         byte[] packetBytes = toBytes(packet);

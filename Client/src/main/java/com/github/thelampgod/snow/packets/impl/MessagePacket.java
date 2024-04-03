@@ -1,11 +1,11 @@
 package com.github.thelampgod.snow.packets.impl;
 
-import com.github.thelampgod.snow.packets.SnowflakePacket;
+import com.github.thelampgod.snow.packets.WrappedPacket;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class MessagePacket extends SnowflakePacket {
+public class MessagePacket extends WrappedPacket {
 
     // Meant for group or user
     private final boolean group;
@@ -38,6 +38,7 @@ public class MessagePacket extends SnowflakePacket {
         public void handle() {
             //todo:
             //groupscreen.add(message, from, group)
+            //super.getSender()
 
         }
     }

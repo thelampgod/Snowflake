@@ -4,6 +4,7 @@ import com.github.thelampgod.snow.EncryptionUtil;
 import com.github.thelampgod.snow.Helper;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.packets.SnowflakePacket;
+import com.github.thelampgod.snow.packets.WrappedPacket;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -15,11 +16,13 @@ public class EncryptedDataPacket extends SnowflakePacket {
 
     // Meant for group or user
     private final boolean group;
+
+    private int senderId;
     // The group or user id
     private final int id;
     private final byte[] encryptedPacket;
 
-    public EncryptedDataPacket(boolean group, int id, SnowflakePacket packet) throws Exception {
+    public EncryptedDataPacket(boolean group, int id, WrappedPacket packet) throws Exception {
         this.group = group;
         this.id = id;
         this.encryptedPacket = EncryptionUtil.encryptPacket(packet, group, id);
@@ -27,6 +30,7 @@ public class EncryptedDataPacket extends SnowflakePacket {
 
     public EncryptedDataPacket(boolean group, DataInputStream in) throws IOException {
         this.group = group;
+        this.senderId = in.readInt();
         this.id = in.readInt();
         this.encryptedPacket = new byte[in.readInt()];
         in.readFully(encryptedPacket);
@@ -47,7 +51,7 @@ public class EncryptedDataPacket extends SnowflakePacket {
     }
 
     public static class Group extends EncryptedDataPacket {
-        public Group(int groupId, SnowflakePacket packet) throws Exception {
+        public Group(int groupId, WrappedPacket packet) throws Exception {
             super(true, groupId, packet);
         }
 
@@ -62,7 +66,8 @@ public class EncryptedDataPacket extends SnowflakePacket {
             try {
                 byte[] decrypted = EncryptionUtil.decryptByPassword(super.encryptedPacket, group.getPassword());
 
-                SnowflakePacket packet = EncryptionUtil.toPacket(decrypted);
+                WrappedPacket packet = EncryptionUtil.toPacket(decrypted);
+                packet.setSender(super.senderId);
                 packet.handle();
             } catch (Exception e) {
                 printModMessage("Failed to decrypt");
@@ -72,7 +77,7 @@ public class EncryptedDataPacket extends SnowflakePacket {
     }
 
     public static class User extends EncryptedDataPacket {
-        public User(int userId, SnowflakePacket packet) throws Exception {
+        public User(int userId, WrappedPacket packet) throws Exception {
             super(false, userId, packet);
         }
 
@@ -85,7 +90,8 @@ public class EncryptedDataPacket extends SnowflakePacket {
             try {
                 byte[] decrypted = EncryptionUtil.decrypt(super.encryptedPacket, Helper.getPrivateKey());
 
-                SnowflakePacket packet = EncryptionUtil.toPacket(decrypted);
+                WrappedPacket packet = EncryptionUtil.toPacket(decrypted);
+                packet.setSender(super.senderId);
                 packet.handle();
             } catch (Exception e) {
                 printModMessage("Failed to decrypt");

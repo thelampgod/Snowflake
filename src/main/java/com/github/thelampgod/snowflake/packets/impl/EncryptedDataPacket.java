@@ -26,6 +26,7 @@ public class EncryptedDataPacket extends SnowflakePacket {
     public void writeData(DataOutputStream out) throws IOException {
         out.writeByte(21);
         out.writeBoolean(group);
+        out.writeInt(this.getSender().getId());
         out.writeInt(id);
         out.writeInt(data.length);
         out.write(data);
