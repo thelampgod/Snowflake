@@ -1,5 +1,7 @@
 package com.github.thelampgod.snow.commands.impl;
 
+import com.github.thelampgod.snow.EncryptionUtil;
+import com.github.thelampgod.snow.Helper;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.packets.impl.EncryptedDataPacket;
 import com.github.thelampgod.snow.packets.impl.MessagePacket;
@@ -27,7 +29,23 @@ public class AuthenticateCommand {
                 .then(ClientCommandManager.literal("send")
                         .then(ClientCommandManager.argument("group", IntegerArgumentType.integer())
                                 .then(ClientCommandManager.argument("message", StringArgumentType.string())
-                                        .executes(AuthenticateCommand::sendMessage))));
+                                        .executes(AuthenticateCommand::sendMessage))))
+                .then(ClientCommandManager.literal("test")
+                        .then(ClientCommandManager.argument("message", StringArgumentType.string())
+                        .executes(AuthenticateCommand::test)));
+    }
+
+    private static int test(CommandContext<FabricClientCommandSource> ctx) {
+        try {
+            final String message = ctx.getArgument("message", String.class);
+            byte[] enc = EncryptionUtil.encrypt(message.getBytes(), Helper.getPublicKey());
+            System.out.println(new String(enc));
+            byte[] dec = EncryptionUtil.decrypt(enc, Helper.getPrivateKey());
+            System.out.println(new String(dec));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 1;
     }
 
     private static int sendMessage(CommandContext<FabricClientCommandSource> ctx) {
