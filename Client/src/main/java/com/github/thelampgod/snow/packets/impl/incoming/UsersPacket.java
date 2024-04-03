@@ -29,6 +29,6 @@ public class UsersPacket extends SnowflakePacket {
   @Override
   public void handle() {
     final UserManager man = Snow.instance.getUserManager();
-    idToNameMap.forEach((id, name) -> man.add(new User(name, id, "")));
+    idToNameMap.forEach((id, name) -> man.add(new User(name, id, null)));
   }
 }

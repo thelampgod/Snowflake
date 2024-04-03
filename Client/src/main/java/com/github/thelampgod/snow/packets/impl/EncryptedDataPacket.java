@@ -1,8 +1,8 @@
 package com.github.thelampgod.snow.packets.impl;
 
 import com.github.thelampgod.snow.EncryptionUtil;
+import com.github.thelampgod.snow.Helper;
 import com.github.thelampgod.snow.Snow;
-import com.github.thelampgod.snow.groups.Group;
 import com.github.thelampgod.snow.packets.SnowflakePacket;
 
 import java.io.DataInputStream;
@@ -12,16 +12,22 @@ import java.io.IOException;
 import static com.github.thelampgod.snow.Helper.printModMessage;
 
 public class EncryptedDataPacket extends SnowflakePacket {
-    private final int groupId;
+
+    // Meant for group or user
+    private final boolean group;
+    // The group or user id
+    private final int id;
     private final byte[] encryptedPacket;
 
-    public EncryptedDataPacket(int groupId, SnowflakePacket packet) throws Exception {
-        this.groupId = groupId;
-        this.encryptedPacket = EncryptionUtil.encryptPacket(packet, groupId);
+    public EncryptedDataPacket(boolean group, int id, SnowflakePacket packet) throws Exception {
+        this.group = group;
+        this.id = id;
+        this.encryptedPacket = EncryptionUtil.encryptPacket(packet, group, id);
     }
 
-    public EncryptedDataPacket(DataInputStream in) throws IOException {
-        this.groupId = in.readInt();
+    public EncryptedDataPacket(boolean group, DataInputStream in) throws IOException {
+        this.group = group;
+        this.id = in.readInt();
         this.encryptedPacket = new byte[in.readInt()];
         in.readFully(encryptedPacket);
     }
@@ -29,23 +35,62 @@ public class EncryptedDataPacket extends SnowflakePacket {
     @Override
     public void writeData(DataOutputStream out) throws IOException {
         out.writeByte(17);
-        out.writeInt(groupId);
+        out.writeBoolean(group);
+        out.writeInt(id);
         out.writeInt(encryptedPacket.length);
         out.write(encryptedPacket);
     }
 
     @Override
     public void handle() {
-        final Group group = Snow.instance.getGroupManager().get(groupId);
 
-        try {
-            byte[] decrypted = EncryptionUtil.decryptByPassword(encryptedPacket, group.getPassword());
+    }
 
-            SnowflakePacket packet = EncryptionUtil.toPacket(decrypted);
-            packet.handle();
-        } catch (Exception e) {
-            printModMessage("Failed to decrypt");
-            e.printStackTrace();
+    public static class Group extends EncryptedDataPacket {
+        public Group(int groupId, SnowflakePacket packet) throws Exception {
+            super(true, groupId, packet);
+        }
+
+        public Group(DataInputStream in) throws IOException {
+            super(true, in);
+        }
+
+        @Override
+        public void handle() {
+            final com.github.thelampgod.snow.groups.Group group = Snow.instance.getGroupManager().get(super.id);
+
+            try {
+                byte[] decrypted = EncryptionUtil.decryptByPassword(super.encryptedPacket, group.getPassword());
+
+                SnowflakePacket packet = EncryptionUtil.toPacket(decrypted);
+                packet.handle();
+            } catch (Exception e) {
+                printModMessage("Failed to decrypt");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static class User extends EncryptedDataPacket {
+        public User(int userId, SnowflakePacket packet) throws Exception {
+            super(false, userId, packet);
+        }
+
+        public User(DataInputStream in) throws IOException {
+            super(false, in);
+        }
+
+        @Override
+        public void handle() {
+            try {
+                byte[] decrypted = EncryptionUtil.decrypt(super.encryptedPacket, Helper.getPrivateKey());
+
+                SnowflakePacket packet = EncryptionUtil.toPacket(decrypted);
+                packet.handle();
+            } catch (Exception e) {
+                printModMessage("Failed to decrypt");
+                e.printStackTrace();
+            }
         }
     }
 }

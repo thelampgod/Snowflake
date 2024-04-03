@@ -2,6 +2,7 @@ package com.github.thelampgod.snow.commands.impl;
 
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.packets.impl.EncryptedDataPacket;
+import com.github.thelampgod.snow.packets.impl.MessagePacket;
 import com.github.thelampgod.snow.packets.impl.outgoing.ListUsersPacket;
 import com.github.thelampgod.snow.packets.impl.outgoing.LoginStartPacket;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -11,6 +12,7 @@ import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 
+import java.io.IOException;
 import java.security.PublicKey;
 
 import static com.github.thelampgod.snow.Helper.mc;
@@ -30,9 +32,13 @@ public class AuthenticateCommand {
     }
 
     private static int sendMessage(CommandContext<FabricClientCommandSource> ctx) {
-        final int groupId = ctx.getArgument("group", Integer.class);
-        final String message = ctx.getArgument("message", String.class);
-//        Snow.getServerManager().sendPacket(new EncryptedDataPacket(groupId, new MessagePacket(groupId, message)));
+        try {
+            final int groupId = ctx.getArgument("group", Integer.class);
+            final String message = ctx.getArgument("message", String.class);
+            Snow.getServerManager().sendPacket(new EncryptedDataPacket.Group(groupId, new MessagePacket.Group(groupId, message)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return 1;
     }
 

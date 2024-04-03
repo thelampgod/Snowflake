@@ -62,7 +62,7 @@ public class ConnectionPacket extends SnowflakePacket {
               .append(Text.literal(" connected").formatted(Formatting.GREEN)
               ));
 
-      Snow.instance.getUserManager().add(new User(this.getUser(), this.getId(), ""));
+      Snow.instance.getUserManager().add(new User(this.getUser(), this.getId(), null));
     }
 
   }

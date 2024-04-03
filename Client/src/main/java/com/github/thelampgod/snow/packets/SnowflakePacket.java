@@ -52,7 +52,10 @@ public abstract class SnowflakePacket implements Serializable {
       case 20:
         return new GroupRemovePacket(in);
       case 21:
-        return new EncryptedDataPacket(in);
+        if (in.readBoolean()) {
+          return new EncryptedDataPacket.Group(in);
+        }
+        return new EncryptedDataPacket.User(in);
       default:
         throw new RuntimeException("Unknown packet type " + id);
     }

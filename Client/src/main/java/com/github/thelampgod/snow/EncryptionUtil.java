@@ -2,6 +2,7 @@ package com.github.thelampgod.snow;
 
 import com.github.thelampgod.snow.groups.Group;
 import com.github.thelampgod.snow.packets.SnowflakePacket;
+import com.github.thelampgod.snow.users.User;
 import org.apache.logging.log4j.core.tools.Generate;
 
 import javax.crypto.Cipher;
@@ -83,7 +84,23 @@ public class EncryptionUtil {
         return (SnowflakePacket) ois.readObject();
     }
 
-    public static byte[] encryptPacket(SnowflakePacket packet, int groupId) throws Exception {
+    public static byte[] encryptPacket(SnowflakePacket packet, boolean forGroup, int id) throws Exception {
+        if (forGroup) {
+            return encryptPacketForGroup(packet, id);
+        }
+
+        return encryptPacketForUser(packet, id);
+    }
+
+    private static byte[] encryptPacketForUser(SnowflakePacket packet, int userId) throws Exception {
+        final User user = Snow.instance.getUserManager().get(userId);
+
+        byte[] packetBytes = toBytes(packet);
+
+        return encrypt(packetBytes, user.getKey());
+    }
+
+    public static byte[] encryptPacketForGroup(SnowflakePacket packet, int groupId) throws Exception {
         final Group group = Snow.instance.getGroupManager().get(groupId);
 
         byte[] packetBytes = toBytes(packet);
