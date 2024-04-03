@@ -12,7 +12,6 @@ import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 
-import java.io.IOException;
 import java.security.PublicKey;
 
 import static com.github.thelampgod.snow.Helper.mc;
