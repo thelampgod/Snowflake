@@ -1,6 +1,10 @@
 package com.github.thelampgod.snow.packets.impl;
 
+import com.github.thelampgod.snow.Snow;
+import com.github.thelampgod.snow.groups.Group;
 import com.github.thelampgod.snow.packets.WrappedPacket;
+import com.github.thelampgod.snow.render.WaypointRenderer;
+import com.github.thelampgod.snow.users.User;
 
 public class LocationPacket extends WrappedPacket {
     private final int groupId;
@@ -19,6 +23,8 @@ public class LocationPacket extends WrappedPacket {
 
     @Override
     public void handle() {
-        //todo:
+        final User user = Snow.instance.getUserManager().get(this.getSender());
+        final Group group = Snow.instance.getGroupManager().get(groupId);
+        WaypointRenderer.updatePoint(user, x, y, z, dimension, group);
     }
 }
