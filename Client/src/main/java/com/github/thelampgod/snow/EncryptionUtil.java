@@ -17,7 +17,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
-import java.util.Arrays;
 
 public class EncryptionUtil {
 
@@ -42,7 +41,6 @@ public class EncryptionUtil {
         byte[] salt = new byte[SALT_LENGTH]; // Generate a random salt
         SecureRandom random = new SecureRandom();
         random.nextBytes(salt);
-        System.out.println(Arrays.toString(salt));
 
         // Generate a key from the password and salt
         SecretKey key = generateKeyFromPassword(password, salt);
@@ -65,7 +63,6 @@ public class EncryptionUtil {
         System.arraycopy(encryptedData, SALT_LENGTH, encryptedDataWithoutSalt, 0, encryptedData.length - SALT_LENGTH);
 
         char[] password = bytesToChars(passwordBytes);
-        System.out.println(Arrays.toString(salt));
         SecretKey key = generateKeyFromPassword(password, salt);
         return decrypt(encryptedDataWithoutSalt, key);
     }
