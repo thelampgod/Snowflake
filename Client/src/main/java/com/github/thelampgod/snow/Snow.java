@@ -2,11 +2,15 @@ package com.github.thelampgod.snow;
 
 import com.github.thelampgod.snow.commands.impl.AuthenticateCommand;
 import com.github.thelampgod.snow.groups.GroupManager;
+import com.github.thelampgod.snow.render.WaypointRenderer;
 import com.github.thelampgod.snow.users.UserManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.DimensionRenderingRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
