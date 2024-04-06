@@ -1,5 +1,6 @@
 package com.github.thelampgod.snow.mixins.impl;
 
+import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.render.WaypointRenderer;
 import net.minecraft.client.MinecraftClient;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,6 +13,6 @@ public class MinecraftClientMixin {
 
     @Inject(method="tick", at = @At(value = "HEAD"))
     public void run(CallbackInfo ci) {
-        WaypointRenderer.tick();
+        Snow.instance.getRenderer().tick();
     }
 }

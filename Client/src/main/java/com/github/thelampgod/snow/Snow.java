@@ -27,6 +27,8 @@ public class Snow implements ModInitializer {
 
     private GroupManager groupManager;
     private UserManager userManager;
+
+    private WaypointRenderer renderer;
     @Override
     public void onInitialize() {
         LOGGER.info("Loading...");
@@ -42,6 +44,7 @@ public class Snow implements ModInitializer {
             dispatcher.register(AuthenticateCommand.register());
         });
 
+        renderer = new WaypointRenderer();
         groupManager = new GroupManager();
         userManager = new UserManager();
         serverManager = new ServerManager(IP, PORT);
@@ -75,5 +78,12 @@ public class Snow implements ModInitializer {
 
     public UserManager getUserManager() {
         return userManager;
+    }
+
+    public WaypointRenderer getRenderer() {
+        if (renderer == null) {
+            renderer = new WaypointRenderer();
+        }
+        return renderer;
     }
 }

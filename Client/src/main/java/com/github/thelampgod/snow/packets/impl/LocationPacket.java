@@ -23,8 +23,6 @@ public class LocationPacket extends WrappedPacket {
 
     @Override
     public void handle() {
-        final User user = Snow.instance.getUserManager().get(this.getSender());
-        final Group group = Snow.instance.getGroupManager().get(groupId);
-        WaypointRenderer.updatePoint(user, x, y, z, dimension, group);
+        Snow.instance.getRenderer().updatePoint(this.getSender(), x, y, z, dimension, this.groupId);
     }
 }

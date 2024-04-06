@@ -1,5 +1,6 @@
 package com.github.thelampgod.snow.mixins.impl;
 
+import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.render.WaypointRenderer;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
@@ -17,6 +18,6 @@ public class WorldRendererMixin {
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;draw(Lnet/minecraft/client/render/RenderLayer;)V", ordinal = 24, shift = At.Shift.AFTER))
     public void onDebugRender(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f projectionMatrix, CallbackInfo ci) {
-        WaypointRenderer.render(matrices, tickDelta, camera);
+        Snow.instance.getRenderer().render(matrices, tickDelta, camera);
     }
 }
