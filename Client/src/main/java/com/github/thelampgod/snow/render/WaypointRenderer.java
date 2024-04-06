@@ -44,7 +44,6 @@ public class WaypointRenderer {
 
 
     public void render(MatrixStack stack, float tickDelta, Camera camera) {
-        System.out.println(mc.world.getDimension().coordinateScale());
         if (mc.world == null || toRender.isEmpty()) return;
 
         for (Map.Entry<Integer, PositionData> entry : toRender.entrySet()) {
