@@ -1,5 +1,6 @@
 package com.github.thelampgod.snow.render;
 
+import com.github.thelampgod.snow.DrawUtil;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.users.User;
 import com.google.common.collect.Maps;
@@ -50,7 +51,23 @@ public class WaypointRenderer {
             final PositionData position = transformPosition(entry.getValue());
             final User user = Snow.instance.getUserManager().get(entry.getKey());
             final Vec3d renderPos = camera.getPos();
-            final Vec3d pos = new Vec3d(position.x,position.y,position.z).subtract(renderPos);
+
+            double angle = Math.atan2(position.z - renderPos.z, position.x - renderPos.x);
+            final double distanceTo = Math.tan((position.z - renderPos.z) / (position.x - renderPos.x));
+            double yAngle = Math.asin((position.y - renderPos.y) / distanceTo);
+
+            Vec3d pos = new Vec3d(
+                    renderPos.x + 100 * Math.cos(angle),
+                    renderPos.y + 100 * Math.sin(yAngle),
+                    renderPos.z + 100 * Math.sin(angle));
+
+
+            if (distanceTo < 100) {
+                pos = new Vec3d(
+                        DrawUtil.interpolate(position.prevX, position.x, tickDelta),
+                        DrawUtil.interpolate(position.prevY, position.y, tickDelta),
+                        DrawUtil.interpolate(position.prevZ, position.z, tickDelta)).subtract(renderPos);
+            }
 
             renderWaypoint(user.getName(), pos.x, pos.y, pos.z, stack, camera, tickDelta);
         }
@@ -86,7 +103,6 @@ public class WaypointRenderer {
         Matrix4f matrix = stack.peek().getPositionMatrix();
 
         //draw text
-
         final float nameWidth = (float) mc.textRenderer.getWidth(text) / 2;
         Color color = new Color(-1);
         mc.textRenderer.drawWithOutline(Text.literal(text).asOrderedText(), -nameWidth, 0, color.getRGB(), new Color(0,0,0,0).getRGB(), matrix, consumers, 255);
