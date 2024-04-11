@@ -1,5 +1,6 @@
 package com.github.thelampgod.snow.gui;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -15,7 +16,6 @@ public class SnowScreen extends Screen {
 
     @Override
     protected void init() {
-        super.init();
         connectElement = new ConnectElement();
     }
     @Override
@@ -28,5 +28,23 @@ public class SnowScreen extends Screen {
     @Override
     public boolean shouldPause() {
         return false;
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        connectElement.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean charTyped(char chr, int modifiers) {
+        connectElement.charTyped(chr, modifiers);
+        return super.charTyped(chr, modifiers);
+    }
+
+    @Override
+    public void resize(MinecraftClient client, int width, int height) {
+        connectElement.resize();
+        super.resize(client, width, height);
     }
 }
