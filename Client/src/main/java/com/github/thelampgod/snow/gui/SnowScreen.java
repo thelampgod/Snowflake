@@ -43,6 +43,18 @@ public class SnowScreen extends Screen {
     }
 
     @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        connectElement.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean isMouseOver(double mouseX, double mouseY) {
+        connectElement.isMouseOver(mouseX, mouseY);
+        return super.isMouseOver(mouseX, mouseY);
+    }
+
+    @Override
     public void resize(MinecraftClient client, int width, int height) {
         connectElement.resize();
         super.resize(client, width, height);
