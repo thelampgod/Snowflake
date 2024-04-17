@@ -1,6 +1,7 @@
 package com.github.thelampgod.snow.gui;
 
 import com.github.thelampgod.snow.Snow;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -32,6 +33,8 @@ public class ConnectElement {
     private TextFieldWidget inputField;
     private ButtonWidget connectButton;
 
+    public TextRenderer textRenderer;
+
     public ConnectElement() {
         this.init();
     }
@@ -40,18 +43,18 @@ public class ConnectElement {
         this.resize();
         ctx.fill(0,0,width, height, new Color(139, 139, 139).getRGB());
         ctx.fill(0,0,width,headerHeight, new Color(136, 52, 52).getRGB());
-        ctx.drawCenteredTextWithShadow(mc.textRenderer,
+        ctx.drawCenteredTextWithShadow(textRenderer,
                 "Connect",
                 width / 2,
-                headerHeight / 2 - mc.textRenderer.fontHeight / 2,
+                headerHeight / 2 - textRenderer.fontHeight / 2,
                 Formatting.GOLD.getColorValue());
         this.inputField.render(ctx, mouseX, mouseY, delta);
 
         boolean hovered = connectButton.isMouseOver(mouseX - x, mouseY - y);
-        ctx.drawTextWithShadow(mc.textRenderer,
+        ctx.drawTextWithShadow(textRenderer,
                 connectButton.getMessage(),
                 connectButton.getX(),
-                (height + headerHeight - mc.textRenderer.fontHeight) / 2,
+                (height + headerHeight - textRenderer.fontHeight) / 2,
                 hovered ? Color.YELLOW.getRGB() : Color.WHITE.getRGB());
     }
 
@@ -67,7 +70,7 @@ public class ConnectElement {
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
         this.inputField.keyPressed(keyCode, scanCode, modifiers);
         if (keyCode == 259 || Screen.isCut(keyCode)) {
-            int messageLength = mc.textRenderer.getWidth(this.inputField.getText());
+            int messageLength = textRenderer.getWidth(this.inputField.getText());
             this.inputField.setX((this.width - messageLength) / 2);
             this.connectButton.setX((this.width + messageLength + 20) / 2);
         }
@@ -80,7 +83,7 @@ public class ConnectElement {
 
     public void charTyped(char chr, int modifiers) {
         this.inputField.charTyped(chr, modifiers);
-        int messageLength = mc.textRenderer.getWidth(this.inputField.getText());
+        int messageLength = textRenderer.getWidth(this.inputField.getText());
         this.inputField.setX((this.width - messageLength) / 2);
         this.connectButton.setX((this.width + messageLength + 20) / 2);
     }
@@ -95,14 +98,15 @@ public class ConnectElement {
     public final void init() {
         x = (SnowScreen.scaledWidth - width) / 2;
         y = (SnowScreen.scaledHeight - height) / 2;
+        textRenderer = mc.textRenderer;
 
-        this.inputField = new TextFieldWidget(mc.textRenderer, (this.width - mc.textRenderer.getWidth("_")) / 2, (height + headerHeight - mc.textRenderer.fontHeight) / 2, this.width - 18, 12, Text.literal("IP"));
+        this.inputField = new TextFieldWidget(textRenderer, (this.width - textRenderer.getWidth("_")) / 2, (height + headerHeight - textRenderer.fontHeight) / 2, this.width - 18, 12, Text.literal("IP"));
         this.inputField.setMaxLength(256);
         this.inputField.setDrawsBackground(false);
         this.inputField.setFocused(true);
         this.inputField.setText(savedIp);
 
-        int buttonWidth = mc.textRenderer.getWidth("Go") + 10;
+        int buttonWidth = textRenderer.getWidth("Go") + 10;
         this.connectButton = ButtonWidget.builder(Text.literal("Go"),(button -> this.connect()))
                 .dimensions(this.inputField.getX() + 20, (height + headerHeight - 12) / 2, buttonWidth, 12)
                 .build();
