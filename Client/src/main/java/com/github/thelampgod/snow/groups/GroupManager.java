@@ -8,6 +8,10 @@ public class GroupManager {
 
     private final Set<Group> groups = Sets.newHashSet();
 
+    public void clear() {
+        groups.clear();
+    }
+
     public void add(Group group) {
         groups.add(group);
     }
@@ -21,4 +25,5 @@ public class GroupManager {
                 .findAny()
                 .orElseGet(null);
     }
+
 }

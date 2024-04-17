@@ -25,7 +25,7 @@ public class WaypointRenderer {
     private final Map<Integer, PositionData> toRender = Maps.newConcurrentMap();
 
     // Cleanup for new connection or disconnect
-    public void close() {
+    public void clear() {
         toProcess.clear();
         toRender.clear();
     }

@@ -3,6 +3,7 @@ package com.github.thelampgod.snow;
 import com.github.thelampgod.snow.commands.impl.AuthenticateCommand;
 import com.github.thelampgod.snow.groups.GroupManager;
 import com.github.thelampgod.snow.gui.SnowScreen;
+import com.github.thelampgod.snow.packets.impl.DisconnectPacket;
 import com.github.thelampgod.snow.render.WaypointRenderer;
 import com.github.thelampgod.snow.users.UserManager;
 import net.fabricmc.api.EnvType;
@@ -11,10 +12,6 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.rendering.v1.DimensionRenderingRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
-import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
-import net.fabricmc.fabric.impl.client.keybinding.KeyBindingRegistryImpl;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
@@ -26,7 +23,7 @@ import java.io.IOException;
 
 @Environment(EnvType.CLIENT)
 public class Snow implements ModInitializer {
-    public static final Snow instance = new Snow();
+    public static Snow instance;
     private final Logger LOGGER = LogManager.getLogger("Snow");
 
     private static final String IP = "127.0.0.1";
@@ -48,6 +45,7 @@ public class Snow implements ModInitializer {
     }
 
     private void init() {
+        instance = this;
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(AuthenticateCommand.register());
         });
@@ -102,9 +100,18 @@ public class Snow implements ModInitializer {
     }
 
     public WaypointRenderer getRenderer() {
-        if (renderer == null) {
-            renderer = new WaypointRenderer();
-        }
         return renderer;
+    }
+
+    public void connect(String text) throws IOException {
+        if (serverManager.isConnected()) {
+            serverManager.sendPacket(new DisconnectPacket());
+            serverManager.close();
+        }
+        groupManager.clear();
+        userManager.clear();
+        renderer.clear();
+        String[] parts = text.split(":");
+        serverManager = new ServerManager(parts[0], Integer.parseInt(parts[1]));
     }
 }

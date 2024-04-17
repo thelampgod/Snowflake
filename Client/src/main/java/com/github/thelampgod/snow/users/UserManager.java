@@ -8,6 +8,10 @@ public class UserManager {
 
     private final Set<User> users = Sets.newHashSet();
 
+    public void clear() {
+        users.clear();
+    }
+
     public void add(User user) {
         users.add(user);
     }

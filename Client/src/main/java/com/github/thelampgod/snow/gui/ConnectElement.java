@@ -1,26 +1,33 @@
 package com.github.thelampgod.snow.gui;
 
+import com.github.thelampgod.snow.Snow;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import java.awt.*;
+import java.io.IOException;
 
 import static com.github.thelampgod.snow.Helper.mc;
+import static com.github.thelampgod.snow.Helper.printModMessage;
 
 
 public class ConnectElement {
 
-    int x;
-    int y;
-    int width = 200;
-    int height = 60;
+    private int x;
+    private int y;
+    private final int width = 200;
+    private final int height = 60;
 
-    int headerHeight = 10;
+    private final int headerHeight = 10;
+    //TODO: actually save last ip
+    private final static String savedIp = "127.0.0.1:2147";
 
     private TextFieldWidget inputField;
     private ButtonWidget connectButton;
@@ -33,9 +40,19 @@ public class ConnectElement {
         this.resize();
         ctx.fill(0,0,width, height, new Color(139, 139, 139).getRGB());
         ctx.fill(0,0,width,headerHeight, new Color(136, 52, 52).getRGB());
-        ctx.drawCenteredTextWithShadow(mc.textRenderer, "Connect", width / 2, headerHeight / 2 - mc.textRenderer.fontHeight / 2, Formatting.GOLD.getColorValue());
+        ctx.drawCenteredTextWithShadow(mc.textRenderer,
+                "Connect",
+                width / 2,
+                headerHeight / 2 - mc.textRenderer.fontHeight / 2,
+                Formatting.GOLD.getColorValue());
         this.inputField.render(ctx, mouseX, mouseY, delta);
-        this.connectButton.render(ctx, mouseX, mouseY, delta);
+
+        boolean hovered = connectButton.isMouseOver(mouseX - x, mouseY - y);
+        ctx.drawTextWithShadow(mc.textRenderer,
+                connectButton.getMessage(),
+                connectButton.getX(),
+                (height + headerHeight - mc.textRenderer.fontHeight) / 2,
+                hovered ? Color.YELLOW.getRGB() : Color.WHITE.getRGB());
     }
 
     public void preRender(DrawContext ctx, int mouseX, int mouseY, float delta) {
@@ -56,6 +73,7 @@ public class ConnectElement {
         }
 
         if (this.inputField.isFocused() && (keyCode == 257 || keyCode == 335)) {
+            mc.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             this.connectButton.onPress();
         }
     }
@@ -82,7 +100,7 @@ public class ConnectElement {
         this.inputField.setMaxLength(256);
         this.inputField.setDrawsBackground(false);
         this.inputField.setFocused(true);
-        this.inputField.setText("");
+        this.inputField.setText(savedIp);
 
         int buttonWidth = mc.textRenderer.getWidth("Go") + 10;
         this.connectButton = ButtonWidget.builder(Text.literal("Go"),(button -> this.connect()))
@@ -91,18 +109,18 @@ public class ConnectElement {
     }
 
     private void connect() {
-        System.out.println("Connecting to " + this.inputField.getText());
+        final String ip = this.inputField.getText();
+        System.out.println("Connecting to " + ip);
+        try {
+            Snow.instance.connect(ip);
+        } catch (IOException e) {
+            printModMessage("Couldn't connect to " + ip);
+            e.printStackTrace();
+        }
     }
 
     public void mouseClicked(double mouseX, double mouseY, int button) {
         connectButton.mouseClicked(mouseX - x, mouseY - y, button);
-    }
-
-    //todo doesnt work?
-    public void isMouseOver(double mouseX, double mouseY) {
-        if (connectButton.isMouseOver(mouseX - x, mouseY - y)) {
-            System.out.println("yepppers!!!!");
-        }
     }
 
 }

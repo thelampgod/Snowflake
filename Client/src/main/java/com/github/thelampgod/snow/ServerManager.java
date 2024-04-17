@@ -22,8 +22,6 @@ public class ServerManager {
 
     private static String sharedSecret = null;
 
-    private final Map<Integer, String> connectedUsers = Maps.newConcurrentMap();
-
     private boolean isRunning = true;
 
     public ServerManager(String ip, int port) {
