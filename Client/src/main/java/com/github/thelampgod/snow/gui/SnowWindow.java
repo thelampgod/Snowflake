@@ -9,7 +9,7 @@ import java.awt.*;
 
 import static com.github.thelampgod.snow.Helper.mc;
 
-public class SnowWindowElement {
+public class SnowWindow {
     public double x;
     public double y;
     public int width;
@@ -21,7 +21,7 @@ public class SnowWindowElement {
 
     public TextRenderer textRenderer;
 
-    public SnowWindowElement(String title, int width, int height) {
+    public SnowWindow(String title, int width, int height) {
         this.title = title;
         this.width = width;
         this.height = height;

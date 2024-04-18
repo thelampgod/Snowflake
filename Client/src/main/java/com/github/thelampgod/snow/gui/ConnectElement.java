@@ -15,7 +15,7 @@ import static com.github.thelampgod.snow.Helper.mc;
 import static com.github.thelampgod.snow.Helper.printModMessage;
 
 
-public class ConnectElement extends SnowWindowElement {
+public class ConnectElement extends SnowWindow {
 
 
     //TODO: actually save last ip

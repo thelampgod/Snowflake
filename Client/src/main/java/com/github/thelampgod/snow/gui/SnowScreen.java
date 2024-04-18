@@ -8,29 +8,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SnowScreen extends Screen {
-
-    private ConnectElement connectElement;
     public static int scaledWidth;
     public static int scaledHeight;
 
-    public static List<SnowWindowElement> windowList = new ArrayList<>();
+    public static List<SnowWindow> windowList = new ArrayList<>();
 
     public SnowScreen(Text title) {
         super(title);
-        connectElement = new ConnectElement(200, 60);
-        windowList.add(new TestWindow("Test", 100, 100));
-        windowList.add(connectElement);
+        windowList.add(new TestElement("Test", 100, 100));
+        windowList.add(new ConnectElement(200, 60));
     }
 
     @Override
     protected void init() {
-        for (SnowWindowElement element : windowList) {
+        for (SnowWindow element : windowList) {
             element.init(element.width, element.height);
         }
     }
 
-    public static void focusWindow(SnowWindowElement window) {
-        for (SnowWindowElement win : windowList) {
+    public static void focusWindow(SnowWindow window) {
+        for (SnowWindow win : windowList) {
             win.focused = false;
         }
         window.focused = true;
@@ -43,7 +40,7 @@ public class SnowScreen extends Screen {
         scaledWidth = ctx.getScaledWindowWidth();
         scaledHeight = ctx.getScaledWindowHeight();
 
-        for (SnowWindowElement element : windowList) {
+        for (SnowWindow element : windowList) {
             element.preRender(ctx, mouseX, mouseY, delta);
         }
     }
@@ -55,7 +52,7 @@ public class SnowScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        for (SnowWindowElement element : windowList) {
+        for (SnowWindow element : windowList) {
             element.keyPressed(keyCode, scanCode, modifiers);
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
@@ -63,7 +60,7 @@ public class SnowScreen extends Screen {
 
     @Override
     public boolean charTyped(char chr, int modifiers) {
-        for (SnowWindowElement element : windowList) {
+        for (SnowWindow element : windowList) {
             element.charTyped(chr, modifiers);
         }
         return super.charTyped(chr, modifiers);
@@ -72,7 +69,7 @@ public class SnowScreen extends Screen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         for (int i = windowList.size() - 1; i >= 0; i--) {
-            SnowWindowElement liveWindow = windowList.get(i);
+            SnowWindow liveWindow = windowList.get(i);
             if (liveWindow.cursorInWindow(mouseX, mouseY)) {
                 if (i != windowList.size() - 1) {
                     windowList.remove(i);
@@ -88,7 +85,7 @@ public class SnowScreen extends Screen {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        for (SnowWindowElement element : windowList) {
+        for (SnowWindow element : windowList) {
             element.mouseReleased(mouseX, mouseY, button);
         }
         return super.mouseReleased(mouseX, mouseY, button);
@@ -96,7 +93,7 @@ public class SnowScreen extends Screen {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        for (SnowWindowElement element : windowList) {
+        for (SnowWindow element : windowList) {
             element.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
         }
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
