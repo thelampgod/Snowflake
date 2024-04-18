@@ -1,53 +1,35 @@
 package com.github.thelampgod.snow.gui;
 
 import com.github.thelampgod.snow.Snow;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 
 import java.awt.*;
-import java.io.IOException;
 
 import static com.github.thelampgod.snow.Helper.mc;
 import static com.github.thelampgod.snow.Helper.printModMessage;
 
 
-public class ConnectElement {
+public class ConnectElement extends SnowWindowElement {
 
-    private int x;
-    private int y;
-    private final int width = 200;
-    private final int height = 60;
 
-    private final int headerHeight = 10;
     //TODO: actually save last ip
     private final static String savedIp = "127.0.0.1:2147";
 
     private TextFieldWidget inputField;
     private ButtonWidget connectButton;
 
-    public TextRenderer textRenderer;
-
-    public ConnectElement() {
-        this.init();
+    public ConnectElement(int width, int height) {
+        super("Connect", width, height);
     }
 
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        this.resize();
-        ctx.fill(0,0,width, height, new Color(139, 139, 139).getRGB());
-        ctx.fill(0,0,width,headerHeight, new Color(136, 52, 52).getRGB());
-        ctx.drawCenteredTextWithShadow(textRenderer,
-                "Connect",
-                width / 2,
-                headerHeight / 2 - textRenderer.fontHeight / 2,
-                Formatting.GOLD.getColorValue());
+        super.render(ctx, mouseX, mouseY, delta);
         this.inputField.render(ctx, mouseX, mouseY, delta);
 
         boolean hovered = connectButton.isMouseOver(mouseX - x, mouseY - y);
@@ -56,14 +38,6 @@ public class ConnectElement {
                 connectButton.getX(),
                 (height + headerHeight - textRenderer.fontHeight) / 2,
                 hovered ? Color.YELLOW.getRGB() : Color.WHITE.getRGB());
-    }
-
-    public void preRender(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        MatrixStack stack = ctx.getMatrices();
-        stack.push();
-        stack.translate(x, y, 0);
-        render(ctx, mouseX, mouseY, delta);
-        stack.pop();
     }
 
 
@@ -79,6 +53,7 @@ public class ConnectElement {
             mc.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             this.connectButton.onPress();
         }
+        super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     public void charTyped(char chr, int modifiers) {
@@ -86,19 +61,11 @@ public class ConnectElement {
         int messageLength = textRenderer.getWidth(this.inputField.getText());
         this.inputField.setX((this.width - messageLength) / 2);
         this.connectButton.setX((this.width + messageLength + 20) / 2);
+        super.charTyped(chr, modifiers);
     }
 
-    public void resize() {
-        String string = this.inputField.getText();
-        x = (SnowScreen.scaledWidth - width) / 2;
-        y = (SnowScreen.scaledHeight - height) / 2;
-        this.inputField.setText(string);
-    }
-
-    public final void init() {
-        x = (SnowScreen.scaledWidth - width) / 2;
-        y = (SnowScreen.scaledHeight - height) / 2;
-        textRenderer = mc.textRenderer;
+    public void init(int width, int height) {
+        super.init(this.width, this.height);
 
         this.inputField = new TextFieldWidget(textRenderer, (this.width - textRenderer.getWidth("_")) / 2, (height + headerHeight - textRenderer.fontHeight) / 2, this.width - 18, 12, Text.literal("IP"));
         this.inputField.setMaxLength(256);
@@ -125,6 +92,7 @@ public class ConnectElement {
 
     public void mouseClicked(double mouseX, double mouseY, int button) {
         connectButton.mouseClicked(mouseX - x, mouseY - y, button);
+        super.mouseClicked(mouseX, mouseY, button);
     }
 
 }
