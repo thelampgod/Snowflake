@@ -30,6 +30,7 @@ public class ConnectElement extends SnowWindowElement {
 
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         super.render(ctx, mouseX, mouseY, delta);
+        if (!focused) return;
         this.inputField.render(ctx, mouseX, mouseY, delta);
 
         boolean hovered = connectButton.isMouseOver(mouseX - x, mouseY - y);
@@ -42,6 +43,7 @@ public class ConnectElement extends SnowWindowElement {
 
 
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (!focused) return;
         this.inputField.keyPressed(keyCode, scanCode, modifiers);
         if (keyCode == 259 || Screen.isCut(keyCode)) {
             int messageLength = textRenderer.getWidth(this.inputField.getText());
@@ -57,6 +59,7 @@ public class ConnectElement extends SnowWindowElement {
     }
 
     public void charTyped(char chr, int modifiers) {
+        if (!focused) return;
         this.inputField.charTyped(chr, modifiers);
         int messageLength = textRenderer.getWidth(this.inputField.getText());
         this.inputField.setX((this.width - messageLength) / 2);

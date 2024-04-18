@@ -10,29 +10,32 @@ import java.awt.*;
 import static com.github.thelampgod.snow.Helper.mc;
 
 public class SnowWindowElement {
-    public int x;
-    public int y;
-    public int width = 400;
-    public int height = 250;
+    public double x;
+    public double y;
+    public int width;
+    public int height;
     public int headerHeight = 17;
     private String title;
     private boolean clicked;
-    double clickX;
-    double clickY;
+    boolean focused;
 
     public TextRenderer textRenderer;
 
     public SnowWindowElement(String title, int width, int height) {
         this.title = title;
-        this.init(width, height);
+        this.width = width;
+        this.height = height;
+        x = (double) (SnowScreen.scaledWidth - this.width) / 2 + 20 * SnowScreen.windowList.size();
+        y = (double) (SnowScreen.scaledHeight - this.height) / 2 + 20 * SnowScreen.windowList.size();
+        textRenderer = mc.textRenderer;
     }
 
     public void init(int width, int height) {
         this.width = width;
         this.height = height;
 
-        x = (SnowScreen.scaledWidth - this.width) / 2 + 20 * SnowScreen.windowList.size();
-        y = (SnowScreen.scaledHeight - this.height) / 2 + 20 * SnowScreen.windowList.size();
+        x = (double) (SnowScreen.scaledWidth - this.width) / 2 + 20 * SnowScreen.windowList.size();
+        y = (double) (SnowScreen.scaledHeight - this.height) / 2 + 20 * SnowScreen.windowList.size();
         textRenderer = mc.textRenderer;
     }
 
@@ -56,8 +59,8 @@ public class SnowWindowElement {
     }
 
     public void resize(int width, int height) {
-        x = (SnowScreen.scaledWidth - width) / 2;
-        y = (SnowScreen.scaledHeight - height) / 2;
+        x = (double) (SnowScreen.scaledWidth - width) / 2;
+        y = (double) (SnowScreen.scaledHeight - height) / 2;
     }
 
 
@@ -68,11 +71,15 @@ public class SnowWindowElement {
     }
 
     public void mouseClicked(double mouseX, double mouseY, int button) {
+        focused = cursorInWindow(mouseX, mouseY);
+
         if (cursorInHeader(mouseX, mouseY)) {
             clicked = true;
-            clickX = mouseX;
-            clickY = mouseY;
         }
+    }
+
+    private boolean cursorInWindow(double mouseX, double mouseY) {
+        return mouseX - x > 0 && mouseX - x < width && mouseY - y > 0 && mouseY - y < height;
     }
 
     private boolean cursorInHeader(double mouseX, double mouseY) {
@@ -80,12 +87,13 @@ public class SnowWindowElement {
     }
 
     public void mouseReleased(double mouseX, double mouseY, int button) {
-        if (!clicked) return;
         clicked = false;
-        double xDiff = mouseX - clickX;
-        double yDiff = mouseY - clickY;
+    }
 
-        x += (int) xDiff;
-        y += (int) yDiff;
+    public void mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (!clicked) return;
+
+        x += deltaX;
+        y += deltaY;
     }
 }

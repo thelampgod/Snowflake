@@ -74,6 +74,14 @@ public class SnowScreen extends Screen {
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        for (SnowWindowElement element : windowList) {
+            element.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        }
+        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+    }
+
     //    @Override
 //    public void resize(MinecraftClient client, int width, int height) {
 //        for (SnowWindowElement element : windowList) {
