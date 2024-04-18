@@ -117,9 +117,9 @@ public class ConnectElement {
         System.out.println("Connecting to " + ip);
         try {
             Snow.instance.connect(ip);
-        } catch (IOException e) {
+        } catch (Throwable th) {
             printModMessage("Couldn't connect to " + ip);
-            e.printStackTrace();
+            th.printStackTrace();
         }
     }
 

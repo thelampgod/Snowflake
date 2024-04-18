@@ -12,6 +12,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
@@ -32,8 +33,9 @@ public class Snow implements ModInitializer {
 
     private GroupManager groupManager;
     private UserManager userManager;
-
     private WaypointRenderer renderer;
+
+    private SnowScreen snowScreen;
     @Override
     public void onInitialize() {
         LOGGER.info("Loading...");
@@ -59,7 +61,7 @@ public class Snow implements ModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (keyBinding.wasPressed()) {
-                client.setScreen(new SnowScreen(Text.literal("Snow")));
+                client.setScreen(getOrCreateSnowScreen());
             }
         });
 
@@ -67,6 +69,13 @@ public class Snow implements ModInitializer {
         groupManager = new GroupManager();
         userManager = new UserManager();
         serverManager = new ServerManager(IP, PORT);
+    }
+
+    private Screen getOrCreateSnowScreen() {
+        if (snowScreen == null) {
+            snowScreen = new SnowScreen(Text.literal("Snow"));
+        }
+        return snowScreen;
     }
 
     private void shutdown() {
@@ -103,7 +112,8 @@ public class Snow implements ModInitializer {
         return renderer;
     }
 
-    public void connect(String text) throws IOException {
+    //TODO: toasts for connect and disconnect
+    public void connect(String text) throws Exception {
         if (serverManager.isConnected()) {
             serverManager.sendPacket(new DisconnectPacket());
             serverManager.close();
@@ -112,6 +122,7 @@ public class Snow implements ModInitializer {
         userManager.clear();
         renderer.clear();
         String[] parts = text.split(":");
+        if (parts.length < 2) return;
         serverManager = new ServerManager(parts[0], Integer.parseInt(parts[1]));
     }
 }
