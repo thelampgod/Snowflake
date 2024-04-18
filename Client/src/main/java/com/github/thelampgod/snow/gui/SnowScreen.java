@@ -14,10 +14,11 @@ public class SnowScreen extends Screen {
     public static int scaledHeight;
 
     public static List<SnowWindowElement> windowList = new ArrayList<>();
+
     public SnowScreen(Text title) {
         super(title);
-        connectElement = new ConnectElement(200,60);
-        windowList.add(new TestWindow("Test", 100,100));
+        connectElement = new ConnectElement(200, 60);
+        windowList.add(new TestWindow("Test", 100, 100));
         windowList.add(connectElement);
     }
 
@@ -27,6 +28,16 @@ public class SnowScreen extends Screen {
             element.init(element.width, element.height);
         }
     }
+
+    public static void focusWindow(SnowWindowElement window) {
+        for (SnowWindowElement win : windowList) {
+            win.focused = false;
+        }
+        window.focused = true;
+        windowList.removeIf(it -> it == window);
+        windowList.add(window);
+    }
+
     @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         scaledWidth = ctx.getScaledWindowWidth();
@@ -60,9 +71,18 @@ public class SnowScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        for (SnowWindowElement element : windowList) {
-            element.mouseClicked(mouseX, mouseY, button);
+        for (int i = windowList.size() - 1; i >= 0; i--) {
+            SnowWindowElement liveWindow = windowList.get(i);
+            if (liveWindow.cursorInWindow(mouseX, mouseY)) {
+                if (i != windowList.size() - 1) {
+                    windowList.remove(i);
+                    windowList.add(liveWindow);
+                }
+                break;
+            }
         }
+
+        windowList.get(windowList.size() - 1).mouseClicked(mouseX, mouseY, button);
         return super.mouseClicked(mouseX, mouseY, button);
     }
 

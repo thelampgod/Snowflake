@@ -41,8 +41,8 @@ public class SnowWindowElement {
 
 
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        ctx.fill(0, 0, width, height, new Color(139, 139, 139).getRGB());
-        ctx.fill(0, 0, width, headerHeight, new Color(136, 52, 52).getRGB());
+        ctx.fill(0, 0, width, height, new Color(139, 139, 139, (focused ? 255 : 180)).getRGB());
+        ctx.fill(0, 0, width, headerHeight, new Color(136, 52, 52, (focused ? 255 : 180)).getRGB());
         ctx.drawCenteredTextWithShadow(textRenderer,
                 title,
                 width / 2,
@@ -71,14 +71,19 @@ public class SnowWindowElement {
     }
 
     public void mouseClicked(double mouseX, double mouseY, int button) {
-        focused = cursorInWindow(mouseX, mouseY);
+        if (cursorInWindow(mouseX, mouseY)) {
+            focused = true;
+            SnowScreen.focusWindow(this);
+        } else {
+            focused = false;
+        }
 
         if (cursorInHeader(mouseX, mouseY)) {
             clicked = true;
         }
     }
 
-    private boolean cursorInWindow(double mouseX, double mouseY) {
+    public boolean cursorInWindow(double mouseX, double mouseY) {
         return mouseX - x > 0 && mouseX - x < width && mouseY - y > 0 && mouseY - y < height;
     }
 
