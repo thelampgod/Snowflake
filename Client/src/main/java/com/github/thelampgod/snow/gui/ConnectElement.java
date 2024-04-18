@@ -30,15 +30,14 @@ public class ConnectElement extends SnowWindow {
 
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         super.render(ctx, mouseX, mouseY, delta);
-        if (!focused) return;
         this.inputField.render(ctx, mouseX, mouseY, delta);
 
         boolean hovered = connectButton.isMouseOver(mouseX - x, mouseY - y);
-        ctx.drawTextWithShadow(textRenderer,
-                connectButton.getMessage(),
+        this.drawText(
+                connectButton.getMessage().getString(),
                 connectButton.getX(),
                 (height + headerHeight - textRenderer.fontHeight) / 2,
-                hovered ? Color.YELLOW.getRGB() : Color.WHITE.getRGB());
+                hovered ? Color.YELLOW.getRGB() : Color.WHITE.getRGB(), true, ctx);
     }
 
 

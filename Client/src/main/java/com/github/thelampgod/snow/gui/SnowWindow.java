@@ -3,6 +3,7 @@ package com.github.thelampgod.snow.gui;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import java.awt.*;
@@ -43,11 +44,14 @@ public class SnowWindow {
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         ctx.fill(0, 0, width, height, new Color(139, 139, 139, (focused ? 255 : 180)).getRGB());
         ctx.fill(0, 0, width, headerHeight, new Color(136, 52, 52, (focused ? 255 : 180)).getRGB());
-        ctx.drawCenteredTextWithShadow(textRenderer,
+
+        this.drawOutlinedText(
                 title,
-                width / 2,
-                headerHeight / 2 - textRenderer.fontHeight / 2,
-                Formatting.GOLD.getColorValue());
+                (width - textRenderer.getWidth(title)) / 2,
+                (headerHeight - textRenderer.fontHeight) / 2,
+                Formatting.GOLD.getColorValue(),
+                0,
+                ctx);
     }
 
     public void preRender(DrawContext ctx, int mouseX, int mouseY, float delta) {
@@ -100,5 +104,27 @@ public class SnowWindow {
 
         x += deltaX;
         y += deltaY;
+    }
+
+    public void drawOutlinedText(String title, int x, int y, int color, int bgColor, DrawContext ctx) {
+        textRenderer.drawWithOutline(
+                Text.literal(title).asOrderedText(),
+                (float) x,
+                (float) y,
+                color,
+                bgColor,
+                ctx.getMatrices().peek().getPositionMatrix(),
+                ctx.getVertexConsumers(), 255);
+    }
+
+    public void drawText(String title, int x, int y, int color, boolean shadow, DrawContext ctx) {
+        textRenderer.draw(
+                Text.literal(title).asOrderedText(),
+                (float) x,
+                (float) y,
+                color,
+                shadow,
+                ctx.getMatrices().peek().getPositionMatrix(),
+                ctx.getVertexConsumers(), TextRenderer.TextLayerType.SEE_THROUGH, 0, 255);
     }
 }

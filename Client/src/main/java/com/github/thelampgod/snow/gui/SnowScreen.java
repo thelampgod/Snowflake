@@ -10,7 +10,6 @@ import java.util.List;
 public class SnowScreen extends Screen {
     public static int scaledWidth;
     public static int scaledHeight;
-
     public static List<SnowWindow> windowList = new ArrayList<>();
 
     public SnowScreen(Text title) {
