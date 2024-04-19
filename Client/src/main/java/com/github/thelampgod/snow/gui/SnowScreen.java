@@ -16,6 +16,7 @@ public class SnowScreen extends Screen {
         super(title);
         windowList.add(new TestElement("Test", 100, 100));
         windowList.add(new ConnectElement(200, 60));
+        windowList.add(new GroupListElement(150, 200));
     }
 
     @Override
