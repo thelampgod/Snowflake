@@ -1,6 +1,7 @@
 package com.github.thelampgod.snow.gui;
 
 import com.github.thelampgod.snow.groups.Group;
+import com.github.thelampgod.snow.users.User;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -19,6 +20,7 @@ public class SnowScreen extends Screen {
         super(title);
         windowList.add(new ConnectElement(200, 60));
         windowList.add(new GroupListElement(150, 200));
+        windowList.add(new UserListElement(150, 200));
     }
 
     @Override
@@ -34,6 +36,18 @@ public class SnowScreen extends Screen {
     private void setScale() {
         scaledWidth = mc.getWindow().getScaledWidth();
         scaledHeight = mc.getWindow().getScaledHeight();
+    }
+
+    public void focusWindow(User user) {
+        for (SnowWindow win : windowList) {
+            if (win instanceof UserElement e) {
+                if (e.getId() == user.getId()) {
+                    focusWindow(e);
+                    return;
+                }
+            }
+        }
+        focusWindow(new UserElement(user));
     }
 
     public void focusWindow(Group group) {
