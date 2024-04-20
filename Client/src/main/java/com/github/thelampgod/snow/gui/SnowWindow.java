@@ -1,5 +1,6 @@
 package com.github.thelampgod.snow.gui;
 
+import com.github.thelampgod.snow.Snow;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
@@ -19,6 +20,7 @@ public class SnowWindow {
     private String title;
     private boolean clicked;
     boolean focused;
+    public boolean hasInit = false;
 
     public TextRenderer textRenderer;
 
@@ -38,6 +40,7 @@ public class SnowWindow {
         x = (double) (SnowScreen.scaledWidth - this.width) / 2 + 20 * SnowScreen.windowList.size();
         y = (double) (SnowScreen.scaledHeight - this.height) / 2 + 20 * SnowScreen.windowList.size();
         textRenderer = mc.textRenderer;
+        this.hasInit = true;
     }
 
 
@@ -76,8 +79,7 @@ public class SnowWindow {
 
     public void mouseClicked(double mouseX, double mouseY, int button) {
         if (cursorInWindow(mouseX, mouseY)) {
-            focused = true;
-            SnowScreen.focusWindow(this);
+            Snow.instance.getOrCreateSnowScreen().focusWindow(this);
         } else {
             focused = false;
         }

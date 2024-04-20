@@ -1,11 +1,14 @@
 package com.github.thelampgod.snow.gui;
 
+import com.github.thelampgod.snow.groups.Group;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.github.thelampgod.snow.Helper.mc;
 
 public class SnowScreen extends Screen {
     public static int scaledWidth;
@@ -14,32 +17,50 @@ public class SnowScreen extends Screen {
 
     public SnowScreen(Text title) {
         super(title);
-        windowList.add(new TestElement("Test", 100, 100));
         windowList.add(new ConnectElement(200, 60));
         windowList.add(new GroupListElement(150, 200));
     }
 
     @Override
     protected void init() {
+        this.setScale();
         for (SnowWindow element : windowList) {
-            element.init(element.width, element.height);
+            if (!element.hasInit) {
+                element.init(element.width, element.height);
+            }
         }
     }
 
-    public static void focusWindow(SnowWindow window) {
+    private void setScale() {
+        scaledWidth = mc.getWindow().getScaledWidth();
+        scaledHeight = mc.getWindow().getScaledHeight();
+    }
+
+    public void focusWindow(Group group) {
+        for (SnowWindow win : windowList) {
+            if (win instanceof GroupElement e) {
+                if (e.getId() == group.getId()) {
+                    focusWindow(e);
+                    return;
+                }
+            }
+        }
+        focusWindow(new GroupElement(group));
+    }
+
+    public void focusWindow(SnowWindow window) {
         for (SnowWindow win : windowList) {
             win.focused = false;
         }
         window.focused = true;
+        window.hasInit = true;
         windowList.removeIf(it -> it == window);
         windowList.add(window);
     }
 
     @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        scaledWidth = ctx.getScaledWindowWidth();
-        scaledHeight = ctx.getScaledWindowHeight();
-
+        setScale();
         for (SnowWindow element : windowList) {
             element.preRender(ctx, mouseX, mouseY, delta);
         }

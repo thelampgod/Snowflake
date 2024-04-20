@@ -36,6 +36,15 @@ public class GroupListElement extends SnowWindow {
         }
     }
 
+    @Override
+    public void mouseClicked(double mouseX, double mouseY, int buttonId) {
+        super.mouseClicked(mouseX, mouseY, buttonId);
+
+        for (GroupButton button : buttons) {
+            button.mouseClicked(mouseX, mouseY);
+        }
+    }
+
     class GroupButton {
         private final int bheight = 17;
         private int bwidth;
@@ -74,9 +83,15 @@ public class GroupListElement extends SnowWindow {
             ctx.drawHorizontalLine(bx + 5, bwidth - 6, by + 12, color);
             ctx.drawHorizontalLine(bx + 6, bwidth - 5, by + 13, Color.BLACK.getRGB());
         }
-        private boolean mouseHover(int mouseX, int mouseY) {
-            if (!focused) return false;
+        private boolean mouseHover(double mouseX, double mouseY) {
             return mouseX - x > 0 & mouseX - x < bwidth && mouseY - y - by > 0 && mouseY - y - by < bheight;
+        }
+
+        public void mouseClicked(double mouseX, double mouseY) {
+            if (mouseHover(mouseX,mouseY)) {
+                final Group group = Snow.instance.getGroupManager().get(this.id);
+                Snow.instance.getOrCreateSnowScreen().focusWindow(group);
+            }
         }
     }
 

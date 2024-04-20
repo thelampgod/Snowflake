@@ -34,7 +34,6 @@ public class Snow implements ModInitializer {
     private GroupManager groupManager;
     private UserManager userManager;
     private WaypointRenderer renderer;
-
     private SnowScreen snowScreen;
     @Override
     public void onInitialize() {
@@ -71,7 +70,7 @@ public class Snow implements ModInitializer {
         serverManager = new ServerManager(IP, PORT);
     }
 
-    private Screen getOrCreateSnowScreen() {
+    public SnowScreen getOrCreateSnowScreen() {
         if (snowScreen == null) {
             snowScreen = new SnowScreen(Text.literal("Snow"));
         }
