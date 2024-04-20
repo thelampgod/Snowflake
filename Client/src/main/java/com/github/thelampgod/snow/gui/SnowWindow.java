@@ -19,8 +19,11 @@ public class SnowWindow {
     public int headerHeight = 17;
     private String title;
     private boolean clicked;
-    boolean focused;
+    protected boolean focused;
     public boolean hasInit = false;
+
+    public boolean closeable;
+    private CloseButton close;
 
     public TextRenderer textRenderer;
 
@@ -28,26 +31,44 @@ public class SnowWindow {
         this.title = title;
         this.width = width;
         this.height = height;
+        this.closeable = true;
+        x = (double) (SnowScreen.scaledWidth - this.width) / 2 + 20 * SnowScreen.windowList.size();
+        y = (double) (SnowScreen.scaledHeight - this.height) / 2 + 20 * SnowScreen.windowList.size();
+        textRenderer = mc.textRenderer;
+    }
+
+    public SnowWindow(String title, int width, int height, boolean closeable) {
+        this.title = title;
+        this.width = width;
+        this.height = height;
+        this.closeable = closeable;
         x = (double) (SnowScreen.scaledWidth - this.width) / 2 + 20 * SnowScreen.windowList.size();
         y = (double) (SnowScreen.scaledHeight - this.height) / 2 + 20 * SnowScreen.windowList.size();
         textRenderer = mc.textRenderer;
     }
 
     public void init(int width, int height) {
+        if (hasInit) return;
         this.width = width;
         this.height = height;
 
         x = (double) (SnowScreen.scaledWidth - this.width) / 2 + 20 * SnowScreen.windowList.size();
         y = (double) (SnowScreen.scaledHeight - this.height) / 2 + 20 * SnowScreen.windowList.size();
         textRenderer = mc.textRenderer;
+
+        int padding = 5;
+        int size = 7;
+        close = new CloseButton(width - padding - size, padding, size, size, Color.BLACK.getRGB());
         this.hasInit = true;
     }
 
 
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+        // Window
         ctx.fill(0, 0, width, height, new Color(139, 139, 139, (focused ? 255 : 180)).getRGB());
+        // Header
         ctx.fill(0, 0, width, headerHeight, new Color(136, 52, 52, (focused ? 255 : 180)).getRGB());
-
+        // Header Title
         this.drawOutlinedText(
                 title,
                 (width - textRenderer.getWidth(title)) / 2,
@@ -55,7 +76,12 @@ public class SnowWindow {
                 Formatting.GOLD.getColorValue(),
                 0,
                 ctx);
+
+        if (closeable) {
+            close.render(ctx, mouseX, mouseY);
+        }
     }
+
 
     public void preRender(DrawContext ctx, int mouseX, int mouseY, float delta) {
         MatrixStack stack = ctx.getMatrices();
@@ -63,11 +89,6 @@ public class SnowWindow {
         stack.translate(x, y, 0);
         render(ctx, mouseX, mouseY, delta);
         stack.pop();
-    }
-
-    public void resize(int width, int height) {
-        x = (double) (SnowScreen.scaledWidth - width) / 2;
-        y = (double) (SnowScreen.scaledHeight - height) / 2;
     }
 
 
@@ -86,6 +107,10 @@ public class SnowWindow {
 
         if (cursorInHeader(mouseX, mouseY)) {
             clicked = true;
+        }
+
+        if (closeable && close.mouseHover(mouseX, mouseY)) {
+            Snow.instance.getOrCreateSnowScreen().remove(this);
         }
     }
 
@@ -128,5 +153,35 @@ public class SnowWindow {
                 shadow,
                 ctx.getMatrices().peek().getPositionMatrix(),
                 ctx.getVertexConsumers(), TextRenderer.TextLayerType.SEE_THROUGH, 0, 255);
+    }
+
+    private class CloseButton {
+        int bx;
+        int by;
+        int w;
+        int h;
+        int color;
+
+        public CloseButton(int x, int y, int w, int h, int color) {
+            this.bx = x;
+            this.by = y;
+            this.w = w;
+            this.h = h;
+            this.color = color;
+        }
+
+        public void render(DrawContext ctx, int mouseX, int mouseY) {
+            int preColor = color;
+            if (mouseHover(mouseX, mouseY)) color = Color.WHITE.getRGB();
+            ctx.drawHorizontalLine(bx, bx +w, by, color);
+            ctx.drawHorizontalLine(bx, bx +w, by +h, color);
+            ctx.drawVerticalLine(bx, by, by +h,color);
+            ctx.drawVerticalLine(bx +w, by, by +h,color);
+            color = preColor;
+        }
+
+        private boolean mouseHover(double mouseX, double mouseY) {
+            return mouseX - x - bx > 0 & mouseX - x - bx < w && mouseY - y - by > 0 && mouseY - y - by < h;
+        }
     }
 }

@@ -67,9 +67,13 @@ public class SnowScreen extends Screen {
             win.focused = false;
         }
         window.focused = true;
-        window.hasInit = true;
         windowList.removeIf(it -> it == window);
         windowList.add(window);
+        window.init(window.width, window.height);
+    }
+
+    public void remove(SnowWindow window) {
+        windowList.remove(window);
     }
 
     @Override
@@ -133,12 +137,4 @@ public class SnowScreen extends Screen {
         }
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
-
-    //    @Override
-//    public void resize(MinecraftClient client, int width, int height) {
-//        for (SnowWindowElement element : windowList) {
-//            element.resize(width, height);
-//        }
-//        super.resize(client, width, height);
-//    }
 }

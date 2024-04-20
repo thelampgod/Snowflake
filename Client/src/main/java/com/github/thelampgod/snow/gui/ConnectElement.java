@@ -25,7 +25,7 @@ public class ConnectElement extends SnowWindow {
     private ButtonWidget connectButton;
 
     public ConnectElement(int width, int height) {
-        super("Connect", width, height);
+        super("Connect", width, height, false);
     }
 
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {

@@ -14,7 +14,7 @@ public class ListElement extends SnowWindow {
     protected final List<ListButton> buttons = new ArrayList<>();
 
     public ListElement(String title, int width, int height) {
-        super(title, width, height);
+        super(title, width, height, false);
     }
 
     @Override
