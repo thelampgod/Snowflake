@@ -17,10 +17,13 @@ public class SnowScreen extends Screen {
     public static int scaledHeight;
     public static List<SnowWindow> windowList = new ArrayList<>();
 
+    public GroupListElement groupListElement;
+
     public SnowScreen(Text title) {
         super(title);
+        groupListElement = new GroupListElement(150, 200);
         windowList.add(new ConnectElement(200, 60));
-        windowList.add(new GroupListElement(150, 200));
+        windowList.add(groupListElement);
         windowList.add(new UserListElement(150, 200));
     }
 
@@ -70,7 +73,9 @@ public class SnowScreen extends Screen {
         window.focused = true;
         windowList.removeIf(it -> it == window);
         windowList.add(window);
-        window.init(window.width, window.height);
+        if (!window.hasInit) {
+            window.init(window.width, window.height);
+        }
     }
 
     public void remove(SnowWindow window) {
@@ -137,5 +142,9 @@ public class SnowScreen extends Screen {
             element.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
         }
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+    }
+
+    public void addGroup(Group group) {
+        groupListElement.addGroup(group);
     }
 }

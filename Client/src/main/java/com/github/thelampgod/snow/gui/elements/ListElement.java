@@ -40,23 +40,21 @@ public class ListElement extends SnowWindow {
         private int bx;
         private int by;
         private final String name;
-        private final int id;
         private int size;
 
         private final Runnable onClick;
 
-        public ListButton(int x, int y, int w, String name, int id, int size, Runnable onClick) {
+        public ListButton(int x, int y, int w, String name, int size, Runnable onClick) {
             this.bx = x;
             this.by = y + textRenderer.fontHeight;
             this.bwidth = w;
             this.name = name;
-            this.id = id;
             this.size = size;
             this.onClick = onClick;
         }
 
-        public ListButton(int x, int y, int w, String name, int id, Runnable onClick) {
-            this(x,y,w,name,id,0, onClick);
+        public ListButton(int x, int y, int w, String name, Runnable onClick) {
+            this(x,y,w,name,0, onClick);
         }
 
         public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {

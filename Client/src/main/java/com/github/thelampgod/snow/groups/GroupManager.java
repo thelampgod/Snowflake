@@ -1,9 +1,12 @@
 package com.github.thelampgod.snow.groups;
 
+import com.github.thelampgod.snow.gui.SnowScreen;
 import org.apache.commons.compress.utils.Lists;
 
 import java.util.List;
 import java.util.Set;
+
+import static com.github.thelampgod.snow.Helper.mc;
 
 public class GroupManager {
 
@@ -25,6 +28,10 @@ public class GroupManager {
 
     public void add(Group group) {
         groups.add(group);
+
+        if (mc.currentScreen instanceof SnowScreen screen) {
+            screen.addGroup(group);
+        }
     }
     public void remove(Group group) {
         groups.remove(group);

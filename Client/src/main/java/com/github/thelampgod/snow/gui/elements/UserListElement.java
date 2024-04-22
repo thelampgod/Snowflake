@@ -21,7 +21,6 @@ public class UserListElement extends ListElement {
                             0,
                             headerHeight + 20 * i,
                             width, user.getName(),
-                            user.getId(),
                             () -> Snow.instance.getOrCreateSnowScreen().focusWindow(user)
                     ));
         }
