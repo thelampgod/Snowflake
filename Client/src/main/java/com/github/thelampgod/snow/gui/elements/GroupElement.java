@@ -1,6 +1,7 @@
-package com.github.thelampgod.snow.gui;
+package com.github.thelampgod.snow.gui.elements;
 
 import com.github.thelampgod.snow.groups.Group;
+import com.github.thelampgod.snow.gui.SnowWindow;
 
 public class GroupElement extends SnowWindow {
     private final int id;

@@ -1,6 +1,7 @@
 package com.github.thelampgod.snow.gui;
 
 import com.github.thelampgod.snow.groups.Group;
+import com.github.thelampgod.snow.gui.elements.*;
 import com.github.thelampgod.snow.users.User;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;

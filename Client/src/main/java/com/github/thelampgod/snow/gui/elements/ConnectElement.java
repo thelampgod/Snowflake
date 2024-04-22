@@ -1,6 +1,7 @@
-package com.github.thelampgod.snow.gui;
+package com.github.thelampgod.snow.gui.elements;
 
 import com.github.thelampgod.snow.Snow;
+import com.github.thelampgod.snow.gui.SnowWindow;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
