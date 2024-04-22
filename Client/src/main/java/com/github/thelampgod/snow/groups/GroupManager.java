@@ -31,6 +31,9 @@ public class GroupManager {
 
         if (mc.currentScreen instanceof SnowScreen screen) {
             screen.addGroup(group);
+            if (group.isOwner()) {
+                screen.focusWindow(group);
+            }
         }
     }
     public void remove(Group group) {
