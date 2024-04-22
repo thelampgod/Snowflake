@@ -1,9 +1,6 @@
 package com.github.thelampgod.snow.gui.elements;
 
-import com.github.thelampgod.snow.Snow;
-import com.github.thelampgod.snow.groups.Group;
 import com.github.thelampgod.snow.gui.SnowWindow;
-import com.github.thelampgod.snow.users.User;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
@@ -46,22 +43,20 @@ public class ListElement extends SnowWindow {
         private final int id;
         private int size;
 
-        public ListButton(int x, int y, int w, String name, int id, int size) {
+        private final Runnable onClick;
+
+        public ListButton(int x, int y, int w, String name, int id, int size, Runnable onClick) {
             this.bx = x;
             this.by = y + textRenderer.fontHeight;
             this.bwidth = w;
             this.name = name;
             this.id = id;
             this.size = size;
+            this.onClick = onClick;
         }
 
-        public ListButton(int x, int y, int w, String name, int id) {
-            this.bx = x;
-            this.by = y + textRenderer.fontHeight;
-            this.bwidth = w;
-            this.name = name;
-            this.id = id;
-            this.size = 0;
+        public ListButton(int x, int y, int w, String name, int id, Runnable onClick) {
+            this(x,y,w,name,id,0, onClick);
         }
 
         public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
@@ -91,14 +86,7 @@ public class ListElement extends SnowWindow {
 
         public void mouseClicked(double mouseX, double mouseY) {
             if (mouseHover(mouseX,mouseY)) {
-                if (this.size != 0) {
-                    final Group group = Snow.instance.getGroupManager().get(this.id);
-                    Snow.instance.getOrCreateSnowScreen().focusWindow(group);
-                    return;
-                }
-
-                final User user = Snow.instance.getUserManager().get(this.id);
-                Snow.instance.getOrCreateSnowScreen().focusWindow(user);
+                onClick.run();
             }
         }
     }

@@ -16,7 +16,14 @@ public class UserListElement extends ListElement {
         final List<User> users = Snow.instance.getUserManager().getUsers();
         for (int i = 0; i < users.size(); ++i) {
             final User user = users.get(i);
-            buttons.add(new ListButton(0, headerHeight + 20 * i, width, user.getName(), user.getId()));
+            buttons.add(
+                    new ListButton(
+                            0,
+                            headerHeight + 20 * i,
+                            width, user.getName(),
+                            user.getId(),
+                            () -> Snow.instance.getOrCreateSnowScreen().focusWindow(user)
+                    ));
         }
     }
 }

@@ -17,7 +17,15 @@ public class GroupListElement extends ListElement {
         final List<Group> groups = Snow.instance.getGroupManager().getGroups();
         for (int i = 0; i < groups.size(); ++i) {
             final Group group = groups.get(i);
-            buttons.add(new ListButton(0, headerHeight + 20 * i, width, group.getName(), group.getId(), group.getUsers().size()));
+            buttons.add(
+                    new ListButton(
+                            0,
+                            headerHeight + 20 * i,
+                            width, group.getName(),
+                            group.getId(),
+                            group.getUsers().size(),
+                            () -> Snow.instance.getOrCreateSnowScreen().focusWindow(group)
+                    ));
         }
     }
 }
