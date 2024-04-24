@@ -1,6 +1,7 @@
 package com.github.thelampgod.snow.gui;
 
 import com.github.thelampgod.snow.Snow;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
@@ -162,6 +163,7 @@ public class SnowWindow {
         int h;
         int color;
 
+        //TODO: general button class, with icon and runnable?
         public CloseButton(int x, int y, int w, int h, int color) {
             this.bx = x;
             this.by = y;
@@ -171,13 +173,14 @@ public class SnowWindow {
         }
 
         public void render(DrawContext ctx, int mouseX, int mouseY) {
-            int preColor = color;
-            if (mouseHover(mouseX, mouseY)) color = Color.WHITE.getRGB();
-            ctx.drawHorizontalLine(bx, bx +w, by, color);
-            ctx.drawHorizontalLine(bx, bx +w, by +h, color);
-            ctx.drawVerticalLine(bx, by, by +h,color);
-            ctx.drawVerticalLine(bx +w, by, by +h,color);
-            color = preColor;
+            if (!mouseHover(mouseX, mouseY)) {
+                ctx.fill(bx + 1, by + 1, bx + 1 + w, by + 1 + h, color);
+                ctx.fill(bx, by, bx + w, by + h, Color.GRAY.getRGB());
+                return;
+            }
+
+            ctx.fill(bx-1, by-1, bx-1 + w, by-1 + h, color);
+            ctx.fill(bx, by, bx + w, by + h, Color.GRAY.getRGB());
         }
 
         private boolean mouseHover(double mouseX, double mouseY) {
