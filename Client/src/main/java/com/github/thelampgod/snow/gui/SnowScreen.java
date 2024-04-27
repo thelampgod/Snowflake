@@ -148,8 +148,4 @@ public class SnowScreen extends Screen {
     public void addGroup(Group group) {
         groupListElement.addGroup(group);
     }
-
-    public void addToast(String s) {
-        mc.getToastManager().add(new SystemToast(SystemToast.Type.NARRATOR_TOGGLE, Text.literal(s), null));
-    }
 }

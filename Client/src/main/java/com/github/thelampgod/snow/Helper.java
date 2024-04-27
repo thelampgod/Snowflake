@@ -2,6 +2,7 @@ package com.github.thelampgod.snow;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
+import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -49,4 +50,8 @@ public class Helper {
         Snow.instance.getLog().info(msg.getString());
     }
 
+
+    public static void addToast(String s) {
+        mc.getToastManager().add(new SystemToast(SystemToast.Type.NARRATOR_TOGGLE, Text.literal(s), null));
+    }
 }

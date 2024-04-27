@@ -1,5 +1,6 @@
 package com.github.thelampgod.snow.gui.elements;
 
+import com.github.thelampgod.snow.Helper;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.groups.Group;
 import com.github.thelampgod.snow.packets.impl.outgoing.GroupUserRemovePacket;
@@ -36,7 +37,7 @@ public class UserRemoveFromGroupListElement extends ListElement {
         }
 
         if (j == 0) {
-            Snow.instance.getOrCreateSnowScreen().addToast("No one to remove!");
+            Helper.addToast("No one to remove!");
             Snow.instance.getOrCreateSnowScreen().remove(this);
         }
     }

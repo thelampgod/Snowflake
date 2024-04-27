@@ -1,6 +1,7 @@
 package com.github.thelampgod.snow.gui.elements;
 
 import com.github.thelampgod.snow.EncryptionUtil;
+import com.github.thelampgod.snow.Helper;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.groups.Group;
 import com.github.thelampgod.snow.packets.impl.outgoing.GroupInvitePacket;
@@ -38,7 +39,7 @@ public class UserAddToGroupListElement extends ListElement {
         }
 
         if (j == 0) {
-            Snow.instance.getOrCreateSnowScreen().addToast("No one to add!");
+            Helper.addToast("No one to add!");
             Snow.instance.getOrCreateSnowScreen().remove(this);
         }
     }
