@@ -7,6 +7,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+
 import java.awt.*;
 
 import static com.github.thelampgod.snow.Helper.mc;
@@ -27,8 +28,10 @@ public class SnowWindow {
     public boolean hasInit = false;
 
     public boolean closeable;
-    private CloseButton close;
+    private TextButton close;
 
+    protected int size = 9;
+    protected int padding = (headerHeight - size) / 2;
     public TextRenderer textRenderer;
 
     public SnowWindow(String title, boolean titleCentered, int width, int height, boolean closeable) {
@@ -58,11 +61,7 @@ public class SnowWindow {
         x = (double) (SnowScreen.scaledWidth - this.width) / 2 + 20 * SnowScreen.windowList.size();
         y = (double) (SnowScreen.scaledHeight - this.height) / 2 + 20 * SnowScreen.windowList.size();
         textRenderer = mc.textRenderer;
-
-
-        int size = 9;
-        int padding = (headerHeight - size) / 2;
-        close = new CloseButton(width - padding - size, padding, size, Color.BLACK.getRGB());
+        close = new TextButton("x", width - padding - size, padding, size, Color.BLACK.getRGB());
         this.hasInit = true;
     }
 
@@ -163,18 +162,28 @@ public class SnowWindow {
     }
 
 
-    private class CloseButton {
+    protected class TextButton {
+        String icon;
         int bx;
         int by;
         int size;
         int color;
+        int fontHeight;
+        String tooltipText;
 
         //TODO: general button class, with icon and runnable?
-        public CloseButton(int x, int y, int size, int color) {
+        public TextButton(String iconChar, int x, int y, int size, int color, int fontHeight, String tooltipText) {
+            this.icon = iconChar;
             this.bx = x;
             this.by = y;
             this.size = size;
             this.color = color;
+            this.fontHeight = fontHeight;
+            this.tooltipText = tooltipText;
+        }
+
+        public TextButton(String iconChar, int x, int y, int size, int color) {
+            this(iconChar, x,y,size,color, textRenderer.fontHeight, "");
         }
 
         public void render(DrawContext ctx, int mouseX, int mouseY) {
@@ -183,12 +192,14 @@ public class SnowWindow {
             if (mouseHover(mouseX, mouseY)) {
                 ctx.fill(0, 0, size, size, headerColor.brighter().getRGB());
             }
-            ctx.drawText(textRenderer, "x", (size - textRenderer.getWidth("x")) / 2 + 1, (size - textRenderer.fontHeight) / 2 , color, false);
-
+            ctx.drawText(textRenderer, icon, (size - textRenderer.getWidth(icon)) / 2 + 1, (size - fontHeight) / 2 , color, false);
+            if (!tooltipText.isEmpty() && mouseHover(mouseX, mouseY)) {
+                ctx.drawTooltip(textRenderer, Text.literal(tooltipText), 0, 0);
+            }
             ctx.getMatrices().pop();
         }
 
-        private boolean mouseHover(double mouseX, double mouseY) {
+        public boolean mouseHover(double mouseX, double mouseY) {
             return mouseX - x - bx > 0 & mouseX - x - bx < size && mouseY - y - by > 0 && mouseY - y - by < size;
         }
     }
