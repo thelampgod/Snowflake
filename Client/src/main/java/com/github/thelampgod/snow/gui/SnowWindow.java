@@ -68,6 +68,8 @@ public class SnowWindow {
 
 
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+        // Border
+        ctx.fill(-1, -1, width + 1, height + 1, (focused ? Color.WHITE.getRGB() : Color.BLACK.getRGB()));
         // Window
         ctx.fill(0, 0, width, height, windowColor.getRGB());
         // Header
@@ -160,6 +162,7 @@ public class SnowWindow {
                 ctx.getVertexConsumers(), TextRenderer.TextLayerType.SEE_THROUGH, 0, 255);
     }
 
+
     private class CloseButton {
         int bx;
         int by;
@@ -180,7 +183,7 @@ public class SnowWindow {
             if (mouseHover(mouseX, mouseY)) {
                 ctx.fill(0, 0, size, size, headerColor.brighter().getRGB());
             }
-            ctx.drawText(textRenderer, "x", (size - textRenderer.getWidth("x")) / 2 + 1, (size - textRenderer.fontHeight) / 2 , 0, false);
+            ctx.drawText(textRenderer, "x", (size - textRenderer.getWidth("x")) / 2 + 1, (size - textRenderer.fontHeight) / 2 , color, false);
 
             ctx.getMatrices().pop();
         }
