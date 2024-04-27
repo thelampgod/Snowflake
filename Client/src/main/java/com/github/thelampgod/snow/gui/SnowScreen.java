@@ -5,6 +5,7 @@ import com.github.thelampgod.snow.gui.elements.*;
 import com.github.thelampgod.snow.users.User;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
@@ -146,5 +147,9 @@ public class SnowScreen extends Screen {
 
     public void addGroup(Group group) {
         groupListElement.addGroup(group);
+    }
+
+    public void addToast(String s) {
+        mc.getToastManager().add(new SystemToast(SystemToast.Type.NARRATOR_TOGGLE, Text.literal(s), null));
     }
 }

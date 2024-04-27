@@ -1,5 +1,7 @@
 package com.github.thelampgod.snow.groups;
 
+import com.github.thelampgod.snow.users.User;
+
 import java.util.Set;
 
 public class Group {
@@ -32,6 +34,10 @@ public class Group {
 
     public void addUser(int id) {
         users.add(id);
+    }
+
+    public void addUser(User user) {
+        this.addUser(user.getId());
     }
 
     public void removeUser(int id) {

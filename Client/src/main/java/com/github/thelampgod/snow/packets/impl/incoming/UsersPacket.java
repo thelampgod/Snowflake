@@ -2,6 +2,7 @@ package com.github.thelampgod.snow.packets.impl.incoming;
 
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.packets.SnowflakePacket;
+import com.github.thelampgod.snow.packets.impl.outgoing.KeyRequestPacket;
 import com.github.thelampgod.snow.users.User;
 import com.github.thelampgod.snow.users.UserManager;
 
@@ -29,6 +30,9 @@ public class UsersPacket extends SnowflakePacket {
   @Override
   public void handle() {
     final UserManager man = Snow.instance.getUserManager();
-    idToNameMap.forEach((id, name) -> man.add(new User(name, id, null)));
+    idToNameMap.forEach((id, name) -> {
+      man.add(new User(name, id, null));
+      Snow.getServerManager().sendPacket(new KeyRequestPacket(id));
+    });
   }
 }

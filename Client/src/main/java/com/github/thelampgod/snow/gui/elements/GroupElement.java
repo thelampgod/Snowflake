@@ -1,5 +1,6 @@
 package com.github.thelampgod.snow.gui.elements;
 
+import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.groups.Group;
 import com.github.thelampgod.snow.gui.SnowWindow;
 import net.minecraft.client.gui.DrawContext;
@@ -54,7 +55,7 @@ public class GroupElement extends SnowWindow {
 
         if (group.isOwner()) {
             if (addButton.mouseHover(mouseX, mouseY)) {
-                add();
+                Snow.instance.getOrCreateSnowScreen().focusWindow(new UserAddToGroupListElement(this.group, 150, 200));
             }
             if (removeButton.mouseHover(mouseX, mouseY)) {
                 remove();
@@ -63,8 +64,5 @@ public class GroupElement extends SnowWindow {
     }
 
     private void remove() {
-    }
-
-    private void add() {
     }
 }

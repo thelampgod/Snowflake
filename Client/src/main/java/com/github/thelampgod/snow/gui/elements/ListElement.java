@@ -12,8 +12,13 @@ public class ListElement extends SnowWindow {
     protected final List<ListButton> buttons = new ArrayList<>();
 
     public ListElement(String title, int width, int height) {
-        super(title, width, height, false);
+        this(title, width, height, false);
     }
+
+    public ListElement(String title, int width, int height, boolean closeable) {
+        super(title, width, height, closeable);
+    }
+
 
     @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
