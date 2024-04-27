@@ -58,11 +58,9 @@ public class GroupElement extends SnowWindow {
                 Snow.instance.getOrCreateSnowScreen().focusWindow(new UserAddToGroupListElement(this.group, 150, 200));
             }
             if (removeButton.mouseHover(mouseX, mouseY)) {
-                remove();
+                Snow.instance.getOrCreateSnowScreen().focusWindow(new UserRemoveFromGroupListElement(this.group, 150, 200));
+
             }
         }
-    }
-
-    private void remove() {
     }
 }
