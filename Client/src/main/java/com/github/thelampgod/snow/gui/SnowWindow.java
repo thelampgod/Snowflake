@@ -1,7 +1,6 @@
 package com.github.thelampgod.snow.gui;
 
 import com.github.thelampgod.snow.Snow;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
@@ -18,7 +17,11 @@ public class SnowWindow {
     public int width;
     public int height;
     public int headerHeight = 17;
-    private String title;
+
+    public Color windowColor = new Color(139, 139, 139);
+    public Color headerColor = new Color(136, 52, 52);
+    private final String title;
+    private final boolean titleCentered;
     private boolean clicked;
     protected boolean focused;
     public boolean hasInit = false;
@@ -28,24 +31,23 @@ public class SnowWindow {
 
     public TextRenderer textRenderer;
 
-    public SnowWindow(String title, int width, int height) {
+    public SnowWindow(String title, boolean titleCentered, int width, int height, boolean closeable) {
         this.title = title;
-        this.width = width;
-        this.height = height;
-        this.closeable = true;
-        x = (double) (SnowScreen.scaledWidth - this.width) / 2 + 20 * SnowScreen.windowList.size();
-        y = (double) (SnowScreen.scaledHeight - this.height) / 2 + 20 * SnowScreen.windowList.size();
-        textRenderer = mc.textRenderer;
-    }
-
-    public SnowWindow(String title, int width, int height, boolean closeable) {
-        this.title = title;
+        this.titleCentered = titleCentered;
         this.width = width;
         this.height = height;
         this.closeable = closeable;
         x = (double) (SnowScreen.scaledWidth - this.width) / 2 + 20 * SnowScreen.windowList.size();
         y = (double) (SnowScreen.scaledHeight - this.height) / 2 + 20 * SnowScreen.windowList.size();
-        textRenderer = mc.textRenderer;
+        this.textRenderer = mc.textRenderer;
+    }
+
+    public SnowWindow(String title, boolean titleCentered, int width, int height) {
+        this(title, titleCentered, width, height, true);
+    }
+
+    public SnowWindow(String title, int width, int height, boolean closeable) {
+        this(title, true, width, height, closeable);
     }
 
     public void init(int width, int height) {
@@ -57,22 +59,24 @@ public class SnowWindow {
         y = (double) (SnowScreen.scaledHeight - this.height) / 2 + 20 * SnowScreen.windowList.size();
         textRenderer = mc.textRenderer;
 
-        int padding = 5;
-        int size = 7;
-        close = new CloseButton(width - padding - size, padding, size, size, Color.BLACK.getRGB());
+
+        int size = 9;
+        int padding = (headerHeight - size) / 2;
+        close = new CloseButton(width - padding - size, padding, size, Color.BLACK.getRGB());
         this.hasInit = true;
     }
 
 
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         // Window
-        ctx.fill(0, 0, width, height, new Color(139, 139, 139, (focused ? 255 : 180)).getRGB());
+        ctx.fill(0, 0, width, height, windowColor.getRGB());
         // Header
-        ctx.fill(0, 0, width, headerHeight, new Color(136, 52, 52, (focused ? 255 : 180)).getRGB());
+        ctx.fill(0, 0, width, headerHeight, headerColor.getRGB());
         // Header Title
+        int headerX = titleCentered ? (width - textRenderer.getWidth(title)) / 2 : 5;
         this.drawOutlinedText(
                 title,
-                (width - textRenderer.getWidth(title)) / 2,
+                headerX,
                 (headerHeight - textRenderer.fontHeight) / 2,
                 Formatting.GOLD.getColorValue(),
                 0,
@@ -159,32 +163,30 @@ public class SnowWindow {
     private class CloseButton {
         int bx;
         int by;
-        int w;
-        int h;
+        int size;
         int color;
 
         //TODO: general button class, with icon and runnable?
-        public CloseButton(int x, int y, int w, int h, int color) {
+        public CloseButton(int x, int y, int size, int color) {
             this.bx = x;
             this.by = y;
-            this.w = w;
-            this.h = h;
+            this.size = size;
             this.color = color;
         }
 
         public void render(DrawContext ctx, int mouseX, int mouseY) {
-            if (!mouseHover(mouseX, mouseY)) {
-                ctx.fill(bx + 1, by + 1, bx + 1 + w, by + 1 + h, color);
-                ctx.fill(bx, by, bx + w, by + h, Color.GRAY.getRGB());
-                return;
+            ctx.getMatrices().push();
+            ctx.getMatrices().translate(bx,by,0);
+            if (mouseHover(mouseX, mouseY)) {
+                ctx.fill(0, 0, size, size, headerColor.brighter().getRGB());
             }
+            ctx.drawText(textRenderer, "x", (size - textRenderer.getWidth("x")) / 2 + 1, (size - textRenderer.fontHeight) / 2 , 0, false);
 
-            ctx.fill(bx-1, by-1, bx-1 + w, by-1 + h, color);
-            ctx.fill(bx, by, bx + w, by + h, Color.GRAY.getRGB());
+            ctx.getMatrices().pop();
         }
 
         private boolean mouseHover(double mouseX, double mouseY) {
-            return mouseX - x - bx > 0 & mouseX - x - bx < w && mouseY - y - by > 0 && mouseY - y - by < h;
+            return mouseX - x - bx > 0 & mouseX - x - bx < size && mouseY - y - by > 0 && mouseY - y - by < size;
         }
     }
 }
