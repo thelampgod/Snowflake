@@ -64,6 +64,7 @@ public class GroupListElement extends ListElement {
     }
 
     public void updateButtons() {
+        buttons.clear();
         final List<Group> groups = Snow.instance.getGroupManager().getGroups();
         for (int i = 0; i < groups.size(); ++i) {
             final Group group = groups.get(i);
