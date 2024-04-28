@@ -32,7 +32,7 @@ public class UserManager {
     }
 
     public void remove(User user) {
-        this.remove(user.getId());
+        users.remove(user.getId());
 
         SnowScreen screen = Snow.instance.getOrCreateSnowScreen();
         screen.updateUserButtons();

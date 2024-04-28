@@ -65,6 +65,7 @@ public class HandshakeResponsePacket extends SnowflakePacket {
                 client.getConnection().sendPacket(new GroupInfoPacket(group.getName(), group.getId(), group.getOwnerId() == client.getId(), group.getUsers()));
                 for (int groupUsersIds : group.getUsers()) {
                     final SocketClient groupUser = Snowflake.INSTANCE.getServer().getClientReceiver(groupUsersIds);
+                    if (groupUser == null) continue;
                     groupUser.getConnection().sendPacket(new GroupConnectionPacket.Joined(group.getId(), client.getId()));
                 }
             }

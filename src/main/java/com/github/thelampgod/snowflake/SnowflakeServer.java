@@ -86,6 +86,6 @@ public class SnowflakeServer {
                 .filter(client -> client.getId() == clientId)
                 .filter(SocketClient::isReceiver)
                 .findAny()
-                .orElseGet(null);
+                .orElse(null);
     }
 }
