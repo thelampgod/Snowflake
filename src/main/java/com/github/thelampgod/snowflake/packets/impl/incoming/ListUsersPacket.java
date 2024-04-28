@@ -32,18 +32,12 @@ public class ListUsersPacket extends SnowflakePacket {
             return;
         }
 
-        JsonObject node = new JsonObject();
         final Map<Integer, String> idToNameMap = new HashMap<>();
         for (SocketClient client : getConnectedClients()) {
+            if (client.getId() == 0) continue;
             idToNameMap.put(client.getId(), client.getName());
-
-            JsonObject jsonClient = new JsonObject();
-            jsonClient.addProperty(String.valueOf(client.getId()), client.getName());
-            jsonClient.entrySet().forEach(entry -> node.add(entry.getKey(), entry.getValue()));
         }
 
-        String list = new GsonBuilder().setPrettyPrinting().create().toJson(node);
         this.getSender().getConnection().sendPacket(new UsersPacket(idToNameMap));
-        this.getSender().getConnection().sendPacket(new PlainMessagePacket(list));
     }
 }

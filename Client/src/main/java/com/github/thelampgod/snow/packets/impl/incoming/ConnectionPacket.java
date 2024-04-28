@@ -1,7 +1,9 @@
 package com.github.thelampgod.snow.packets.impl.incoming;
 
+import com.github.thelampgod.snow.Helper;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.packets.SnowflakePacket;
+import com.github.thelampgod.snow.packets.impl.outgoing.KeyRequestPacket;
 import com.github.thelampgod.snow.users.User;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -61,8 +63,10 @@ public class ConnectionPacket extends SnowflakePacket {
           Text.literal(this.getUser()).formatted(Formatting.ITALIC)
               .append(Text.literal(" connected").formatted(Formatting.GREEN)
               ));
+      Helper.addToast("User connected!", this.getUser() + " joined.");
 
       Snow.instance.getUserManager().add(new User(this.getUser(), this.getId(), null));
+      Snow.getServerManager().sendPacket(new KeyRequestPacket(this.getId()));
     }
 
   }
@@ -83,6 +87,7 @@ public class ConnectionPacket extends SnowflakePacket {
               Text.literal(this.getUser()).formatted(Formatting.ITALIC)
                       .append(Text.literal(" disconnected").formatted(Formatting.RED)
                       ));
+      Helper.addToast("User disconnected!", this.getUser() + " left.");
 
       Snow.instance.getUserManager().remove(this.getId());
     }

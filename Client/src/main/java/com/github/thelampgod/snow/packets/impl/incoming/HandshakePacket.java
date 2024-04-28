@@ -29,7 +29,7 @@ public class HandshakePacket extends SnowflakePacket {
 
   @Override
   public void handle() {
-    final ServerManager man = Snow.instance.getServerManager();
+    final ServerManager man = Snow.getServerManager();
     try {
       final String decrypted = new String(EncryptionUtil.decrypt(encryptedSecret, Helper.getPrivateKey()));
 
