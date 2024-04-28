@@ -71,7 +71,7 @@ public class HandshakeResponsePacket extends SnowflakePacket {
             }
 
             client.getConnection().sendPacket(new PlainMessagePacket("Successfully authenticated"));
-            client.getConnection().sendPacket(new AuthSuccessPacket());
+            client.getConnection().sendPacket(new AuthSuccessPacket(client.getId()));
         } else {
             client.getConnection().sendPacket(new DisconnectPacket("Wrong password", client));
         }

@@ -29,7 +29,7 @@ public abstract class SnowflakePacket implements Serializable {
       case 12:
         return new UsersPacket(in);
       case 13:
-        return new AuthSuccessPacket();
+        return new AuthSuccessPacket(in);
       case 14:
         return new MultiPacketPacket(in);
       case 16:

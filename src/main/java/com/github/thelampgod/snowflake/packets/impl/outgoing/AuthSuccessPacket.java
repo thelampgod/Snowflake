@@ -8,12 +8,16 @@ import java.io.IOException;
 
 public class AuthSuccessPacket extends SnowflakePacket {
 
-    public AuthSuccessPacket() throws IOException {
+    private final int authedUserId;
+
+    public AuthSuccessPacket(int id) throws IOException {
         super(SocketClient.Snowflake());
+        this.authedUserId = id;
     }
 
     @Override
     public void writeData(DataOutputStream out) throws IOException {
         out.writeByte(13);
+        out.writeInt(authedUserId);
     }
 }

@@ -11,6 +11,7 @@ import static com.github.thelampgod.snow.Helper.mc;
 public class UserManager {
 
     private final List<User> users = Lists.newArrayList();
+    private int me;
 
     public UserManager() {
 //        users.add(new User("l_amp", 0,null));
@@ -55,5 +56,13 @@ public class UserManager {
 
     public List<User> getUsers() {
         return users;
+    }
+
+    public void setMe(int id) {
+        this.me = id;
+    }
+
+    public int getMe() {
+        return me;
     }
 }
