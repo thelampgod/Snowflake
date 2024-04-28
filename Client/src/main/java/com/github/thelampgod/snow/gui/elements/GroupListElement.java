@@ -1,5 +1,6 @@
 package com.github.thelampgod.snow.gui.elements;
 
+import com.github.thelampgod.snow.EncryptionUtil;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.groups.Group;
 import com.github.thelampgod.snow.packets.impl.outgoing.CreateGroupPacket;
@@ -24,18 +25,7 @@ public class GroupListElement extends ListElement {
         super.init(width, height);
         newGroupField = new TextFieldWidget(super.textRenderer, 0, headerHeight + textRenderer.fontHeight - 4, width, 17, Text.empty());
 
-        final List<Group> groups = Snow.instance.getGroupManager().getGroups();
-        for (int i = 0; i < groups.size(); ++i) {
-            final Group group = groups.get(i);
-            buttons.add(
-                    new ListButton(
-                            0,
-                            headerHeight + 20 * (i + 1),
-                            width, group.getName(),
-                            group.getUsers().size(),
-                            () -> Snow.instance.getOrCreateSnowScreen().focusWindow(group)
-                    ));
-        }
+        updateButtons();
     }
 
     @Override
@@ -73,14 +63,18 @@ public class GroupListElement extends ListElement {
         }
     }
 
-    public void addGroup(final Group group) {
-        buttons.add(
-                new ListButton(
-                        0,
-                        headerHeight + 20 * (buttons.size() + 1),
-                        width, group.getName(),
-                        group.getUsers().size(),
-                        () -> Snow.instance.getOrCreateSnowScreen().focusWindow(group)
-                ));
+    public void updateButtons() {
+        final List<Group> groups = Snow.instance.getGroupManager().getGroups();
+        for (int i = 0; i < groups.size(); ++i) {
+            final Group group = groups.get(i);
+            buttons.add(
+                    new ListButton(
+                            0,
+                            headerHeight + 20 * (i + 1),
+                            width, group.getName(),
+                            group.getUsers().size(),
+                            () -> Snow.instance.getOrCreateSnowScreen().focusWindow(group)
+                    ));
+        }
     }
 }

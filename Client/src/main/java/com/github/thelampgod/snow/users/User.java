@@ -1,8 +1,8 @@
 package com.github.thelampgod.snow.users;
 
-import java.security.KeyFactory;
+import com.github.thelampgod.snow.EncryptionUtil;
+
 import java.security.PublicKey;
-import java.security.spec.X509EncodedKeySpec;
 
 import static com.github.thelampgod.snow.Helper.printModMessage;
 
@@ -33,11 +33,12 @@ public class User {
         this.key = getKey(stringKey);
     }
 
-    private PublicKey getKey(String stringKey) {
+    private PublicKey getKey(String asciiArmored) {
         PublicKey key = null;
         try {
-            KeyFactory factory = KeyFactory.getInstance("RSA");
-            key = factory.generatePublic(new X509EncodedKeySpec(stringKey.getBytes()));
+            key = EncryptionUtil.parseAsciiArmored(asciiArmored);
+            printModMessage("Succesffully parsed " + this.name + "'s pubkey :D");
+            System.out.println(asciiArmored);
         } catch (Exception e) {
             printModMessage("Couldn't generate public key");
             e.printStackTrace();

@@ -47,7 +47,7 @@ public class HandshakeResponsePacket extends SnowflakePacket {
                     .filter(c -> c.getLinkString().equals(client.getLinkString()))
                     .filter(SocketClient::isReceiver)
                     .forEach(c -> {
-                        c.setPubKey(pubKey.getBytes());
+                        c.setPubKey(pubKey);
                         c.setName(name);
                         c.setId(id);
                         c.setAuthenticated(true);

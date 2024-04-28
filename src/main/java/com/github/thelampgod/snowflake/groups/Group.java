@@ -23,6 +23,7 @@ public class Group {
     public Group(String name, int ownerId) {
         this.name = name;
         this.ownerId = ownerId;
+        users.add(ownerId);
     }
 
     public int getId() {

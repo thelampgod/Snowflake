@@ -19,13 +19,15 @@ public class SnowScreen extends Screen {
     public static List<SnowWindow> windowList = new ArrayList<>();
 
     public GroupListElement groupListElement;
+    public UserListElement userListElement;
 
     public SnowScreen(Text title) {
         super(title);
-        groupListElement = new GroupListElement(150, 200);
         windowList.add(new ConnectElement(200, 60));
+        groupListElement = new GroupListElement(150, 200);
+        userListElement = new UserListElement(150, 200);
         windowList.add(groupListElement);
-        windowList.add(new UserListElement(150, 200));
+        windowList.add(userListElement);
     }
 
     @Override
@@ -145,7 +147,32 @@ public class SnowScreen extends Screen {
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
-    public void addGroup(Group group) {
-        groupListElement.addGroup(group);
+
+    public void updateUserButtons() {
+        userListElement.updateButtons();
+    }
+
+    public void updateGroupButtons() {
+        groupListElement.updateButtons();
+    }
+
+    public void removeGroupWindow(Group group) {
+        for (SnowWindow window : windowList) {
+            if (window instanceof GroupElement element) {
+                if (element.getId() == group.getId()) {
+                    remove(element);
+                }
+            }
+        }
+    }
+
+    public void removeUserWindow(User user) {
+        for (SnowWindow window : windowList) {
+            if (window instanceof UserElement element) {
+                if (element.getId() == user.getId()) {
+                    remove(element);
+                }
+            }
+        }
     }
 }

@@ -20,7 +20,8 @@ public class GroupInfoPacket extends SnowflakePacket {
         this.name = in.readUTF();
         this.id = in.readInt();
         this.isOwner = in.readBoolean();
-        for (int i = 0; i < in.readByte(); ++i) {
+        int numUsers = in.readByte();
+        for (int i = 0; i < numUsers; ++i) {
             users.add(in.readInt());
         }
     }

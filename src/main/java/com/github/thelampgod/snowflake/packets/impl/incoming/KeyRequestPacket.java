@@ -31,6 +31,7 @@ public class KeyRequestPacket extends SnowflakePacket {
         if (!super.isAuthenticated()) {
             return;
         }
+        if (id < 1) return;
         String key = "";
         try (Connection conn = getDb().getConnection()) {
             ResultSet result = DatabaseUtil.runQuery("select pubkey from users where id=" + id, conn).getResultSet();

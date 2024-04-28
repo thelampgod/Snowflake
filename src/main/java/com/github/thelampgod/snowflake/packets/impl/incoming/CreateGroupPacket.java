@@ -4,6 +4,7 @@ import com.github.thelampgod.snowflake.Snowflake;
 import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.groups.Group;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
+import com.github.thelampgod.snowflake.packets.impl.outgoing.GroupCreateSuccessPacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.GroupInfoPacket;
 import com.github.thelampgod.snowflake.util.DatabaseUtil;
 
@@ -34,7 +35,9 @@ public class CreateGroupPacket extends SnowflakePacket {
         int groupId = DatabaseUtil.insertGroup(group, Snowflake.INSTANCE.getDb());
         group.setId(groupId);
         Snowflake.INSTANCE.getGroupManager().add(group);
+        DatabaseUtil.addUserToGroup(this.getSender().getId(), group, Snowflake.INSTANCE.getDb());
 
         this.getSender().getConnection().sendPacket(new GroupInfoPacket(group.getName(), group.getId(), true, group.getUsers()));
+        this.getSender().getConnection().sendPacket(new GroupCreateSuccessPacket(group.getId()));
     }
 }

@@ -56,6 +56,8 @@ public abstract class SnowflakePacket implements Serializable {
           return new EncryptedDataPacket.Group(in);
         }
         return new EncryptedDataPacket.User(in);
+      case 22:
+        return new GroupCreateSuccessPacket(in);
       default:
         throw new RuntimeException("Unknown packet type " + id);
     }

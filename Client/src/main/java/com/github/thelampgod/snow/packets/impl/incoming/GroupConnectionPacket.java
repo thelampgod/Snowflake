@@ -57,8 +57,8 @@ public class GroupConnectionPacket extends SnowflakePacket {
 
             try {
                 if (group.isOwner()) {
-                    final String newPassword = RandomStringUtils.random(16, 0, 0, true, true, null, new SecureRandom());
-                    byte[] encrypted = EncryptionUtil.encryptByPassword(newPassword.getBytes(), group.getPassword());
+                    final byte[] newPassword = EncryptionUtil.generatePassword();
+                    byte[] encrypted = EncryptionUtil.encryptByPassword(newPassword, group.getPassword());
                     Snow.getServerManager().sendPacket(new GroupPasswordUpdatePacket(groupId, encrypted));
                 }
             } catch (Exception e) {

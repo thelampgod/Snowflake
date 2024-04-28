@@ -68,7 +68,7 @@ public class AuthenticateCommand {
         try {
             PublicKey pub = mc.getProfileKeys().fetchKeyPair().get().get().publicKey().data().key();
             Snow.getServerManager().sendPacket(new LoginStartPacket(
-                    pub.getEncoded()));
+                    EncryptionUtil.asciiArmored(pub)));
         } catch (Exception e) {
             printModMessage("Couldn't get public key.");
             e.printStackTrace();

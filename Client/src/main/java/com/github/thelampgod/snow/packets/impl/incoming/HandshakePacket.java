@@ -1,5 +1,7 @@
 package com.github.thelampgod.snow.packets.impl.incoming;
 
+import com.github.thelampgod.snow.EncryptionUtil;
+import com.github.thelampgod.snow.Helper;
 import com.github.thelampgod.snow.ServerManager;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.packets.SnowflakePacket;
@@ -29,7 +31,7 @@ public class HandshakePacket extends SnowflakePacket {
   public void handle() {
     final ServerManager man = Snow.instance.getServerManager();
     try {
-      final String decrypted = new String(NetworkEncryptionUtils.decrypt(mc.getProfileKeys().fetchKeyPair().get().get().privateKey(), encryptedSecret));
+      final String decrypted = new String(EncryptionUtil.decrypt(encryptedSecret, Helper.getPrivateKey()));
 
       System.out.println("Secret is " + decrypted);
       man.sendPacket(new HandshakeResponsePacket(decrypted, mc.getSession().getUsername()));

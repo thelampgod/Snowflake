@@ -1,6 +1,7 @@
 package com.github.thelampgod.snow.gui.elements;
 
 import com.github.thelampgod.snow.Snow;
+import com.github.thelampgod.snow.groups.Group;
 import com.github.thelampgod.snow.users.User;
 
 import java.util.List;
@@ -13,6 +14,11 @@ public class UserListElement extends ListElement {
     @Override
     public void init(int width, int height) {
         super.init(width, height);
+        updateButtons();
+    }
+
+    public void updateButtons() {
+        buttons.clear();
         final List<User> users = Snow.instance.getUserManager().getUsers();
         for (int i = 0; i < users.size(); ++i) {
             final User user = users.get(i);
