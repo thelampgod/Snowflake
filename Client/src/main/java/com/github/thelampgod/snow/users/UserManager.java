@@ -26,6 +26,7 @@ public class UserManager {
     }
 
     public void add(User user) {
+        if (user.getId() == me) return;
         users.add(user);
 
         SnowScreen screen = Snow.instance.getOrCreateSnowScreen();
