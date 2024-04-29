@@ -1,5 +1,6 @@
 package com.github.thelampgod.snowflake.packets.impl.incoming;
 
+import com.github.thelampgod.snowflake.Snowflake;
 import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 import com.github.thelampgod.snowflake.packets.impl.DisconnectPacket;
@@ -60,6 +61,8 @@ public class LoginPacket extends SnowflakePacket {
 
         client.setPubKey(this.pubKey);
         client.setSecret(secret);
-        client.getConnection().sendPacket(new HandshakeStartPacket(encryptedMessage));
+
+        SocketClient receiver = Snowflake.INSTANCE.getServer().getClientReceiver(client.getLinkString());
+        receiver.getConnection().sendPacket(new HandshakeStartPacket(encryptedMessage));
     }
 }

@@ -89,4 +89,12 @@ public class SnowflakeServer {
                 .findAny()
                 .orElse(null);
     }
+
+    public SocketClient getClientReceiver(String linker) {
+        return this.connectedClients.stream()
+                .filter(client -> client.getLinkString().equals(linker))
+                .filter(SocketClient::isReceiver)
+                .findAny()
+                .orElse(null);
+    }
 }
