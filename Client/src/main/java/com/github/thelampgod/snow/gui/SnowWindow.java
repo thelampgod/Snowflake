@@ -43,6 +43,9 @@ public class SnowWindow {
         x = (double) (SnowScreen.scaledWidth - this.width) / 2 + 20 * SnowScreen.windowList.size();
         y = (double) (SnowScreen.scaledHeight - this.height) / 2 + 20 * SnowScreen.windowList.size();
         this.textRenderer = mc.textRenderer;
+        if (textRenderer.getWidth(title) > width) {
+            this.width = textRenderer.getWidth(title) + 40;
+        }
     }
 
     public SnowWindow(String title, boolean titleCentered, int width, int height) {

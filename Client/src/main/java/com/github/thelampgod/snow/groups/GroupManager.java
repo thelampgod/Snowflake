@@ -3,12 +3,8 @@ package com.github.thelampgod.snow.groups;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.gui.SnowScreen;
 import org.apache.commons.compress.utils.Lists;
-import org.apache.commons.compress.utils.Sets;
 
 import java.util.List;
-import java.util.Set;
-
-import static com.github.thelampgod.snow.Helper.mc;
 
 public class GroupManager {
 
