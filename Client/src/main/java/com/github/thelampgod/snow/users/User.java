@@ -37,7 +37,7 @@ public class User {
         PublicKey key = null;
         try {
             key = EncryptionUtil.parseAsciiArmored(asciiArmored);
-            printModMessage("Succesffully parsed " + this.name + "'s pubkey :D");
+            printModMessage("Successfully parsed " + this.name + "'s pubkey :D");
             System.out.println(asciiArmored);
         } catch (Exception e) {
             printModMessage("Couldn't generate public key");

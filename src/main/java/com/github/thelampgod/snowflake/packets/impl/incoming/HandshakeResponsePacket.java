@@ -53,14 +53,9 @@ public class HandshakeResponsePacket extends SnowflakePacket {
                         c.setAuthenticated(true);
                         getLog().debug(c + " authenticated.");
                     });
-
             getLog().info(client + " authenticated.");
-            sendConnectionMsg();
 
             final Set<Group> userGroups = Snowflake.INSTANCE.getGroupManager().findUserGroups(client.getId());
-
-
-
             for (Group group : userGroups) {
                 client.getConnection().sendPacket(new GroupInfoPacket(group.getName(), group.getId(), group.getOwnerId() == client.getId(), group.getUsers()));
                 for (int groupUsersIds : group.getUsers()) {
@@ -72,6 +67,7 @@ public class HandshakeResponsePacket extends SnowflakePacket {
 
             client.getConnection().sendPacket(new PlainMessagePacket("Successfully authenticated"));
             client.getConnection().sendPacket(new AuthSuccessPacket(client.getId()));
+            sendConnectionMsg();
         } else {
             client.getConnection().sendPacket(new DisconnectPacket("Wrong password", client));
         }
