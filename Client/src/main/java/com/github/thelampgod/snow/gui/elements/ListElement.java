@@ -22,6 +22,18 @@ public class ListElement extends SnowWindow {
         scrollPosition = Math.max(buttons.size() - 1, 0);
     }
 
+    @Override
+    public void init(int width, int height) {
+        int maxWidth = 0;
+        for (ListButton button : buttons) {
+            int buttonWidth = textRenderer.getWidth(button.name) + 10;
+            if (maxWidth < buttonWidth) {
+                maxWidth = buttonWidth;
+            }
+        }
+
+        super.init(Math.max(maxWidth, width), height);
+    }
 
     @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {

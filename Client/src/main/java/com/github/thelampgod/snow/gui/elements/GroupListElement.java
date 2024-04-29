@@ -23,7 +23,7 @@ public class GroupListElement extends ListElement {
     @Override
     public void init(int width, int height) {
         super.init(width, height);
-        newGroupField = new TextFieldWidget(super.textRenderer, 0, headerHeight + textRenderer.fontHeight - 4, width, 17, Text.empty());
+        newGroupField = new TextFieldWidget(super.textRenderer, 0, headerHeight + textRenderer.fontHeight - 4, this.width, 17, Text.empty());
 
         updateButtons();
     }
