@@ -25,12 +25,13 @@ public class UserManager {
         users.clear();
     }
 
-    public void add(User user) {
-        if (user.getId() == me) return;
+    public boolean add(User user) {
+        if (user.getId() == me) return false;
         users.add(user);
 
         SnowScreen screen = Snow.instance.getOrCreateSnowScreen();
         screen.updateUserButtons();
+        return true;
     }
 
     public void remove(User user) {
@@ -43,7 +44,7 @@ public class UserManager {
 
     public void remove(int userId) {
         final User user = this.get(userId);
-        if (this.get(userId) != null) {
+        if (user != null) {
             this.remove(user);
         }
     }
@@ -52,7 +53,7 @@ public class UserManager {
         return users.stream()
                 .filter(user -> user.getId() == userId)
                 .findAny()
-                .orElseGet(null);
+                .orElse(null);
     }
 
     public List<User> getUsers() {

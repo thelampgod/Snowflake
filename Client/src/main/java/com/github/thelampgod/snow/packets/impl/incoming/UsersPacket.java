@@ -31,8 +31,9 @@ public class UsersPacket extends SnowflakePacket {
   public void handle() {
     final UserManager man = Snow.instance.getUserManager();
     idToNameMap.forEach((id, name) -> {
-      man.add(new User(name, id, null));
-      Snow.getServerManager().sendPacket(new KeyRequestPacket(id));
+      if (man.add(new User(name, id, null))) {
+        Snow.getServerManager().sendPacket(new KeyRequestPacket(id));
+      }
     });
   }
 }

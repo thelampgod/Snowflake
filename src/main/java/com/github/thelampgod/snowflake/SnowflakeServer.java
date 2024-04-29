@@ -66,6 +66,7 @@ public class SnowflakeServer {
         getLog().info(client + " disconnected.");
 
         try {
+            if (!client.isAuthenticated()) return;
             sendDisconnectMessage(client);
         } catch (IOException e) {
             e.printStackTrace();

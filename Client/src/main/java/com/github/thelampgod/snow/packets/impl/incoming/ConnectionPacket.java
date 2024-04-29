@@ -65,8 +65,9 @@ public class ConnectionPacket extends SnowflakePacket {
               ));
       Helper.addToast("User connected!", this.getUser() + " joined.");
 
-      Snow.instance.getUserManager().add(new User(this.getUser(), this.getId(), null));
-      Snow.getServerManager().sendPacket(new KeyRequestPacket(this.getId()));
+      if (Snow.instance.getUserManager().add(new User(this.getUser(), this.getId(), null))) {
+        Snow.getServerManager().sendPacket(new KeyRequestPacket(this.getId()));
+      }
     }
 
   }
