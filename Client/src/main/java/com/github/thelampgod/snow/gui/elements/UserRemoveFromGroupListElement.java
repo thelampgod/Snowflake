@@ -22,6 +22,8 @@ public class UserRemoveFromGroupListElement extends ListElement {
         final Set<Integer> users = group.getUsers();
         int j = 0;
         for (final int userId : users) {
+            // can't remove yourself
+            if (userId == Snow.instance.getUserManager().getMe()) continue;
             final User user = Snow.instance.getUserManager().get(userId);
             buttons.add(
                     new ListButton(

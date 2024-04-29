@@ -157,7 +157,8 @@ public class SnowScreen extends Screen {
     }
 
     public void removeGroupWindow(Group group) {
-        for (SnowWindow window : windowList) {
+        for (int i = windowList.size() - 1; i >= 0; i--) {
+            SnowWindow window = windowList.get(i);
             if (window instanceof GroupElement element) {
                 if (element.getId() == group.getId()) {
                     remove(element);
@@ -167,7 +168,8 @@ public class SnowScreen extends Screen {
     }
 
     public void removeUserWindow(User user) {
-        for (SnowWindow window : windowList) {
+        for (int i = windowList.size() - 1; i >= 0; i--) {
+            SnowWindow window = windowList.get(i);
             if (window instanceof UserElement element) {
                 if (element.getId() == user.getId()) {
                     remove(element);

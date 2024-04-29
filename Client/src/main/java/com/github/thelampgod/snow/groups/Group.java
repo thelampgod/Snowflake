@@ -1,5 +1,6 @@
 package com.github.thelampgod.snow.groups;
 
+import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.users.User;
 
 import java.util.Set;
@@ -34,6 +35,7 @@ public class Group {
 
     public void addUser(int id) {
         users.add(id);
+        Snow.instance.getOrCreateSnowScreen().updateGroupButtons();
     }
 
     public void addUser(User user) {
@@ -42,6 +44,7 @@ public class Group {
 
     public void removeUser(int id) {
         users.remove(id);
+        Snow.instance.getOrCreateSnowScreen().updateGroupButtons();
     }
 
     public boolean containsUser(int id) {

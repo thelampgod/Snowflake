@@ -116,6 +116,7 @@ public class Snow implements ModInitializer {
         if (serverManager.isConnected()) {
             serverManager.sendPacket(new DisconnectPacket());
             serverManager.close();
+            serverManager = null;
         }
         groupManager.clear();
         userManager.clear();
