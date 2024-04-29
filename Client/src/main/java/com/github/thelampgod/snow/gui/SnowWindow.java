@@ -142,6 +142,9 @@ public class SnowWindow {
         y += deltaY;
     }
 
+    public void mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+    }
+
     public void drawOutlinedText(String title, int x, int y, int color, int bgColor, DrawContext ctx) {
         textRenderer.drawWithOutline(
                 Text.literal(title).asOrderedText(),

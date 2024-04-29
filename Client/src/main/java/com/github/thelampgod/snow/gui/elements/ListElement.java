@@ -2,6 +2,7 @@ package com.github.thelampgod.snow.gui.elements;
 
 import com.github.thelampgod.snow.gui.SnowWindow;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.util.math.MathHelper;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.List;
 public class ListElement extends SnowWindow {
 
     protected final List<ListButton> buttons = new ArrayList<>();
+    double scrollPosition = 0;
 
     public ListElement(String title, int width, int height) {
         this(title, width, height, false);
@@ -17,6 +19,7 @@ public class ListElement extends SnowWindow {
 
     public ListElement(String title, int width, int height, boolean closeable) {
         super(title, width, height, closeable);
+        scrollPosition = Math.max(buttons.size() - 1, 0);
     }
 
 
@@ -25,7 +28,7 @@ public class ListElement extends SnowWindow {
         super.render(ctx, mouseX, mouseY, delta);
 
         for (ListButton button : buttons) {
-            button.render(ctx, mouseX, mouseY, delta);
+            button.render(ctx, mouseX, mouseY, delta, scrollPosition);
         }
     }
 
@@ -34,8 +37,21 @@ public class ListElement extends SnowWindow {
         super.mouseClicked(mouseX, mouseY, buttonId);
 
         for (ListButton button : buttons) {
-            button.mouseClicked(mouseX, mouseY);
+            button.mouseClicked(mouseX, mouseY, scrollPosition);
         }
+    }
+
+    @Override
+    public void mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        if (!cursorInWindow(mouseX, mouseY)) return;
+        int buttonsHeight = headerHeight + (buttons.size() + 1) * 20;
+        if (buttonsHeight < height) return;
+
+        scrollPosition += (verticalAmount > 0 ? 1 : -1);
+        //find how much height needs to be cut off
+        int min = (buttonsHeight - (height - headerHeight - 20)) / 20;
+        scrollPosition = MathHelper.clamp(scrollPosition, -min, 0);
+        super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
     protected class ListButton {
@@ -62,7 +78,14 @@ public class ListElement extends SnowWindow {
             this(x,y,w,name,0, onClick);
         }
 
-        public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+        public void render(DrawContext ctx, int mouseX, int mouseY, float delta, double scrollPosition) {
+            int tempY = by;
+            by += (int) (scrollPosition * 20);
+            if (by < headerHeight + 20 || by > height) {
+                by = tempY;
+                return;
+            }
+
             int color = Color.WHITE.getRGB();
             if (mouseHover(mouseX, mouseY)) {
                 color = Color.ORANGE.getRGB();
@@ -82,12 +105,14 @@ public class ListElement extends SnowWindow {
             // Divider
             ctx.drawHorizontalLine(bx + 5, bwidth - 6, by + 12, color);
             ctx.drawHorizontalLine(bx + 6, bwidth - 5, by + 13, Color.BLACK.getRGB());
+            by = tempY;
         }
         private boolean mouseHover(double mouseX, double mouseY) {
             return mouseX - x > 0 & mouseX - x < bwidth && mouseY - y - by > 0 && mouseY - y - by < bheight;
         }
 
-        public void mouseClicked(double mouseX, double mouseY) {
+        public void mouseClicked(double mouseX, double mouseY, double scrollPosition) {
+            mouseY -= scrollPosition * 20;
             if (mouseHover(mouseX,mouseY)) {
                 onClick.run();
             }
