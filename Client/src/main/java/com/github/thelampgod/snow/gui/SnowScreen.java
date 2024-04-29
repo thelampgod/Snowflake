@@ -5,7 +5,6 @@ import com.github.thelampgod.snow.gui.elements.*;
 import com.github.thelampgod.snow.users.User;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
@@ -21,13 +20,20 @@ public class SnowScreen extends Screen {
     public GroupListElement groupListElement;
     public UserListElement userListElement;
 
+    private ConnectElement connectElement;
+
     public SnowScreen(Text title) {
         super(title);
-        windowList.add(new ConnectElement(200, 60));
+        connectElement = new ConnectElement(200, 60);
         groupListElement = new GroupListElement(150, 200);
         userListElement = new UserListElement(150, 200);
+        windowList.add(connectElement);
         windowList.add(groupListElement);
         windowList.add(userListElement);
+    }
+
+    public void clear() {
+        windowList.clear();
     }
 
     @Override

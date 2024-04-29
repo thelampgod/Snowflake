@@ -62,6 +62,7 @@ public class GroupConnectionPacket extends SnowflakePacket {
             try {
                 if (group.isOwner()) {
                     final byte[] newPassword = EncryptionUtil.generatePassword();
+                    //todo: save group passwords
                     byte[] encrypted = EncryptionUtil.encryptByPassword(newPassword, group.getPassword());
                     Snow.getServerManager().sendPacket(new GroupPasswordUpdatePacket(groupId, encrypted));
                 }

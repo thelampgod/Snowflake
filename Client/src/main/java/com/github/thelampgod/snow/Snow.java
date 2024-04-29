@@ -22,6 +22,8 @@ import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
 
+import static com.github.thelampgod.snow.Helper.mc;
+
 @Environment(EnvType.CLIENT)
 public class Snow implements ModInitializer {
     public static Snow instance;
@@ -121,6 +123,11 @@ public class Snow implements ModInitializer {
         groupManager.clear();
         userManager.clear();
         renderer.clear();
+        if (mc.currentScreen instanceof SnowScreen screen) {
+            screen.close();
+        }
+        snowScreen.clear();
+        snowScreen = null;
         String[] parts = text.split(":");
         if (parts.length < 2) return;
         serverManager = new ServerManager(parts[0], Integer.parseInt(parts[1]));
