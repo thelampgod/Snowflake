@@ -52,8 +52,7 @@ public class SnowflakeServer {
                     getLog().debug(c + " disconnected.");
                     try {
                         c.getSocket().close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    } catch (IOException ignored) {
                     }
                 });
         threads.stream()

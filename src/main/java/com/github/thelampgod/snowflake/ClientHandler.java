@@ -57,8 +57,7 @@ public class ClientHandler extends Thread {
                 packet.handle();
                 getLog().debug("Received a " + packet.getClass().getSimpleName() + " from " + client);
             }
-        } catch (Throwable th) {
-            th.printStackTrace();
+        } catch (Throwable ignored) {
             getServer().removeClient(client);
         }
     }
