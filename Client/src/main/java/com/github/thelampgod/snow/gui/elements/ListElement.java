@@ -26,7 +26,7 @@ public class ListElement extends SnowWindow {
     public void init(int width, int height) {
         int maxWidth = 0;
         for (ListButton button : buttons) {
-            int buttonWidth = textRenderer.getWidth(button.name) + 10;
+            int buttonWidth = textRenderer.getWidth(button.name) + 30;
             if (maxWidth < buttonWidth) {
                 maxWidth = buttonWidth;
             }
@@ -124,6 +124,9 @@ public class ListElement extends SnowWindow {
         }
 
         public void mouseClicked(double mouseX, double mouseY, double scrollPosition) {
+            if (mouseY < (y + headerHeight + 20) || mouseY > y + height) {
+                return;
+            }
             mouseY -= scrollPosition * 20;
             if (mouseHover(mouseX,mouseY)) {
                 onClick.run();
