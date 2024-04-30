@@ -9,6 +9,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import static com.github.thelampgod.snow.Helper.printModMessage;
+
 public class AuthSuccessPacket extends SnowflakePacket {
 
   private final int id;
@@ -25,8 +27,15 @@ public class AuthSuccessPacket extends SnowflakePacket {
   @Override
   public void handle() {
     Snow.instance.getUserManager().setMe(id);
+
     final ServerManager man = Snow.getServerManager();
 
     man.sendPacket(new ListUsersPacket());
+    try {
+      Snow.instance.getGroupManager().load(man.address);
+    } catch (IOException e) {
+      printModMessage("Couldn't load group passwords");
+      e.printStackTrace();
+    }
   }
 }

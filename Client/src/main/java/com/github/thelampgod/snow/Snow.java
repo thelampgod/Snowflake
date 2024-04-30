@@ -83,6 +83,7 @@ public class Snow implements ModInitializer {
         LOGGER.info("Shutting down...");
         long now = System.currentTimeMillis();
         try {
+            groupManager.save(serverManager.address);
             serverManager.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -115,6 +116,8 @@ public class Snow implements ModInitializer {
 
     public void connect(String text) throws Exception {
         if (serverManager != null) {
+            groupManager.save(serverManager.address);
+
             serverManager.sendPacket(new DisconnectPacket());
             serverManager.close();
             serverManager = null;

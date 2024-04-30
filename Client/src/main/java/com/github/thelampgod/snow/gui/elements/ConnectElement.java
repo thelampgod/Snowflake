@@ -20,7 +20,7 @@ public class ConnectElement extends SnowWindow {
 
 
     //TODO: actually save last ip
-    private final static String savedIp = "127.0.0.1:2147";
+    public final static String savedIp = "127.0.0.1:2147";
 
     private TextFieldWidget inputField;
     private ButtonWidget connectButton;

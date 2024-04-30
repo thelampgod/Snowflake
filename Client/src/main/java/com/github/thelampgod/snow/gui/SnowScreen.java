@@ -20,7 +20,7 @@ public class SnowScreen extends Screen {
     public GroupListElement groupListElement;
     public UserListElement userListElement;
 
-    private ConnectElement connectElement;
+    public ConnectElement connectElement;
 
     public SnowScreen(Text title) {
         super(title);

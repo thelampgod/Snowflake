@@ -123,7 +123,7 @@ public class EncryptionUtil {
         byte[] encodedKey = pub.getEncoded();
 
         // Encode the bytes using Base64
-        String base64Encoded = Base64.getEncoder().encodeToString(encodedKey);
+        String base64Encoded = base64Encode(encodedKey);
 
         // Wrap the Base64-encoded string in ASCII armor format
         StringBuilder asciiArmoredKey = new StringBuilder();
@@ -148,12 +148,20 @@ public class EncryptionUtil {
                 .replaceAll("\\s+", ""); // Remove any white spaces
 
         // Decode the Base64 string
-        byte[] decodedKey = Base64.getDecoder().decode(base64Encoded);
+        byte[] decodedKey = base64Decode(base64Encoded);
 
         // Generate a PublicKey object from the decoded bytes
         KeyFactory keyFactory = KeyFactory.getInstance("RSA"); // Change "RSA" to the algorithm used for your key
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decodedKey);
         return keyFactory.generatePublic(keySpec);
+    }
+
+    public static String base64Encode(byte[] data) {
+        return Base64.getEncoder().encodeToString(data);
+    }
+
+    public static byte[] base64Decode(String encoded) {
+        return Base64.getDecoder().decode(encoded);
     }
 
     public static byte[] generatePassword() {

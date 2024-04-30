@@ -17,10 +17,12 @@ public class ServerManager {
     private final HashSet<ServerHandler> threads = new HashSet<>();
 
     private static String sharedSecret = null;
+    public final String address;
 
     private boolean isRunning = true;
 
     public ServerManager(String ip, int port) {
+        this.address = ip + ":" + port;
         sharedSecret = RandomStringUtils.random(10, 0, 0, true, true, null, new SecureRandom());
         try {
             ServerHandler receiver = new ServerHandler(connect(ip, port), true, receiveComms);
