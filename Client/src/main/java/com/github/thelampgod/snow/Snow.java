@@ -113,9 +113,8 @@ public class Snow implements ModInitializer {
         return renderer;
     }
 
-    //TODO: toasts for connect and disconnect
     public void connect(String text) throws Exception {
-        if (serverManager.isConnected()) {
+        if (serverManager != null) {
             serverManager.sendPacket(new DisconnectPacket());
             serverManager.close();
             serverManager = null;

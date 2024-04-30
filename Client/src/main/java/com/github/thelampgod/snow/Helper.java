@@ -52,6 +52,10 @@ public class Helper {
 
 
     public static void addToast(String s) {
+        if (mc.player == null) {
+            printMessage(s);
+            return;
+        }
         mc.getToastManager().add(new SystemToast(SystemToast.Type.NARRATOR_TOGGLE, Text.literal(s), null));
     }
 

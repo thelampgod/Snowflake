@@ -25,6 +25,8 @@ public abstract class SnowflakePacket {
 
     public static SnowflakePacket fromId(byte id, DataInputStream in, SocketClient sender) throws IOException {
         switch (id) {
+            case -1:
+                return new DisconnectPacket("Disconnected", sender);
             case 0:
                 return new LoginPacket(in, sender);
             case 4:

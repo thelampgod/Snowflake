@@ -1,5 +1,6 @@
 package com.github.thelampgod.snowflake.packets.impl;
 
+import com.github.thelampgod.snowflake.Snowflake;
 import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 
@@ -23,6 +24,7 @@ public class DisconnectPacket extends SnowflakePacket {
     @Override
     public void handle() throws IOException {
         this.getSender().getConnection().sendPacket(this);
+        Snowflake.INSTANCE.getServer().removeClient(this.getSender());
     }
 
     public String getReason() {

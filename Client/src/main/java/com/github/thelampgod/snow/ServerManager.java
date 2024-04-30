@@ -1,18 +1,14 @@
 package com.github.thelampgod.snow;
 
 import com.github.thelampgod.snow.packets.SnowflakePacket;
-import com.google.common.collect.Maps;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.io.*;
 import java.net.Socket;
 import java.security.SecureRandom;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import static com.github.thelampgod.snow.Helper.printModMessage;
 
 public class ServerManager {
     private final LinkedBlockingQueue<WrappedComm> talkComms = new LinkedBlockingQueue<>();
@@ -65,11 +61,6 @@ public class ServerManager {
         }
         isRunning = false;
         threads.clear();
-    }
-
-
-    public boolean isConnected() {
-        return threads.stream().anyMatch(ServerHandler::isRunning);
     }
 
     public void receiveComm(Comm comm) throws InterruptedException {
@@ -131,7 +122,9 @@ public class ServerManager {
         @Override
         public void run() {
             try {
-                printModMessage("Connected.");
+                if (!receiver) {
+                    Helper.addToast("Connected");
+                }
                 Snow.instance.getLog().info("Connected to snowflake");
                 DataOutputStream out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
                 DataInputStream in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
@@ -150,7 +143,9 @@ public class ServerManager {
             } catch (Throwable th) {
                 th.printStackTrace();
                 isRunning = false;
-                printModMessage("Disconnected from snowflake");
+                if (!receiver) {
+                    Helper.addToast("Disconnected");
+                }
             }
         }
 
