@@ -34,7 +34,7 @@ public class UserAddToGroupListWindow extends ListWindow {
         for (final User user : users) {
             if (group.containsUser(user.getId())) continue;
             buttonListElement.addButton(
-                    width, user.getName(), 0,
+                    user.getName(), 0,
                     () -> {
                         sendInvite(user, group);
                         Snow.instance.getOrCreateSnowScreen().remove(this);

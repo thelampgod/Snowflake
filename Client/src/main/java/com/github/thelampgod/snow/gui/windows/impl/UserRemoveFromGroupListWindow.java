@@ -35,7 +35,7 @@ public class UserRemoveFromGroupListWindow extends ListWindow {
             final User user = Snow.instance.getUserManager().get(userId);
             if (user == null) continue;
             buttonListElement.addButton(
-                    width, user.getName(), 0,
+                    user.getName(), 0,
                     () -> {
                         Snow.getServerManager().sendPacket(new GroupUserRemovePacket(group.getId(), user.getId()));
                         Snow.instance.getOrCreateSnowScreen().remove(this);

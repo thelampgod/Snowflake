@@ -70,10 +70,12 @@ public class GroupListWindow extends ListWindow {
         final List<Group> groups = Snow.instance.getGroupManager().getGroups();
         for (final Group group : groups) {
             buttonListElement.addButton(
-                    width, group.getName(),
+                    group.getName(),
                     group.getUsers().size(),
                     () -> Snow.instance.getOrCreateSnowScreen().focusWindow(group)
             );
         }
+        this.width = buttonListElement.getWidth();
+        this.newGroupField.setWidth(width);
     }
 }

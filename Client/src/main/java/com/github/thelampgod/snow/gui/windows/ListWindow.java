@@ -9,6 +9,7 @@ public abstract class ListWindow extends SnowWindow {
     public ListWindow(String title, int width, int height, boolean closeable) {
         super(title, width, height, closeable);
     }
+
     @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         super.render(ctx, mouseX, mouseY, delta);

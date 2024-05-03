@@ -12,7 +12,7 @@ public class ButtonListElement {
     private final int x;
     private final int y;
     private final int height;
-    private final int width;
+    private int width;
     private final List<ListButton> buttons = new ArrayList<>();
 
     private final TextRenderer textRenderer;
@@ -67,14 +67,21 @@ public class ButtonListElement {
         buttons.clear();
     }
 
-    public void addButton(int width, String text, int size, Runnable runnable) {
-        buttons.add(new ListButton(0, buttons.size(), width, text, size, runnable));
+    public void addButton(String text, int size, Runnable runnable) {
+        buttons.add(new ListButton(0, buttons.size(), text, size, runnable));
+        int buttonWidth = textRenderer.getWidth(text) + 30;
+        if (this.width < buttonWidth) {
+            this.width = buttonWidth;
+        }
+    }
+
+    public int getWidth() {
+        return width;
     }
 
 
     protected class ListButton {
         private final int bheight = 17;
-        private int bwidth;
 
         private int bx;
 
@@ -85,18 +92,13 @@ public class ButtonListElement {
 
         private final Runnable onClick;
 
-        public ListButton(int x, int index, int w, String name, int size, Runnable onClick) {
+        public ListButton(int x, int index, String name, int size, Runnable onClick) {
             this.bx = x;
             this.index = index;
             this.by = index * 20 + textRenderer.fontHeight;
-            this.bwidth = w;
             this.name = name;
             this.size = size;
             this.onClick = onClick;
-        }
-
-        public ListButton(int x, int y, int w, String name, Runnable onClick) {
-            this(x, y, w, name, 0, onClick);
         }
 
         public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
@@ -112,18 +114,18 @@ public class ButtonListElement {
                 ctx.drawTextWithShadow(
                         textRenderer,
                         String.valueOf(size),
-                        bx + bwidth - textRenderer.getWidth(String.valueOf(size)) - 10,
+                        bx + width - textRenderer.getWidth(String.valueOf(size)) - 10,
                         by, Color.GRAY.getRGB()
                 );
             }
             // Divider
-            ctx.drawHorizontalLine(bx + 5, bwidth - 6, by + 12, color);
-            ctx.drawHorizontalLine(bx + 6, bwidth - 5, by + 13, Color.BLACK.getRGB());
+            ctx.drawHorizontalLine(bx + 5, width - 6, by + 12, color);
+            ctx.drawHorizontalLine(bx + 6, width - 5, by + 13, Color.BLACK.getRGB());
         }
 
         private boolean mouseHover(double mouseX, double mouseY) {
             mouseY -= scrollPosition * 20;
-            return mouseX - x > 0 & mouseX - x < bwidth && mouseY - y - by > 0 && mouseY - y - by < bheight;
+            return mouseX - x > 0 & mouseX - x < width && mouseY - y - by > 0 && mouseY - y - by < bheight;
         }
 
         public void mouseClicked(double mouseX, double mouseY) {
