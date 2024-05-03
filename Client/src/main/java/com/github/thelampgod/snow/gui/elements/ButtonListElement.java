@@ -40,8 +40,6 @@ public class ButtonListElement {
             if (buttonY > height || buttonY < y) continue;
             button.render(ctx, mouseX, mouseY, delta);
         }
-        ctx.drawHorizontalLine(5, width - 6, height, Color.YELLOW.getRGB());
-
     }
 
     public void mouseClicked(double mouseX, double mouseY, int buttonId) {
