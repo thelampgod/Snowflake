@@ -1,6 +1,7 @@
-package com.github.thelampgod.snow.gui;
+package com.github.thelampgod.snow.gui.windows;
 
 import com.github.thelampgod.snow.Snow;
+import com.github.thelampgod.snow.gui.SnowScreen;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
@@ -12,7 +13,7 @@ import java.awt.*;
 
 import static com.github.thelampgod.snow.Helper.mc;
 
-public class SnowWindow {
+public abstract class SnowWindow {
     public double x;
     public double y;
     public int width;
@@ -24,7 +25,7 @@ public class SnowWindow {
     private final String title;
     private final boolean titleCentered;
     private boolean clicked;
-    protected boolean focused;
+    public boolean focused;
     public boolean hasInit = false;
 
     public boolean closeable;

@@ -1,7 +1,7 @@
-package com.github.thelampgod.snow.gui.elements;
+package com.github.thelampgod.snow.gui.windows.impl;
 
 import com.github.thelampgod.snow.Snow;
-import com.github.thelampgod.snow.gui.SnowWindow;
+import com.github.thelampgod.snow.gui.windows.SnowWindow;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -16,7 +16,7 @@ import static com.github.thelampgod.snow.Helper.mc;
 import static com.github.thelampgod.snow.Helper.printModMessage;
 
 
-public class ConnectElement extends SnowWindow {
+public class ConnectWindow extends SnowWindow {
 
 
     //TODO: actually save last ip
@@ -25,7 +25,7 @@ public class ConnectElement extends SnowWindow {
     private TextFieldWidget inputField;
     private ButtonWidget connectButton;
 
-    public ConnectElement(int width, int height) {
+    public ConnectWindow(int width, int height) {
         super("Connect", width, height, false);
     }
 

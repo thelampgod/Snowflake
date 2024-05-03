@@ -1,7 +1,8 @@
 package com.github.thelampgod.snow.gui;
 
 import com.github.thelampgod.snow.groups.Group;
-import com.github.thelampgod.snow.gui.elements.*;
+import com.github.thelampgod.snow.gui.windows.SnowWindow;
+import com.github.thelampgod.snow.gui.windows.impl.*;
 import com.github.thelampgod.snow.users.User;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -17,19 +18,19 @@ public class SnowScreen extends Screen {
     public static int scaledHeight;
     public static List<SnowWindow> windowList = new ArrayList<>();
 
-    public GroupListElement groupListElement;
-//    public UserListElement userListElement;
+    public GroupListWindow groupListWindow;
+    public UserListWindow userListWindow;
 
-    public ConnectElement connectElement;
+    public ConnectWindow connectWindow;
 
     public SnowScreen(Text title) {
         super(title);
-        connectElement = new ConnectElement(200, 60);
-        groupListElement = new GroupListElement(150, 200);
-//        userListElement = new UserListElement(150, 200);
-        windowList.add(connectElement);
-        windowList.add(groupListElement);
-//        windowList.add(userListElement);
+        connectWindow = new ConnectWindow(200, 60);
+        groupListWindow = new GroupListWindow(150, 200);
+        userListWindow = new UserListWindow(150, 200);
+        windowList.add(connectWindow);
+        windowList.add(groupListWindow);
+        windowList.add(userListWindow);
     }
 
     public void clear() {
@@ -53,26 +54,26 @@ public class SnowScreen extends Screen {
 
     public void focusWindow(User user) {
         for (SnowWindow win : windowList) {
-            if (win instanceof UserElement e) {
+            if (win instanceof UserWindow e) {
                 if (e.getId() == user.getId()) {
                     focusWindow(e);
                     return;
                 }
             }
         }
-        focusWindow(new UserElement(user));
+        focusWindow(new UserWindow(user));
     }
 
     public void focusWindow(Group group) {
         for (SnowWindow win : windowList) {
-            if (win instanceof GroupElement e) {
+            if (win instanceof GroupWindow e) {
                 if (e.getId() == group.getId()) {
                     focusWindow(e);
                     return;
                 }
             }
         }
-        focusWindow(new GroupElement(group));
+        focusWindow(new GroupWindow(group));
     }
 
     public void focusWindow(SnowWindow window) {
@@ -162,18 +163,18 @@ public class SnowScreen extends Screen {
         return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
-//    public void updateUserButtons() {
-//        userListElement.updateButtons();
-//    }
+    public void updateUserButtons() {
+        userListWindow.updateButtons();
+    }
 
     public void updateGroupButtons() {
-        groupListElement.updateButtons();
+        groupListWindow.updateButtons();
     }
 
     public void removeGroupWindow(Group group) {
         for (int i = windowList.size() - 1; i >= 0; i--) {
             SnowWindow window = windowList.get(i);
-            if (window instanceof GroupElement element) {
+            if (window instanceof GroupWindow element) {
                 if (element.getId() == group.getId()) {
                     remove(element);
                 }
@@ -184,7 +185,7 @@ public class SnowScreen extends Screen {
     public void removeUserWindow(User user) {
         for (int i = windowList.size() - 1; i >= 0; i--) {
             SnowWindow window = windowList.get(i);
-            if (window instanceof UserElement element) {
+            if (window instanceof UserWindow element) {
                 if (element.getId() == user.getId()) {
                     remove(element);
                 }

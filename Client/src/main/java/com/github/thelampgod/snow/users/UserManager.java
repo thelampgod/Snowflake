@@ -30,7 +30,7 @@ public class UserManager {
         users.add(user);
 
         SnowScreen screen = Snow.instance.getOrCreateSnowScreen();
-//        screen.updateUserButtons();
+        screen.updateUserButtons();
         return true;
     }
 
@@ -38,7 +38,7 @@ public class UserManager {
         users.remove(user);
 
         SnowScreen screen = Snow.instance.getOrCreateSnowScreen();
-//        screen.updateUserButtons();
+        screen.updateUserButtons();
         screen.removeUserWindow(user);
     }
 

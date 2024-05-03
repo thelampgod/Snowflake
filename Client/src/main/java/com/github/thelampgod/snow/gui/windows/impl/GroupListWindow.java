@@ -1,8 +1,9 @@
-package com.github.thelampgod.snow.gui.elements;
+package com.github.thelampgod.snow.gui.windows.impl;
 
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.groups.Group;
-import com.github.thelampgod.snow.gui.SnowWindow;
+import com.github.thelampgod.snow.gui.elements.ButtonListElement;
+import com.github.thelampgod.snow.gui.windows.ListWindow;
 import com.github.thelampgod.snow.packets.impl.outgoing.CreateGroupPacket;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -11,12 +12,11 @@ import net.minecraft.text.Text;
 import java.awt.*;
 import java.util.List;
 
-public class GroupListElement extends SnowWindow {
+public class GroupListWindow extends ListWindow {
 
     private TextFieldWidget newGroupField;
-    private ButtonListElement buttonListElement;
 
-    public GroupListElement(int width, int height) {
+    public GroupListWindow(int width, int height) {
         super("Groups", width, height, false);
     }
 
@@ -38,20 +38,12 @@ public class GroupListElement extends SnowWindow {
         } else {
             ctx.drawTextWithShadow(textRenderer, "+ New Group", 10, headerHeight + textRenderer.fontHeight, Color.WHITE.getRGB());
         }
-
-        buttonListElement.preRender(ctx, (int) (mouseX - x), (int) (mouseY - y), delta);
-    }
-
-    @Override
-    public void mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        buttonListElement.mouseScrolled(mouseX - x, mouseY - y, horizontalAmount, verticalAmount);
     }
 
     @Override
     public void mouseClicked(double mouseX, double mouseY, int buttonId) {
         super.mouseClicked(mouseX, mouseY, buttonId);
         newGroupField.setFocused(newGroupField.mouseClicked(mouseX - x, mouseY - y, buttonId));
-        buttonListElement.mouseClicked(mouseX - x, mouseY - y, buttonId);
     }
 
     @Override
