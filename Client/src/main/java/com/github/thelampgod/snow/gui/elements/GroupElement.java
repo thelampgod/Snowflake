@@ -53,14 +53,14 @@ public class GroupElement extends SnowWindow {
     public void mouseClicked(double mouseX, double mouseY, int button) {
         super.mouseClicked(mouseX, mouseY, button);
 
-        if (group.isOwner()) {
-            if (addButton.mouseHover(mouseX, mouseY)) {
-                Snow.instance.getOrCreateSnowScreen().focusWindow(new UserAddToGroupListElement(this.group, 150, 200));
-            }
-            if (removeButton.mouseHover(mouseX, mouseY)) {
-                Snow.instance.getOrCreateSnowScreen().focusWindow(new UserRemoveFromGroupListElement(this.group, 150, 200));
-
-            }
-        }
+//        if (group.isOwner()) {
+//            if (addButton.mouseHover(mouseX, mouseY)) {
+//                Snow.instance.getOrCreateSnowScreen().focusWindow(new UserAddToGroupListElement(this.group, 150, 200));
+//            }
+//            if (removeButton.mouseHover(mouseX, mouseY)) {
+//                Snow.instance.getOrCreateSnowScreen().focusWindow(new UserRemoveFromGroupListElement(this.group, 150, 200));
+//
+//            }
+//        }
     }
 }

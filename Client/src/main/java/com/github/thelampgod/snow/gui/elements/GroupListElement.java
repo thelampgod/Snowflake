@@ -1,8 +1,8 @@
 package com.github.thelampgod.snow.gui.elements;
 
-import com.github.thelampgod.snow.EncryptionUtil;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.groups.Group;
+import com.github.thelampgod.snow.gui.SnowWindow;
 import com.github.thelampgod.snow.packets.impl.outgoing.CreateGroupPacket;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -11,19 +11,21 @@ import net.minecraft.text.Text;
 import java.awt.*;
 import java.util.List;
 
-
-public class GroupListElement extends ListElement {
+public class GroupListElement extends SnowWindow {
 
     private TextFieldWidget newGroupField;
+    private ButtonListElement buttonListElement;
 
     public GroupListElement(int width, int height) {
-        super("Groups", width, height);
+        super("Groups", width, height, false);
     }
 
     @Override
     public void init(int width, int height) {
         super.init(width, height);
-        newGroupField = new TextFieldWidget(super.textRenderer, 0, headerHeight + textRenderer.fontHeight - 4, this.width, 17, Text.empty());
+        int elementY = headerHeight;
+        this.newGroupField = new TextFieldWidget(super.textRenderer, 0, elementY + textRenderer.fontHeight - 4, this.width, 17, Text.empty());
+        this.buttonListElement = new ButtonListElement(super.textRenderer, 0, elementY += 20, height - elementY, width);
 
         updateButtons();
     }
@@ -33,15 +35,23 @@ public class GroupListElement extends ListElement {
         super.render(ctx, mouseX, mouseY, delta);
         if (!newGroupField.getText().isEmpty() || (focused && newGroupField.isMouseOver(mouseX - x, mouseY - y))) {
             newGroupField.render(ctx, mouseX, mouseY, delta);
-            return;
+        } else {
+            ctx.drawTextWithShadow(textRenderer, "+ New Group", 10, headerHeight + textRenderer.fontHeight, Color.WHITE.getRGB());
         }
-        ctx.drawTextWithShadow(textRenderer, "+ New Group", 10, headerHeight + textRenderer.fontHeight, Color.WHITE.getRGB());
+
+        buttonListElement.preRender(ctx, (int) (mouseX - x), (int) (mouseY - y), delta);
+    }
+
+    @Override
+    public void mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        buttonListElement.mouseScrolled(mouseX - x, mouseY - y, horizontalAmount, verticalAmount);
     }
 
     @Override
     public void mouseClicked(double mouseX, double mouseY, int buttonId) {
         super.mouseClicked(mouseX, mouseY, buttonId);
         newGroupField.setFocused(newGroupField.mouseClicked(mouseX - x, mouseY - y, buttonId));
+        buttonListElement.mouseClicked(mouseX - x, mouseY - y, buttonId);
     }
 
     @Override
@@ -64,18 +74,14 @@ public class GroupListElement extends ListElement {
     }
 
     public void updateButtons() {
-        buttons.clear();
+        buttonListElement.clearButtons();
         final List<Group> groups = Snow.instance.getGroupManager().getGroups();
-        for (int i = 0; i < groups.size(); ++i) {
-            final Group group = groups.get(i);
-            buttons.add(
-                    new ListButton(
-                            0,
-                            headerHeight + 20 * (i + 1),
-                            width, group.getName(),
-                            group.getUsers().size(),
-                            () -> Snow.instance.getOrCreateSnowScreen().focusWindow(group)
-                    ));
+        for (final Group group : groups) {
+            buttonListElement.addButton(
+                    width, group.getName(),
+                    group.getUsers().size(),
+                    () -> Snow.instance.getOrCreateSnowScreen().focusWindow(group)
+            );
         }
     }
 }

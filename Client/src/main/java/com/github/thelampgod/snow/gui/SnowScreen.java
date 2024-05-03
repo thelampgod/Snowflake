@@ -18,7 +18,7 @@ public class SnowScreen extends Screen {
     public static List<SnowWindow> windowList = new ArrayList<>();
 
     public GroupListElement groupListElement;
-    public UserListElement userListElement;
+//    public UserListElement userListElement;
 
     public ConnectElement connectElement;
 
@@ -26,10 +26,10 @@ public class SnowScreen extends Screen {
         super(title);
         connectElement = new ConnectElement(200, 60);
         groupListElement = new GroupListElement(150, 200);
-        userListElement = new UserListElement(150, 200);
+//        userListElement = new UserListElement(150, 200);
         windowList.add(connectElement);
         windowList.add(groupListElement);
-        windowList.add(userListElement);
+//        windowList.add(userListElement);
     }
 
     public void clear() {
@@ -162,9 +162,9 @@ public class SnowScreen extends Screen {
         return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
-    public void updateUserButtons() {
-        userListElement.updateButtons();
-    }
+//    public void updateUserButtons() {
+//        userListElement.updateButtons();
+//    }
 
     public void updateGroupButtons() {
         groupListElement.updateButtons();

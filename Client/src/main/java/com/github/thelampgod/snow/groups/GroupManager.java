@@ -3,6 +3,7 @@ package com.github.thelampgod.snow.groups;
 import com.github.thelampgod.snow.EncryptionUtil;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.gui.SnowScreen;
+import com.google.common.collect.Sets;
 import org.apache.commons.compress.utils.Lists;
 
 import java.io.BufferedReader;
@@ -21,11 +22,26 @@ public class GroupManager {
 
     public GroupManager() {
         //testing
-//        groups.add(new Group("TestGroup", 0, false, Sets.newHashSet(1,2,3,4,5)));
-//        groups.add(new Group("Lamp's Group", 1, false, Sets.newHashSet(1,2,4,5)));
-//        groups.add(new Group("Entropy Group", 2, false, Sets.newHashSet(1,2,3,4,5)));
-//        groups.add(new Group("Epic Group", 3, true, Sets.newHashSet(1,2)));
-//        groups.add(new Group(":D", 4, false, Sets.newHashSet(1,5)));
+        groups.add(new Group("TestGroup", 0, false, Sets.newHashSet(1,2,3,4,5)));
+        groups.add(new Group("Lamp's Group", 1, false, Sets.newHashSet(1,2,4,5)));
+        groups.add(new Group("Entropy Group", 2, false, Sets.newHashSet(1,2,3,4,5)));
+        groups.add(new Group("Epic Group", 3, true, Sets.newHashSet(1,2)));
+        groups.add(new Group(":D", 4, false, Sets.newHashSet(1,5)));
+        groups.add(new Group("TestGroup", 0, false, Sets.newHashSet(1,2,3,4,5)));
+        groups.add(new Group("Lamp's Group", 1, false, Sets.newHashSet(1,2,4,5)));
+        groups.add(new Group("Entropy Group", 2, false, Sets.newHashSet(1,2,3,4,5)));
+        groups.add(new Group("Epic Group", 3, true, Sets.newHashSet(1,2)));
+        groups.add(new Group(":D", 4, false, Sets.newHashSet(1,5)));
+        groups.add(new Group("TestGroup", 0, false, Sets.newHashSet(1,2,3,4,5)));
+        groups.add(new Group("Lamp's Group", 1, false, Sets.newHashSet(1,2,4,5)));
+        groups.add(new Group("Entropy Group", 2, false, Sets.newHashSet(1,2,3,4,5)));
+        groups.add(new Group("Epic Group", 3, true, Sets.newHashSet(1,2)));
+        groups.add(new Group(":D", 4, false, Sets.newHashSet(1,5)));
+        groups.add(new Group("TestGroup", 0, false, Sets.newHashSet(1,2,3,4,5)));
+        groups.add(new Group("Lamp's Group", 1, false, Sets.newHashSet(1,2,4,5)));
+        groups.add(new Group("Entropy Group", 2, false, Sets.newHashSet(1,2,3,4,5)));
+        groups.add(new Group("Epic Group", 3, true, Sets.newHashSet(1,2)));
+        groups.add(new Group(":D", 4, false, Sets.newHashSet(1,5)));
 
     }
 
@@ -73,7 +89,7 @@ public class GroupManager {
             for (Group group : groups) {
                 String encoded = EncryptionUtil.base64Encode(group.getPassword());
 
-                writer.write(group.getId() + "," + encoded);
+                writer.write(group.getId() + "," + encoded + "\n");
             }
         } catch (Throwable th) {
             printModMessage("Couldn't save password");
