@@ -1,8 +1,9 @@
 package com.github.thelampgod.snow.gui.elements;
 
-
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.OrderedText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
 import java.awt.*;
@@ -17,7 +18,7 @@ public class ChatElement {
     private int width;
     private static final int PADDING = 3;
 
-    private static final int MESSAGE_HEIGHT = 18;
+    int maxButtonHeight = 0;
     private final List<ChatMessage> messages = new ArrayList<>();
 
     private final TextRenderer textRenderer;
@@ -34,16 +35,31 @@ public class ChatElement {
     }
 
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        for (int i = 0; i < messages.size(); ++i) {
+        String prevSender = "";
+        int textY = y + PADDING;
+        for (int i = scrollPosition; i < messages.size(); ++i) {
             ChatMessage message = messages.get(i);
+            boolean sameSender = prevSender.equals(message.sender);
+            prevSender = message.sender;
 
-            int textY = y + i * MESSAGE_HEIGHT + scrollPosition * SCROLL_SPEED + PADDING;
-            if (textY > y && textY < y + height - textRenderer.fontHeight) {
+            if (!sameSender && textY > y && textY < y + height) {
                 ctx.drawText(this.textRenderer, message.sender, x + PADDING, textY, Color.YELLOW.getRGB(), false);
+                textY += textRenderer.fontHeight;
             }
 
-            if (textY + textRenderer.fontHeight > y && textY + textRenderer.fontHeight < y+height - textRenderer.fontHeight) {
-                ctx.drawText(this.textRenderer, message.message, x + PADDING, textY + textRenderer.fontHeight, Color.BLACK.getRGB(), false);
+            if (textY > y && textY < y + height) {
+                if (textRenderer.getWidth(message.message) > width - PADDING * 2) {
+                    List<OrderedText> wrapped = textRenderer.wrapLines(Text.of(message.message), width - PADDING * 2);
+                    for (OrderedText text : wrapped) {
+                        if (textY > y && textY < y + height) {
+                            ctx.drawText(this.textRenderer, text, x + PADDING, textY, Color.BLACK.getRGB(), false);
+                            textY += textRenderer.fontHeight;
+                        }
+                    }
+                } else {
+                    ctx.drawText(this.textRenderer, message.message, x + PADDING, textY, Color.BLACK.getRGB(), false);
+                    textY += textRenderer.fontHeight;
+                }
             }
         }
     }
@@ -51,8 +67,8 @@ public class ChatElement {
     public void mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         if (!cursorInElement(mouseX, mouseY)) return;
 
-        scrollPosition += (verticalAmount > 0 ? 1 : -1);
-        scrollPosition = MathHelper.clamp(scrollPosition, -minScroll(), 0);
+        scrollPosition += (verticalAmount < 0 ? 1 : -1);
+        scrollPosition = MathHelper.clamp(scrollPosition, 0, Math.max(messages.size() - 1, 0));
     }
 
     private boolean cursorInElement(double mouseX, double mouseY) {
@@ -63,15 +79,9 @@ public class ChatElement {
         messages.add(new ChatMessage(sender, message, System.currentTimeMillis()));
 
         // Scroll down to latest message
-        scrollPosition = -minScroll();
+        scrollPosition = Math.max(messages.size() - 1, 0);
     }
 
-    private int minScroll() {
-        int buttonsHeight = (messages.size()) * MESSAGE_HEIGHT;
-        if (buttonsHeight < height) return 0;
-
-        return (buttonsHeight - (height)) / SCROLL_SPEED + 2;
+    protected record ChatMessage(String sender, String message, long timestamp) {
     }
-
-    protected record ChatMessage(String sender, String message, long timestamp){}
 }
