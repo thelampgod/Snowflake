@@ -17,8 +17,6 @@ public class ChatElement {
     private final int height;
     private int width;
     private static final int PADDING = 3;
-
-    int maxButtonHeight = 0;
     private final List<ChatMessage> messages = new ArrayList<>();
 
     private final TextRenderer textRenderer;
@@ -66,9 +64,28 @@ public class ChatElement {
 
     public void mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         if (!cursorInElement(mouseX, mouseY)) return;
+        int messageHeight = getHeight(messages);
+        if (messageHeight < height) return;
+
+        int diff = (messageHeight - height) / textRenderer.fontHeight + 3;
 
         scrollPosition += (verticalAmount < 0 ? 1 : -1);
-        scrollPosition = MathHelper.clamp(scrollPosition, 0, Math.max(messages.size() - 1, 0));
+        scrollPosition = MathHelper.clamp(scrollPosition, 0, diff);
+    }
+
+    private int getHeight(List<ChatMessage> messages) {
+        int height = 0;
+        String prevSender = "";
+        for (ChatMessage message : messages) {
+            height += (!prevSender.equals(message.sender) ? textRenderer.fontHeight * 2 : textRenderer.fontHeight);
+            prevSender = message.sender;
+
+            if (textRenderer.getWidth(message.message) > width - PADDING * 2) {
+                List<OrderedText> wrapped = textRenderer.wrapLines(Text.of(message.message), width - PADDING * 2);
+                height += wrapped.size();
+            }
+        }
+        return height;
     }
 
     private boolean cursorInElement(double mouseX, double mouseY) {
@@ -79,7 +96,10 @@ public class ChatElement {
         messages.add(new ChatMessage(sender, message, System.currentTimeMillis()));
 
         // Scroll down to latest message
-        scrollPosition = Math.max(messages.size() - 1, 0);
+        int messageHeight = getHeight(messages);
+        if (messageHeight < height) return;
+
+        scrollPosition = (messageHeight - height) / textRenderer.fontHeight + 3;
     }
 
     protected record ChatMessage(String sender, String message, long timestamp) {
