@@ -13,7 +13,7 @@ public abstract class ListWindow extends SnowWindow {
     @Override
     public void updateDimensions() {
         super.updateDimensions();
-        buttonListElement.setWidth(this.width);
+        buttonListElement.setWidth(getWidth());
     }
 
     @Override

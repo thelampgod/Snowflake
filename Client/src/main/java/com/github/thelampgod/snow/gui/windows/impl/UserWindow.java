@@ -37,10 +37,10 @@ public class UserWindow extends SnowWindow {
     @Override
     public void updateDimensions() {
         super.updateDimensions();
-        chatInput.setWidth(this.width);
-        chatInput.setY(this.height - 17);
-        chatElement.setWidth(this.width);
-        chatElement.setHeight(this.height - headerHeight - chatInput.getHeight());
+        chatInput.setWidth(getWidth());
+        chatInput.setY(getHeight() - 17);
+        chatElement.setWidth(getWidth());
+        chatElement.setHeight(getHeight() - headerHeight - chatInput.getHeight());
     }
 
     @Override

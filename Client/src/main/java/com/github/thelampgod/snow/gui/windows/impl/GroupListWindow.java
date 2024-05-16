@@ -24,7 +24,7 @@ public class GroupListWindow extends ListWindow {
     public void init(int width, int height) {
         super.init(width, height);
         int elementY = headerHeight;
-        this.newGroupField = new TextFieldWidget(super.textRenderer, 0, elementY + textRenderer.fontHeight - 4, this.width, 17, Text.empty());
+        this.newGroupField = new TextFieldWidget(super.textRenderer, 0, elementY + textRenderer.fontHeight - 4, getWidth(), 17, Text.empty());
         this.buttonListElement = new ButtonListElement(super.textRenderer, 0, elementY += 20, height - elementY, width);
 
         updateButtons();
@@ -33,7 +33,7 @@ public class GroupListWindow extends ListWindow {
     @Override
     public void updateDimensions() {
         super.updateDimensions();
-        newGroupField.setWidth(this.width);
+        newGroupField.setWidth(getWidth());
     }
 
     @Override
@@ -82,6 +82,6 @@ public class GroupListWindow extends ListWindow {
             );
         }
         this.width = buttonListElement.getWidth();
-        this.newGroupField.setWidth(width);
+        this.newGroupField.setWidth(getWidth());
     }
 }

@@ -40,8 +40,8 @@ public class GroupWindow extends SnowWindow {
     public void updateDimensions() {
         super.updateDimensions();
 
-        addButton.setX(this.width - (padding + size) * 2);
-        removeButton.setX(this.width - (padding + size) * 3);
+        addButton.setX(getWidth() - (padding + size) * 2);
+        removeButton.setX(getWidth() - (padding + size) * 3);
     }
 
     @Override

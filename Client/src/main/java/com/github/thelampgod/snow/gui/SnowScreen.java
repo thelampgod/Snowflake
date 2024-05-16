@@ -42,7 +42,7 @@ public class SnowScreen extends Screen {
         this.setScale();
         for (SnowWindow element : windowList) {
             if (!element.hasInit) {
-                element.init(element.width, element.height);
+                element.init(element.getWidth(), element.getHeight());
             }
         }
     }
@@ -84,7 +84,7 @@ public class SnowScreen extends Screen {
         windowList.removeIf(it -> it == window);
         windowList.add(window);
         if (!window.hasInit) {
-            window.init(window.width, window.height);
+            window.init(window.getWidth(), window.getHeight());
         }
     }
 

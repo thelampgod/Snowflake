@@ -37,7 +37,7 @@ public class ConnectWindow extends SnowWindow {
         this.drawText(
                 connectButton.getMessage().getString(),
                 connectButton.getX(),
-                (height + headerHeight - textRenderer.fontHeight) / 2,
+                (getHeight() + headerHeight - textRenderer.fontHeight) / 2,
                 hovered ? Color.YELLOW.getRGB() : Color.WHITE.getRGB(), true, ctx);
     }
 
@@ -47,8 +47,8 @@ public class ConnectWindow extends SnowWindow {
         this.inputField.keyPressed(keyCode, scanCode, modifiers);
         if (keyCode == 259 || Screen.isCut(keyCode)) {
             int messageLength = textRenderer.getWidth(this.inputField.getText());
-            this.inputField.setX((this.width - messageLength) / 2);
-            this.connectButton.setX((this.width + messageLength + 20) / 2);
+            this.inputField.setX((getWidth() - messageLength) / 2);
+            this.connectButton.setX((getWidth() + messageLength + 20) / 2);
         }
 
         if (this.inputField.isFocused() && (keyCode == 257 || keyCode == 335)) {
@@ -62,15 +62,15 @@ public class ConnectWindow extends SnowWindow {
         if (!focused) return;
         this.inputField.charTyped(chr, modifiers);
         int messageLength = textRenderer.getWidth(this.inputField.getText());
-        this.inputField.setX((this.width - messageLength) / 2);
-        this.connectButton.setX((this.width + messageLength + 20) / 2);
+        this.inputField.setX((getWidth() - messageLength) / 2);
+        this.connectButton.setX((getWidth() + messageLength + 20) / 2);
         super.charTyped(chr, modifiers);
     }
 
     public void init(int width, int height) {
-        super.init(this.width, this.height);
+        super.init(getWidth(), getHeight());
 
-        this.inputField = new TextFieldWidget(textRenderer, (this.width - textRenderer.getWidth("_")) / 2, (height + headerHeight - textRenderer.fontHeight) / 2, this.width - 18, 12, Text.literal("IP"));
+        this.inputField = new TextFieldWidget(textRenderer, (getWidth() - textRenderer.getWidth("_")) / 2, (height + headerHeight - textRenderer.fontHeight) / 2, getWidth() - 18, 12, Text.literal("IP"));
         this.inputField.setMaxLength(256);
         this.inputField.setDrawsBackground(false);
         this.inputField.setFocused(true);

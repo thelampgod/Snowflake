@@ -16,8 +16,8 @@ import static com.github.thelampgod.snow.Helper.mc;
 public abstract class SnowWindow {
     public double x;
     public double y;
-    public int width;
-    public int height;
+    public double width;
+    public double height;
     public int headerHeight = 17;
 
     public Color windowColor = new Color(139, 139, 139);
@@ -42,8 +42,8 @@ public abstract class SnowWindow {
         this.width = width;
         this.height = height;
         this.closeable = closeable;
-        x = (double) (SnowScreen.scaledWidth - this.width) / 2 + 20 * SnowScreen.windowList.size();
-        y = (double) (SnowScreen.scaledHeight - this.height) / 2 + 20 * SnowScreen.windowList.size();
+        x = (SnowScreen.scaledWidth - this.width) / 2 + 20 * SnowScreen.windowList.size();
+        y = (SnowScreen.scaledHeight - this.height) / 2 + 20 * SnowScreen.windowList.size();
         this.textRenderer = mc.textRenderer;
         if (textRenderer.getWidth(title) > width) {
             this.width = textRenderer.getWidth(title) + 40;
@@ -63,8 +63,8 @@ public abstract class SnowWindow {
         this.width = width;
         this.height = height;
 
-        x = (double) (SnowScreen.scaledWidth - this.width) / 2 + 20 * SnowScreen.windowList.size();
-        y = (double) (SnowScreen.scaledHeight - this.height) / 2 + 20 * SnowScreen.windowList.size();
+        x = (SnowScreen.scaledWidth - this.width) / 2 + 20 * SnowScreen.windowList.size();
+        y = (SnowScreen.scaledHeight - this.height) / 2 + 20 * SnowScreen.windowList.size();
         textRenderer = mc.textRenderer;
         close = new TextButton("x", width - padding - size, padding, size, Color.BLACK.getRGB());
         this.hasInit = true;
@@ -73,13 +73,13 @@ public abstract class SnowWindow {
 
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         // Border
-        ctx.fill(-1, -1, width + 1, height + 1, (focused ? Color.WHITE.getRGB() : Color.BLACK.getRGB()));
+        ctx.fill(-1, -1, (getWidth() + 1), getHeight() + 1, (focused ? Color.WHITE.getRGB() : Color.BLACK.getRGB()));
         // Window
-        ctx.fill(0, 0, width, height, windowColor.getRGB());
+        ctx.fill(0, 0, getWidth(), getHeight(), windowColor.getRGB());
         // Header
-        ctx.fill(0, 0, width, headerHeight, headerColor.getRGB());
+        ctx.fill(0, 0, getWidth(), headerHeight, headerColor.getRGB());
         // Header Title
-        int headerX = titleCentered ? (width - textRenderer.getWidth(title)) / 2 : 5;
+        int headerX = titleCentered ? ((getWidth() - textRenderer.getWidth(title)) / 2) : 5;
         this.drawOutlinedText(
                 title,
                 headerX,
@@ -156,8 +156,8 @@ public abstract class SnowWindow {
         }
 
         if (resizing) {
-            width += (int) deltaX;
-            height += (int) deltaY;
+            width += deltaX;
+            height += deltaY;
 
             width = Math.max(this.width, this.textRenderer.getWidth(this.title));
             height = Math.max(this.height, this.headerHeight);
@@ -169,7 +169,7 @@ public abstract class SnowWindow {
     }
 
     public void updateDimensions() {
-        close.setX(this.width - padding - size);
+        close.setX(getWidth() - padding - size);
     }
 
     public void drawOutlinedText(String title, int x, int y, int color, int bgColor, DrawContext ctx) {
@@ -192,6 +192,14 @@ public abstract class SnowWindow {
                 shadow,
                 ctx.getMatrices().peek().getPositionMatrix(),
                 ctx.getVertexConsumers(), TextRenderer.TextLayerType.SEE_THROUGH, 0, 255);
+    }
+
+    public int getWidth() {
+        return (int) width;
+    }
+
+    public int getHeight() {
+        return (int) height;
     }
 
 
