@@ -11,6 +11,12 @@ public abstract class ListWindow extends SnowWindow {
     }
 
     @Override
+    public void updateDimensions() {
+        super.updateDimensions();
+        buttonListElement.setWidth(this.width);
+    }
+
+    @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         super.render(ctx, mouseX, mouseY, delta);
 

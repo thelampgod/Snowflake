@@ -31,6 +31,12 @@ public class GroupListWindow extends ListWindow {
     }
 
     @Override
+    public void updateDimensions() {
+        super.updateDimensions();
+        newGroupField.setWidth(this.width);
+    }
+
+    @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         super.render(ctx, mouseX, mouseY, delta);
         if (!newGroupField.getText().isEmpty() || (focused && newGroupField.isMouseOver(mouseX - x, mouseY - y))) {

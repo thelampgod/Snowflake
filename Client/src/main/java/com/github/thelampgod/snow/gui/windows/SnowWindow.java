@@ -25,6 +25,7 @@ public abstract class SnowWindow {
     private final String title;
     private final boolean titleCentered;
     private boolean clicked;
+    private boolean resizing;
     public boolean focused;
     public boolean hasInit = false;
 
@@ -119,9 +120,20 @@ public abstract class SnowWindow {
             clicked = true;
         }
 
+        if (cursorInBorder(mouseX, mouseY)) {
+            resizing = true;
+        }
+
         if (closeable && close.mouseHover(mouseX, mouseY)) {
             Snow.instance.getOrCreateSnowScreen().remove(this);
         }
+    }
+
+    private boolean cursorInBorder(double mouseX, double mouseY) {
+        return (mouseX - x > 0 && mouseX - x < 5 && mouseY - y > 0 && mouseY - y < 5)
+                || (mouseX - x > width - 5 && mouseX - x < width && mouseY - y > 0 && mouseY - y < 5)
+                || (mouseX - x > 0 && mouseX - x < 5 && mouseY - y > height - 5 && mouseY - y < height)
+                || (mouseX - x > width - 5 && mouseX - x < width && mouseY - y > height - 5 && mouseY - y < height);
     }
 
     public boolean cursorInWindow(double mouseX, double mouseY) {
@@ -134,16 +146,30 @@ public abstract class SnowWindow {
 
     public void mouseReleased(double mouseX, double mouseY, int button) {
         clicked = false;
+        resizing = false;
     }
 
     public void mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if (!clicked) return;
+        if (clicked) {
+            x += deltaX;
+            y += deltaY;
+        }
 
-        x += deltaX;
-        y += deltaY;
+        if (resizing) {
+            width += (int) deltaX;
+            height += (int) deltaY;
+
+            width = Math.max(this.width, this.textRenderer.getWidth(this.title));
+            height = Math.max(this.height, this.headerHeight);
+            updateDimensions();
+        }
     }
 
     public void mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+    }
+
+    public void updateDimensions() {
+        close.setX(this.width - padding - size);
     }
 
     public void drawOutlinedText(String title, int x, int y, int color, int bgColor, DrawContext ctx) {
@@ -208,6 +234,11 @@ public abstract class SnowWindow {
 
         public boolean mouseHover(double mouseX, double mouseY) {
             return mouseX - x - bx > 0 & mouseX - x - bx < size && mouseY - y - by > 0 && mouseY - y - by < size;
+        }
+
+
+        public void setX(int x) {
+            bx = x;
         }
     }
 }

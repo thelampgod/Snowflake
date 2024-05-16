@@ -14,7 +14,7 @@ public class ChatElement {
 
     private final int x;
     private final int y;
-    private final int height;
+    private int height;
     private int width;
     private static final int PADDING = 3;
     private final List<ChatMessage> messages = new ArrayList<>();
@@ -100,6 +100,14 @@ public class ChatElement {
         if (messageHeight < height) return;
 
         scrollPosition = (messageHeight - height) / textRenderer.fontHeight + 3;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     protected record ChatMessage(String sender, String message, long timestamp) {

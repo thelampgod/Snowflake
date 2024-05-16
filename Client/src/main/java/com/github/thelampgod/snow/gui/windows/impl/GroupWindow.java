@@ -37,6 +37,14 @@ public class GroupWindow extends SnowWindow {
     }
 
     @Override
+    public void updateDimensions() {
+        super.updateDimensions();
+
+        addButton.setX(this.width - (padding + size) * 2);
+        removeButton.setX(this.width - (padding + size) * 3);
+    }
+
+    @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         super.render(ctx, mouseX, mouseY, delta);
 

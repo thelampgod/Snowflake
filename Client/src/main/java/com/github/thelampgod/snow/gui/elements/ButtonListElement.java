@@ -79,6 +79,10 @@ public class ButtonListElement {
         return width;
     }
 
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
 
     protected class ListButton {
         private final int bheight = 17;
