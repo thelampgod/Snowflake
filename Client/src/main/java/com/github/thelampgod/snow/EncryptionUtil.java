@@ -10,9 +10,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
@@ -80,18 +78,8 @@ public class EncryptionUtil {
         return new String(bytes, StandardCharsets.UTF_8).toCharArray();
     }
 
-    public static byte[] toBytes(Object obj) throws Exception {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(bos);
-        oos.writeObject(obj);
-        oos.flush();
-        return bos.toByteArray();
-    }
-
-    public static WrappedPacket toPacket(byte[] bytes) throws Exception {
-        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-        ObjectInputStream ois = new ObjectInputStream(bis);
-        return (WrappedPacket) ois.readObject();
+    public static WrappedPacket toPacket(byte[] bytes) {
+        return WrappedPacket.fromBytes(bytes);
     }
 
     public static byte[] encryptPacket(WrappedPacket packet, boolean forGroup, int id) throws Exception {
@@ -105,7 +93,7 @@ public class EncryptionUtil {
     private static byte[] encryptPacketForUser(WrappedPacket packet, int userId) throws Exception {
         final User user = Snow.instance.getUserManager().get(userId);
 
-        byte[] packetBytes = toBytes(packet);
+        byte[] packetBytes = packet.data();
 
         return encrypt(packetBytes, user.getKey());
     }
@@ -113,7 +101,7 @@ public class EncryptionUtil {
     public static byte[] encryptPacketForGroup(WrappedPacket packet, int groupId) throws Exception {
         final Group group = Snow.instance.getGroupManager().get(groupId);
 
-        byte[] packetBytes = toBytes(packet);
+        byte[] packetBytes = packet.data();
 
         return encryptByPassword(packetBytes, group.getPassword());
     }

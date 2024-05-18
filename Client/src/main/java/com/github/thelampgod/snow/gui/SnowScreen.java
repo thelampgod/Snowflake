@@ -1,5 +1,6 @@
 package com.github.thelampgod.snow.gui;
 
+import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.groups.Group;
 import com.github.thelampgod.snow.gui.windows.SnowWindow;
 import com.github.thelampgod.snow.gui.windows.impl.*;
@@ -191,5 +192,22 @@ public class SnowScreen extends Screen {
                 }
             }
         }
+    }
+
+    public void addMessage(int sender, String message) {
+        final User user = Snow.instance.getUserManager().get(sender);
+
+        for (SnowWindow window : windowList) {
+            if (window instanceof UserWindow userWindow) {
+                if (!(userWindow.getId() == user.getId())) continue;
+                focusWindow(userWindow);
+                userWindow.addMessage(user.getName(), message);
+                return;
+            }
+        }
+
+        UserWindow window = new UserWindow(user);
+        focusWindow(window);
+        window.addMessage(user.getName(), message);
     }
 }

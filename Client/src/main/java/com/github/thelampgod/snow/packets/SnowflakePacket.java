@@ -9,7 +9,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
-public abstract class SnowflakePacket implements Serializable {
+public abstract class SnowflakePacket {
   public static SnowflakePacket fromId(byte id, DataInputStream in) throws Exception {
     switch (id) {
       case 4:

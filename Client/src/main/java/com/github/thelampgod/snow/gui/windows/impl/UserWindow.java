@@ -83,4 +83,8 @@ public class UserWindow extends SnowWindow {
     public int getId() {
         return id;
     }
+
+    public void addMessage(String name, String message) {
+        chatElement.addMessage(name, message);
+    }
 }
