@@ -20,6 +20,7 @@ public class UserListWindow extends ListWindow {
     }
 
     public void updateButtons() {
+        if (!hasInit) return;
         buttonListElement.clearButtons();
         final List<User> users = Snow.instance.getUserManager().getUsers();
         for (final User user : users) {

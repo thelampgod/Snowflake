@@ -66,6 +66,7 @@ public class UserWindow extends SnowWindow {
                 Snow.getServerManager().sendPacket(new EncryptedDataPacket.User(this.id, new MessagePacket.User(this.id, chatInput.getText())));
             } catch (Exception e) {
                 Snow.instance.getLog().info("Failed to send message");
+                e.printStackTrace();
             }
             chatElement.addMessage("You", chatInput.getText());
             chatInput.setText("");
