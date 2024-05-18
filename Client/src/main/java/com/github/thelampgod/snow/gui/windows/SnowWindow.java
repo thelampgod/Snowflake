@@ -120,7 +120,7 @@ public abstract class SnowWindow {
             clicked = true;
         }
 
-        if (cursorInBorder(mouseX, mouseY)) {
+        if (cursorInBottomCorner(mouseX, mouseY)) {
             resizing = true;
         }
 
@@ -129,11 +129,8 @@ public abstract class SnowWindow {
         }
     }
 
-    private boolean cursorInBorder(double mouseX, double mouseY) {
-        return (mouseX - x > 0 && mouseX - x < 5 && mouseY - y > 0 && mouseY - y < 5)
-                || (mouseX - x > width - 5 && mouseX - x < width && mouseY - y > 0 && mouseY - y < 5)
-                || (mouseX - x > 0 && mouseX - x < 5 && mouseY - y > height - 5 && mouseY - y < height)
-                || (mouseX - x > width - 5 && mouseX - x < width && mouseY - y > height - 5 && mouseY - y < height);
+    private boolean cursorInBottomCorner(double mouseX, double mouseY) {
+        return mouseX - x > width - 5 && mouseX - x < width && mouseY - y > height - 5 && mouseY - y < height;
     }
 
     public boolean cursorInWindow(double mouseX, double mouseY) {
