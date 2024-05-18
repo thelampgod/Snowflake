@@ -20,7 +20,7 @@ public class EncryptedDataPacket extends SnowflakePacket {
     private int senderId;
     // The group or user id
     private final int id;
-    public final byte[] encryptedPacket;
+    private final byte[] encryptedPacket;
 
     public EncryptedDataPacket(boolean group, int id, WrappedPacket packet) throws Exception {
         this.group = group;
