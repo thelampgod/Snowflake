@@ -96,8 +96,9 @@ public class SnowScreen extends Screen {
     @Override
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         setScale();
-        for (SnowWindow element : windowList) {
-            element.preRender(ctx, mouseX, mouseY, delta);
+        for (int i = 0; i < windowList.size(); ++i) {
+            SnowWindow window = windowList.get(i);
+            window.preRender(ctx, mouseX, mouseY, delta);
         }
     }
 
