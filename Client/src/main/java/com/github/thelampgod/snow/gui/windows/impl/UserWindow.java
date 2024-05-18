@@ -5,14 +5,12 @@ import com.github.thelampgod.snow.gui.elements.ChatElement;
 import com.github.thelampgod.snow.gui.windows.SnowWindow;
 import com.github.thelampgod.snow.packets.impl.EncryptedDataPacket;
 import com.github.thelampgod.snow.packets.impl.MessagePacket;
-import com.github.thelampgod.snow.packets.impl.outgoing.CreateGroupPacket;
 import com.github.thelampgod.snow.users.User;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 
 import java.awt.*;
-import java.io.IOException;
 
 public class UserWindow extends SnowWindow {
     private final int id;
@@ -47,14 +45,10 @@ public class UserWindow extends SnowWindow {
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         super.render(ctx, mouseX, mouseY, delta);
 
+        if (!focused && chatInput.isFocused()) chatInput.setFocused(false);
+        if (focused && !chatInput.isFocused()) chatInput.setFocused(true);
         chatInput.render(ctx, mouseX, mouseY, delta);
         chatElement.render(ctx, mouseX, mouseY, delta);
-    }
-
-    @Override
-    public void mouseClicked(double mouseX, double mouseY, int buttonId) {
-        super.mouseClicked(mouseX, mouseY, buttonId);
-        chatInput.setFocused(chatInput.mouseClicked(mouseX - x, mouseY - y, buttonId));
     }
 
     @Override
