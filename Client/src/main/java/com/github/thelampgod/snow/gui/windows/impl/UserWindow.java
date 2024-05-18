@@ -64,11 +64,11 @@ public class UserWindow extends SnowWindow {
         if (chatInput.isFocused() && ! chatInput.getText().isEmpty() && (keyCode == 257 || keyCode == 335)) {
             try {
                 Snow.getServerManager().sendPacket(new EncryptedDataPacket.User(this.id, new MessagePacket.User(this.id, chatInput.getText())));
+                chatElement.addMessage("You", chatInput.getText());
             } catch (Exception e) {
                 Snow.instance.getLog().info("Failed to send message");
                 e.printStackTrace();
             }
-            chatElement.addMessage("You", chatInput.getText());
             chatInput.setText("");
         }
     }
