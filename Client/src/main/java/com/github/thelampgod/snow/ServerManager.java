@@ -1,6 +1,7 @@
 package com.github.thelampgod.snow;
 
 import com.github.thelampgod.snow.packets.SnowflakePacket;
+import com.github.thelampgod.snow.packets.impl.KeepAlivePacket;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.io.*;
@@ -9,6 +10,7 @@ import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class ServerManager {
     private final LinkedBlockingQueue<WrappedComm> talkComms = new LinkedBlockingQueue<>();
@@ -19,7 +21,8 @@ public class ServerManager {
     private static String sharedSecret = null;
     public final String address;
 
-    private boolean isRunning = true;
+    private boolean isRunning = false;
+    private long lastKeepAlive = 0L;
 
     public ServerManager(String ip, int port) {
         this.address = ip + ":" + port;
@@ -33,8 +36,9 @@ public class ServerManager {
             talker.start();
             listenForReceive();
             listenForReceive();
-
+            this.isRunning = true;
         } catch (IOException e) {
+            this.isRunning = false;
             Snow.instance.getLog().error(e.getMessage());
         }
     }
@@ -45,15 +49,27 @@ public class ServerManager {
                 while (isRunning) {
                     this.receiveComm((out, in) -> {
                         final SnowflakePacket packet = SnowflakePacket.fromId(in.readByte(), in);
+                        if (packet instanceof KeepAlivePacket p) {
+                            lastKeepAlive = p.getTimestamp();
+                        }
                         packet.handle();
                     });
+                    if (lastKeepAlive != 0 && System.currentTimeMillis() - lastKeepAlive > TimeUnit.SECONDS.toMillis(30)) {
+                        this.close();
+                    }
                     Thread.sleep(10);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }).start();
 
+    }
+
+    public boolean isConnected() {
+        return isRunning;
     }
 
     public void close() throws IOException {
@@ -112,7 +128,7 @@ public class ServerManager {
     private static class ServerHandler extends Thread {
         private final Socket socket;
         private final LinkedBlockingQueue<WrappedComm> comms;
-        public boolean isRunning = true;
+        public boolean isRunning = false;
         private final boolean receiver;
 
         public ServerHandler(Socket socket, boolean receiver, LinkedBlockingQueue<WrappedComm> comms) {
@@ -128,6 +144,7 @@ public class ServerManager {
                     Helper.addToast("Connected");
                 }
                 Snow.instance.getLog().info("Connected to snowflake");
+                this.isRunning = true;
                 DataOutputStream out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
                 DataInputStream in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
 
@@ -144,6 +161,7 @@ public class ServerManager {
 
             } catch (Throwable th) {
                 th.printStackTrace();
+                Snow.getServerManager().isRunning = false;
                 isRunning = false;
                 if (!receiver) {
                     Helper.addToast("Disconnected");

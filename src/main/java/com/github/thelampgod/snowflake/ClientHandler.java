@@ -44,8 +44,8 @@ public class ClientHandler extends Thread {
                 getLog().debug("Receiver connected " + client);
                 // keep the thread alive, so it is ready to send packets
                 while (isRunning) {
-                    Thread.sleep(15000);
                     sendKeepAlive();
+                    Thread.sleep(15000);
                 }
                 return;
             }

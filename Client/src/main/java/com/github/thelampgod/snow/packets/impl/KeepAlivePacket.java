@@ -31,4 +31,8 @@ public class KeepAlivePacket extends SnowflakePacket {
     final ServerManager man = Snow.instance.getServerManager();
     man.sendPacket(this);
   }
+
+  public long getTimestamp() {
+    return timestamp;
+  }
 }
