@@ -6,6 +6,7 @@ import com.github.thelampgod.snow.gui.SnowScreen;
 import com.github.thelampgod.snow.packets.WrappedPacket;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 import static com.github.thelampgod.snow.Helper.mc;
 
@@ -26,7 +27,7 @@ public class MessagePacket extends WrappedPacket {
     public static MessagePacket fromBytes(byte[] bytes) {
         String data = new String(bytes).substring(1);
         String[] parts = data.split(DIVIDER);
-        boolean group = Boolean.parseBoolean(parts[0]);
+        boolean group = Objects.equals(parts[0], "1");
         int id = Integer.parseInt(parts[1]);
         String message = parts[2];
 
@@ -40,7 +41,7 @@ public class MessagePacket extends WrappedPacket {
     @Override
     public byte[] data() {
         String data = "0"; // messagepacket id
-        data += group;
+        data += group ? 1 : 0;
         data += DIVIDER;
         data += id;
         data += DIVIDER;
