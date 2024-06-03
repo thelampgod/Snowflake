@@ -29,7 +29,7 @@ public class UserWindow extends SnowWindow {
         chatInput.setPlaceholder(Text.of("Type a message..."));
         chatInput.setEditableColor(Color.GRAY.getRGB());
         chatInput.setMaxLength(256);
-        this.chatElement = new ChatElement(this.textRenderer, 0, headerHeight, height - headerHeight - chatInput.getHeight(), width);
+        this.chatElement = new ChatElement(this.textRenderer, 0, headerHeight, height - headerHeight - chatInput.getHeight() - textRenderer.fontHeight, width);
     }
 
     @Override
@@ -38,7 +38,7 @@ public class UserWindow extends SnowWindow {
         chatInput.setWidth(getWidth());
         chatInput.setY(getHeight() - 17);
         chatElement.setWidth(getWidth());
-        chatElement.setHeight(getHeight() - headerHeight - chatInput.getHeight());
+        chatElement.setHeight(getHeight() - headerHeight - chatInput.getHeight() - textRenderer.fontHeight);
     }
 
     @Override
