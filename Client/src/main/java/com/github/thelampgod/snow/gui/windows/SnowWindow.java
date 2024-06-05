@@ -10,6 +10,8 @@ import net.minecraft.util.Formatting;
 
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.github.thelampgod.snow.Helper.mc;
 
@@ -29,8 +31,8 @@ public abstract class SnowWindow {
     public boolean focused;
     public boolean hasInit = false;
 
+    protected final List<TextButton> headerButtons = new ArrayList<>();
     public boolean closeable;
-    private TextButton close;
 
     protected int size = 9;
     protected int padding = (headerHeight - size) / 2;
@@ -66,7 +68,9 @@ public abstract class SnowWindow {
         x = (SnowScreen.scaledWidth - this.width) / 2 + 20 * SnowScreen.windowList.size();
         y = (SnowScreen.scaledHeight - this.height) / 2 + 20 * SnowScreen.windowList.size();
         textRenderer = mc.textRenderer;
-        close = new TextButton("x", width - padding - size, padding, size, Color.BLACK.getRGB());
+        if (closeable) {
+            addHeaderButton("x", textRenderer.fontHeight, "", () -> Snow.instance.getOrCreateSnowScreen().remove(this));
+        }
         this.hasInit = true;
     }
 
@@ -87,9 +91,9 @@ public abstract class SnowWindow {
                 Formatting.GOLD.getColorValue(),
                 0,
                 ctx);
-
-        if (closeable) {
-            close.render(ctx, mouseX, mouseY);
+        // Header buttons (close, etc)
+        for (TextButton button : headerButtons) {
+            button.render(ctx, mouseX, mouseY);
         }
     }
 
@@ -124,8 +128,8 @@ public abstract class SnowWindow {
             resizing = true;
         }
 
-        if (closeable && close.mouseHover(mouseX, mouseY)) {
-            Snow.instance.getOrCreateSnowScreen().remove(this);
+        for (TextButton b : headerButtons) {
+            b.mouseClicked(mouseX, mouseY, button);
         }
     }
 
@@ -166,7 +170,16 @@ public abstract class SnowWindow {
     }
 
     public void updateDimensions() {
-        close.setX(getWidth() - padding - size);
+        for (int i = 0; i < headerButtons.size(); ++i) {
+            TextButton button = headerButtons.get(i);
+            button.setX(getWidth() - (padding + size) * (i + 1));
+        }
+    }
+
+    public void addHeaderButton(String icon, int fontHeight, String tooltip, Runnable runnable) {
+        headerButtons.add(new TextButton(icon,
+                getWidth() - (padding + size) * (headerButtons.size() + 1),
+                padding, size, Color.BLACK.getRGB(), fontHeight, tooltip, runnable));
     }
 
     public void drawOutlinedText(String title, int x, int y, int color, int bgColor, DrawContext ctx) {
@@ -201,16 +214,17 @@ public abstract class SnowWindow {
 
 
     protected class TextButton {
-        String icon;
-        int bx;
-        int by;
-        int size;
-        int color;
-        int fontHeight;
-        String tooltipText;
+        private final String icon;
+        private int bx;
+        private final int by;
+        private final int size;
+        private final int color;
+        private final int fontHeight;
+        private final String tooltipText;
+        private final Runnable runnable;
 
         //TODO: general button class, with icon and runnable?
-        public TextButton(String iconChar, int x, int y, int size, int color, int fontHeight, String tooltipText) {
+        public TextButton(String iconChar, int x, int y, int size, int color, int fontHeight, String tooltipText, Runnable runnable) {
             this.icon = iconChar;
             this.bx = x;
             this.by = y;
@@ -218,19 +232,16 @@ public abstract class SnowWindow {
             this.color = color;
             this.fontHeight = fontHeight;
             this.tooltipText = tooltipText;
-        }
-
-        public TextButton(String iconChar, int x, int y, int size, int color) {
-            this(iconChar, x,y,size,color, textRenderer.fontHeight, "");
+            this.runnable = runnable;
         }
 
         public void render(DrawContext ctx, int mouseX, int mouseY) {
             ctx.getMatrices().push();
-            ctx.getMatrices().translate(bx,by,0);
+            ctx.getMatrices().translate(bx, by, 0);
             if (mouseHover(mouseX, mouseY)) {
                 ctx.fill(0, 0, size, size, headerColor.brighter().getRGB());
             }
-            ctx.drawText(textRenderer, icon, (size - textRenderer.getWidth(icon)) / 2 + 1, (size - fontHeight) / 2 , color, false);
+            ctx.drawText(textRenderer, icon, (size - textRenderer.getWidth(icon)) / 2 + 1, (size - fontHeight) / 2, color, false);
             if (!tooltipText.isEmpty() && mouseHover(mouseX, mouseY)) {
                 ctx.drawTooltip(textRenderer, Text.literal(tooltipText), 0, 0);
             }
@@ -239,6 +250,12 @@ public abstract class SnowWindow {
 
         public boolean mouseHover(double mouseX, double mouseY) {
             return mouseX - x - bx > 0 & mouseX - x - bx < size && mouseY - y - by > 0 && mouseY - y - by < size;
+        }
+
+        public void mouseClicked(double mouseX, double mouseY, int button) {
+            if (mouseHover(mouseX, mouseY)) {
+                runnable.run();
+            }
         }
 
 

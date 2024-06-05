@@ -58,4 +58,8 @@ public class UserAddToGroupListWindow extends ListWindow {
             e.printStackTrace();
         }
     }
+
+    public int getGroupId() {
+        return group.getId();
+    }
 }

@@ -49,4 +49,8 @@ public class UserRemoveFromGroupListWindow extends ListWindow {
             Snow.instance.getOrCreateSnowScreen().remove(this);
         }
     }
+
+    public int getGroupId() {
+        return group.getId();
+    }
 }

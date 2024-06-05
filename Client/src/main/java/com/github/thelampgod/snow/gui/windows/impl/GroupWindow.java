@@ -2,19 +2,15 @@ package com.github.thelampgod.snow.gui.windows.impl;
 
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.groups.Group;
+import com.github.thelampgod.snow.gui.SnowScreen;
 import com.github.thelampgod.snow.gui.windows.SnowWindow;
 import net.minecraft.client.gui.DrawContext;
-
-import java.awt.*;
 
 public class GroupWindow extends SnowWindow {
     private final Group group;
 
     // Crown character https://graphemica.com/%F0%9F%91%91
     private final static String crown = "\uD83D\uDC51";
-
-    private TextButton addButton;
-    private TextButton removeButton;
 
     public GroupWindow(Group group) {
         super((group.isOwner() ? crown + " " : "") + group.getName(), false, 200, 100);
@@ -29,19 +25,35 @@ public class GroupWindow extends SnowWindow {
     public void init(int width, int height) {
         super.init(width, height);
         if (group.isOwner()) {
-            addButton = new TextButton("+", width - (padding + size) * 2, padding, size, Color.BLACK.getRGB(),
-                    7, "Add User to Group");
-            removeButton = new TextButton("-", width - (padding + size) * 3, padding, size, Color.BLACK.getRGB(),
-                    7, "Remove User from Group");
+            addHeaderButton("+", 7, "Add User to Group",
+                    () -> Snow.instance.getOrCreateSnowScreen().focusWindow(getAddWindow(this.group)));
+            addHeaderButton("-", 7, "Remove User from Group",
+                    () -> Snow.instance.getOrCreateSnowScreen().focusWindow(getRemoveWindow(this.group)));
         }
     }
 
-    @Override
-    public void updateDimensions() {
-        super.updateDimensions();
+    private UserRemoveFromGroupListWindow getRemoveWindow(Group group) {
+        for (SnowWindow w : SnowScreen.windowList) {
+            if (w instanceof UserRemoveFromGroupListWindow listWindow) {
+                if (listWindow.getGroupId() == group.getId()) {
+                    return listWindow;
+                }
+            }
+        }
 
-        addButton.setX(getWidth() - (padding + size) * 2);
-        removeButton.setX(getWidth() - (padding + size) * 3);
+        return new UserRemoveFromGroupListWindow(this.group, 150, 200);
+    }
+
+    private UserAddToGroupListWindow getAddWindow(Group group) {
+        for (SnowWindow w : SnowScreen.windowList) {
+            if (w instanceof UserAddToGroupListWindow listWindow) {
+                if (listWindow.getGroupId() == group.getId()) {
+                    return listWindow;
+                }
+            }
+        }
+
+        return new UserAddToGroupListWindow(this.group, 150, 200);
     }
 
     @Override
@@ -49,26 +61,5 @@ public class GroupWindow extends SnowWindow {
         super.render(ctx, mouseX, mouseY, delta);
 
         // Render Start Location Share button
-
-        if (group.isOwner()) {
-            // Render add and remove user buttons
-            addButton.render(ctx, mouseX, mouseY);
-            removeButton.render(ctx, mouseX, mouseY);
-        }
-    }
-
-    @Override
-    public void mouseClicked(double mouseX, double mouseY, int button) {
-        super.mouseClicked(mouseX, mouseY, button);
-
-        if (group.isOwner()) {
-            if (addButton.mouseHover(mouseX, mouseY)) {
-                Snow.instance.getOrCreateSnowScreen().focusWindow(new UserAddToGroupListWindow(this.group, 150, 200));
-            }
-            if (removeButton.mouseHover(mouseX, mouseY)) {
-                Snow.instance.getOrCreateSnowScreen().focusWindow(new UserRemoveFromGroupListWindow(this.group, 150, 200));
-
-            }
-        }
     }
 }

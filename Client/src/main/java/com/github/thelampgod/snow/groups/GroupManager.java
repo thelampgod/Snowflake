@@ -22,11 +22,11 @@ public class GroupManager {
 
     public GroupManager() {
         //testing
-//        groups.add(new Group("TestGroup", 0, false, Sets.newHashSet(1,2,3,4,5)));
-//        groups.add(new Group("Lamp's Group", 1, false, Sets.newHashSet(1,2,4,5)));
-//        groups.add(new Group("Entropy Group", 2, false, Sets.newHashSet(1,2,3,4,5)));
-//        groups.add(new Group("Epic Group", 3, true, Sets.newHashSet(1,2)));
-//        groups.add(new Group(":D", 4, false, Sets.newHashSet(1,5)));
+        groups.add(new Group("TestGroup", 0, false, Sets.newHashSet(1,2,3,4,5)));
+        groups.add(new Group("Lamp's Group", 1, false, Sets.newHashSet(1,2,4,5)));
+        groups.add(new Group("Entropy Group", 2, false, Sets.newHashSet(1,2,3,4,5)));
+        groups.add(new Group("Epic Group", 3, true, Sets.newHashSet(1,2)));
+        groups.add(new Group(":D", 4, false, Sets.newHashSet(1,5)));
 
     }
 
