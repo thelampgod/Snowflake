@@ -160,7 +160,7 @@ public abstract class SnowWindow {
             width += deltaX;
             height += deltaY;
 
-            width = Math.max(this.width, this.textRenderer.getWidth(this.title));
+            width = Math.max(this.width, this.textRenderer.getWidth(this.title) + (padding + size) * (headerButtons.size() + 1));
             height = Math.max(this.height, this.headerHeight);
             updateDimensions();
         }
