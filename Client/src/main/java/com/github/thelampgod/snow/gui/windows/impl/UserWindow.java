@@ -1,5 +1,6 @@
 package com.github.thelampgod.snow.gui.windows.impl;
 
+import com.github.thelampgod.snow.Helper;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.gui.elements.ChatElement;
 import com.github.thelampgod.snow.gui.windows.SnowWindow;
@@ -66,6 +67,7 @@ public class UserWindow extends SnowWindow {
                 Snow.getServerManager().sendPacket(new EncryptedDataPacket.User(this.id, new MessagePacket.User(this.id, chatInput.getText())));
                 chatElement.addMessage("You", chatInput.getText());
             } catch (Exception e) {
+                Helper.addToast("Failed to send message");
                 Snow.instance.getLog().info("Failed to send message");
                 e.printStackTrace();
             }
