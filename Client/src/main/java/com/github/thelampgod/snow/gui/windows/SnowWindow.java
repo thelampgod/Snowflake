@@ -222,8 +222,6 @@ public abstract class SnowWindow {
         private final int fontHeight;
         private final String tooltipText;
         private final Runnable runnable;
-
-        //TODO: general button class, with icon and runnable?
         public TextButton(String iconChar, int x, int y, int size, int color, int fontHeight, String tooltipText, Runnable runnable) {
             this.icon = iconChar;
             this.bx = x;

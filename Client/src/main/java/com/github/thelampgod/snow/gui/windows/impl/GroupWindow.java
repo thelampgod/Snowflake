@@ -4,16 +4,15 @@ import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.groups.Group;
 import com.github.thelampgod.snow.gui.SnowScreen;
 import com.github.thelampgod.snow.gui.windows.SnowWindow;
-import net.minecraft.client.gui.DrawContext;
 
-public class GroupWindow extends SnowWindow {
+public class GroupWindow extends ChatWindow {
     private final Group group;
 
     // Crown character https://graphemica.com/%F0%9F%91%91
     private final static String crown = "\uD83D\uDC51";
 
     public GroupWindow(Group group) {
-        super((group.isOwner() ? crown + " " : "") + group.getName(), false, 200, 100);
+        super(group.getId(), true, (group.isOwner() ? crown + " " : "") + group.getName(), 200, 100);
         this.group = group;
     }
 
@@ -30,6 +29,9 @@ public class GroupWindow extends SnowWindow {
             addHeaderButton("-", 7, "Remove User from Group",
                     () -> Snow.instance.getOrCreateSnowScreen().focusWindow(getRemoveWindow(this.group)));
         }
+
+        addHeaderButton("!", 7, "Start Location Share",
+                () -> System.out.println()); //TODO: confirmation screen
     }
 
     private UserRemoveFromGroupListWindow getRemoveWindow(Group group) {
@@ -54,12 +56,5 @@ public class GroupWindow extends SnowWindow {
         }
 
         return new UserAddToGroupListWindow(this.group, 150, 200);
-    }
-
-    @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        super.render(ctx, mouseX, mouseY, delta);
-
-        // Render Start Location Share button
     }
 }
