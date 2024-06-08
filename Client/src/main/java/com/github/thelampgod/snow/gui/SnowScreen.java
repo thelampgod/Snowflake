@@ -215,4 +215,21 @@ public class SnowScreen extends Screen {
         focusWindow(window);
         window.addMessage(user.getName(), message);
     }
+
+    public void addMessage(int groupId, int sender, String message) {
+        final User user = Snow.instance.getUserManager().get(sender);
+
+        for (SnowWindow window : windowList) {
+            if (window instanceof GroupWindow groupWindow) {
+                if (!(groupWindow.getId() == groupId)) continue;
+                focusWindow(groupWindow);
+                groupWindow.addMessage(user.getName(), message);
+                return;
+            }
+        }
+
+        GroupWindow window = new GroupWindow(Snow.instance.getGroupManager().get(groupId));
+        focusWindow(window);
+        window.addMessage(user.getName(), message);
+    }
 }

@@ -56,10 +56,9 @@ public class MessagePacket extends WrappedPacket {
 
         @Override
         public void handle() {
-            //todo:
-            //groupscreen.add(message, from, group)
-            //super.getSender()
-
+            Snow.instance.getOrCreateSnowScreen().addMessage(super.id, super.getSender(), this.message);
+            if (mc.currentScreen instanceof SnowScreen) return;
+            Helper.addToast("New message!", Snow.instance.getUserManager().get(super.getSender()).getName() + " says...");
         }
     }
 

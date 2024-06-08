@@ -72,6 +72,7 @@ public class GroupListWindow extends ListWindow {
     }
 
     public void updateButtons() {
+        if (!hasInit) return;
         buttonListElement.clearButtons();
         final List<Group> groups = Snow.instance.getGroupManager().getGroups();
         for (final Group group : groups) {
