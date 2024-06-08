@@ -29,8 +29,8 @@ public class Snow implements ModInitializer {
     public static Snow instance;
     private final Logger LOGGER = LogManager.getLogger("Snow");
 
-    private static final String IP = "127.0.0.1";
-    private static final int PORT = 2147;
+    private static String IP = "127.0.0.1";
+    private static int PORT = 2147;
     private static ServerManager serverManager;
 
     private GroupManager groupManager;
@@ -132,6 +132,8 @@ public class Snow implements ModInitializer {
         snowScreen = null;
         String[] parts = text.split(":");
         if (parts.length < 2) return;
-        serverManager = new ServerManager(parts[0], Integer.parseInt(parts[1]));
+        IP = parts[0];
+        PORT = Integer.parseInt(parts[1]);
+        getServerManager();
     }
 }

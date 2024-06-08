@@ -52,14 +52,14 @@ public class Helper {
 
 
     public static void addToast(String s) {
-        if (mc.player == null) {
-            printMessage(s);
-            return;
-        }
-        mc.getToastManager().add(new SystemToast(SystemToast.Type.NARRATOR_TOGGLE, Text.literal(s), null));
+        addToast(s, "");
     }
 
     public static void addToast(String title, String description) {
+        if (mc.player == null || mc.getToastManager() == null) {
+            printMessage(title + "\n" + description);
+            return;
+        }
         mc.getToastManager().add(new SystemToast(SystemToast.Type.NARRATOR_TOGGLE, Text.literal(title), Text.literal(description)));
     }
 }

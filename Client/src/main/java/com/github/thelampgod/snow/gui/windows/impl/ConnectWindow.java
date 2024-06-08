@@ -43,6 +43,7 @@ public class ConnectWindow extends SnowWindow {
 
 
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
+        super.keyPressed(keyCode, scanCode, modifiers);
         if (!focused) return;
         this.inputField.keyPressed(keyCode, scanCode, modifiers);
         if (keyCode == 259 || Screen.isCut(keyCode)) {
@@ -55,16 +56,15 @@ public class ConnectWindow extends SnowWindow {
             mc.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             this.connectButton.onPress();
         }
-        super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     public void charTyped(char chr, int modifiers) {
+        super.charTyped(chr, modifiers);
         if (!focused) return;
         this.inputField.charTyped(chr, modifiers);
         int messageLength = textRenderer.getWidth(this.inputField.getText());
         this.inputField.setX((getWidth() - messageLength) / 2);
         this.connectButton.setX((getWidth() + messageLength + 20) / 2);
-        super.charTyped(chr, modifiers);
     }
 
     public void init(int width, int height) {
@@ -94,8 +94,8 @@ public class ConnectWindow extends SnowWindow {
     }
 
     public void mouseClicked(double mouseX, double mouseY, int button) {
-        connectButton.mouseClicked(mouseX - x, mouseY - y, button);
         super.mouseClicked(mouseX, mouseY, button);
+        connectButton.mouseClicked(mouseX - x, mouseY - y, button);
     }
 
 }

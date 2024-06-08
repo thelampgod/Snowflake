@@ -113,16 +113,16 @@ public class SnowScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        for (SnowWindow element : windowList) {
-            element.keyPressed(keyCode, scanCode, modifiers);
+        for (int i = 0; i < windowList.size(); ++i) {
+            windowList.get(i).keyPressed(keyCode, scanCode, modifiers);
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
     public boolean charTyped(char chr, int modifiers) {
-        for (SnowWindow element : windowList) {
-            element.charTyped(chr, modifiers);
+        for (int i = 0; i < windowList.size(); ++i) {
+            windowList.get(i).charTyped(chr, modifiers);
         }
         return super.charTyped(chr, modifiers);
     }
