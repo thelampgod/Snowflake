@@ -24,6 +24,7 @@ public class UserListWindow extends ListWindow {
         buttonListElement.clearButtons();
         final List<User> users = Snow.instance.getUserManager().getUsers();
         for (final User user : users) {
+            if (user.getId() == Snow.instance.getUserManager().getMe()) continue;
             buttonListElement.addButton(
                     user.getName(), 0,
                     () -> Snow.instance.getOrCreateSnowScreen().focusWindow(user)

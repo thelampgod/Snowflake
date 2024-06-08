@@ -65,14 +65,14 @@ public class ChatWindow extends SnowWindow {
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
         super.keyPressed(keyCode, scanCode, modifiers);
         chatInput.keyPressed(keyCode, scanCode, modifiers);
-        if (chatInput.isFocused() && ! chatInput.getText().isEmpty() && (keyCode == 257 || keyCode == 335)) {
+        if (chatInput.isFocused() && !chatInput.getText().isEmpty() && (keyCode == 257 || keyCode == 335)) {
             try {
                 if (group) {
                     Snow.getServerManager().sendPacket(new EncryptedDataPacket.Group(this.id, new MessagePacket.Group(this.id, chatInput.getText())));
                 } else {
                     Snow.getServerManager().sendPacket(new EncryptedDataPacket.User(this.id, new MessagePacket.User(this.id, chatInput.getText())));
+                    chatElement.addMessage(Snow.instance.getUserManager().getMeUser().getName(), chatInput.getText());
                 }
-                chatElement.addMessage("You", chatInput.getText());
             } catch (Exception e) {
                 Helper.addToast("Failed to send message");
                 Snow.instance.getLog().info("Failed to send message");

@@ -27,8 +27,8 @@ public class UserManager {
     }
 
     public boolean add(User user) {
-        if (user.getId() == me) return false;
         users.add(user);
+        if (user.getId() == me) return false;
 
         SnowScreen screen = Snow.instance.getOrCreateSnowScreen();
         screen.updateUserButtons();
@@ -67,5 +67,9 @@ public class UserManager {
 
     public int getMe() {
         return me;
+    }
+
+    public User getMeUser() {
+        return get(me);
     }
 }
