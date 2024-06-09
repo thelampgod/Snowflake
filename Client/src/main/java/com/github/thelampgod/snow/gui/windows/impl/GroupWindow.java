@@ -4,6 +4,7 @@ import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.groups.Group;
 import com.github.thelampgod.snow.gui.SnowScreen;
 import com.github.thelampgod.snow.gui.windows.SnowWindow;
+import com.github.thelampgod.snow.packets.impl.outgoing.GroupLeavePacket;
 
 public class GroupWindow extends ChatWindow {
     private final Group group;
@@ -23,6 +24,8 @@ public class GroupWindow extends ChatWindow {
     @Override
     public void init(int width, int height) {
         super.init(width, height);
+        addHeaderButton("L", 7, "Leave Group",
+                () -> Snow.getServerManager().sendPacket(new GroupLeavePacket(this.group.getId())));
         if (group.isOwner()) {
             addHeaderButton("+", 7, "Add User to Group",
                     () -> Snow.instance.getOrCreateSnowScreen().focusWindow(getAddWindow(this.group)));

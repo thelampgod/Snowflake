@@ -219,17 +219,30 @@ public class SnowScreen extends Screen {
     public void addMessage(int groupId, int sender, String message) {
         final User user = Snow.instance.getUserManager().get(sender);
 
+        GroupWindow window = getOrCreateGroupWindow(groupId);
+        focusWindow(window);
+        window.addMessage(user.getName(), message);
+    }
+
+    private GroupWindow getOrCreateGroupWindow(int groupId) {
         for (SnowWindow window : windowList) {
             if (window instanceof GroupWindow groupWindow) {
-                if (!(groupWindow.getId() == groupId)) continue;
-                focusWindow(groupWindow);
-                groupWindow.addMessage(user.getName(), message);
-                return;
+                if ((groupWindow.getId() == groupId)) return groupWindow;
             }
         }
 
-        GroupWindow window = new GroupWindow(Snow.instance.getGroupManager().get(groupId));
+        return new GroupWindow(Snow.instance.getGroupManager().get(groupId));
+    }
+
+    public void groupJoin(int groupId, int userId) {
+        GroupWindow window = getOrCreateGroupWindow(groupId);
         focusWindow(window);
-        window.addMessage(user.getName(), message);
+        window.addMessage(Snow.instance.getUserManager().get(userId).getName() + " joined the group.", Color.GREEN);
+    }
+
+    public void groupLeave(int groupId, int userId) {
+        GroupWindow window = getOrCreateGroupWindow(groupId);
+        focusWindow(window);
+        window.addMessage(Snow.instance.getUserManager().get(userId).getName() + " left the group.", Color.RED);
     }
 }

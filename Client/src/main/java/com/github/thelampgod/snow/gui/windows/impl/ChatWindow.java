@@ -93,6 +93,10 @@ public class ChatWindow extends SnowWindow {
         chatElement.addMessage(name, message);
     }
 
+    public void addMessage(String message, Color color) {
+        chatElement.addMessage(message, color);
+    }
+
     public int getId() {
         return id;
     }

@@ -37,25 +37,31 @@ public class ChatElement {
         int textY = y + PADDING;
         for (int i = scrollPosition; i < messages.size(); ++i) {
             ChatMessage message = messages.get(i);
-            boolean sameSender = prevSender.equals(message.sender);
+            boolean sameSender = prevSender == null || prevSender.equals(message.sender) || message.sender == null;
+
+            if (prevSender == null && message.sender != null) {
+                sameSender = false;
+            }
             prevSender = message.sender;
 
+            // Draw sender name
             if (!sameSender && textY > y && textY < y + height) {
                 ctx.drawText(this.textRenderer, message.sender, x + PADDING, textY, Color.YELLOW.getRGB(), false);
                 textY += textRenderer.fontHeight;
             }
 
+            // Draw message
             if (textY > y && textY < y + height) {
                 if (textRenderer.getWidth(message.message) > width - PADDING * 2) {
                     List<OrderedText> wrapped = textRenderer.wrapLines(Text.of(message.message), width - PADDING * 2);
                     for (OrderedText text : wrapped) {
                         if (textY > y && textY < y + height) {
-                            ctx.drawText(this.textRenderer, text, x + PADDING, textY, Color.BLACK.getRGB(), false);
+                            ctx.drawText(this.textRenderer, text, x + PADDING, textY, message.color, false);
                             textY += textRenderer.fontHeight;
                         }
                     }
                 } else {
-                    ctx.drawText(this.textRenderer, message.message, x + PADDING, textY, Color.BLACK.getRGB(), false);
+                    ctx.drawText(this.textRenderer, message.message, x + PADDING, textY, message.color, false);
                     textY += textRenderer.fontHeight;
                 }
             }
@@ -77,7 +83,12 @@ public class ChatElement {
         int height = 0;
         String prevSender = "";
         for (ChatMessage message : messages) {
-            height += (!prevSender.equals(message.sender) ? textRenderer.fontHeight * 2 : textRenderer.fontHeight);
+            boolean sameSender = prevSender == null || prevSender.equals(message.sender) || message.sender == null;
+            if (prevSender == null && message.sender != null) {
+                sameSender = false;
+            }
+
+            height += (sameSender ? textRenderer.fontHeight : textRenderer.fontHeight * 2);
             prevSender = message.sender;
 
             if (textRenderer.getWidth(message.message) > width - PADDING * 2) {
@@ -92,8 +103,16 @@ public class ChatElement {
         return mouseX - x > 0 && mouseX - x < width && mouseY - y > 0 && mouseY - y < height;
     }
 
+    public void addMessage(String message, Color color) {
+        this.addMessage(null, message, color);
+    }
+
     public void addMessage(String sender, String message) {
-        messages.add(new ChatMessage(sender, message, System.currentTimeMillis()));
+        this.addMessage(sender, message, Color.BLACK);
+    }
+
+    public void addMessage(String sender, String message, Color color) {
+        messages.add(new ChatMessage(sender, message, color.getRGB(), System.currentTimeMillis()));
 
         // Scroll down to latest message
         int messageHeight = getHeight(messages);
@@ -110,6 +129,6 @@ public class ChatElement {
         this.height = height;
     }
 
-    protected record ChatMessage(String sender, String message, long timestamp) {
+    protected record ChatMessage(String sender, String message, int color, long timestamp) {
     }
 }
