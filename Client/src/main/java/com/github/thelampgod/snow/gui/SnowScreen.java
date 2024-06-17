@@ -98,7 +98,7 @@ public class SnowScreen extends Screen {
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         setScale();
         //TODO: Green / red circle
-        ctx.drawText(textRenderer, (Snow.getServerManager().isConnected() ? "Connected" : "Disconnected"), 10, 10, Color.WHITE.getRGB(), true);
+        ctx.drawText(textRenderer, (Snow.getServerManager().isConnected() ? "Connected" : "Disconnected"), 10, scaledHeight - 10, Color.WHITE.getRGB(), true);
 
         for (int i = 0; i < windowList.size(); ++i) {
             SnowWindow window = windowList.get(i);

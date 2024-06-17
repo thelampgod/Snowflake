@@ -8,38 +8,41 @@ import java.io.*;
 import java.net.Socket;
 import java.security.SecureRandom;
 import java.util.HashSet;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public class ServerManager {
-    private final LinkedBlockingQueue<WrappedComm> talkComms = new LinkedBlockingQueue<>();
-    private final LinkedBlockingQueue<WrappedComm> receiveComms = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<Comm> talkComms = new LinkedBlockingQueue<>();
+    private final LinkedBlockingQueue<Comm> receiveComms = new LinkedBlockingQueue<>();
+    private final HashSet<ServerHandler> handlers = new HashSet<>();
+    private static String sharedSecret;
+    private volatile boolean isRunning = false;
+    private volatile long lastKeepAlive = 0L;
 
-    private final HashSet<ServerHandler> threads = new HashSet<>();
-
-    private static String sharedSecret = null;
-    public final String address;
-
-    private boolean isRunning = false;
-    private long lastKeepAlive = 0L;
+    private final String ip;
+    private final int port;
 
     public ServerManager(String ip, int port) {
-        this.address = ip + ":" + port;
-        sharedSecret = RandomStringUtils.random(10, 0, 0, true, true, null, new SecureRandom());
+        this.ip = ip;
+        this.port = port;
+    }
+
+    public synchronized void connect() {
         try {
-            ServerHandler receiver = new ServerHandler(connect(ip, port), true, receiveComms);
-            ServerHandler talker = new ServerHandler(connect(ip, port), false, talkComms);
-            threads.add(receiver);
-            threads.add(talker);
+            close();
+            this.isRunning = false;
+            sharedSecret = RandomStringUtils.random(10, 0, 0, true, true, null, new SecureRandom());
+            ServerHandler receiver = new ServerHandler(createSocket(ip, port), true, receiveComms);
+            ServerHandler talker = new ServerHandler(createSocket(ip, port), false, talkComms);
+            handlers.add(receiver);
+            handlers.add(talker);
             receiver.start();
             talker.start();
-            listenForReceive();
             listenForReceive();
             this.isRunning = true;
         } catch (IOException e) {
             this.isRunning = false;
-            Snow.instance.getLog().error(e.getMessage());
+            Snow.instance.getLog().error("Error connecting to server: " + e.getMessage(), e);
         }
     }
 
@@ -47,42 +50,45 @@ public class ServerManager {
         new Thread(() -> {
             try {
                 while (isRunning) {
-                    this.receiveComm((out, in) -> {
-                        final SnowflakePacket packet = SnowflakePacket.fromId(in.readByte(), in);
+                    receiveComm((out, in) -> {
+                        SnowflakePacket packet = SnowflakePacket.fromId(in.readByte(), in);
                         if (packet instanceof KeepAlivePacket p) {
                             lastKeepAlive = p.getTimestamp();
                         }
                         packet.handle();
                     });
                     if (lastKeepAlive != 0 && System.currentTimeMillis() - lastKeepAlive > TimeUnit.SECONDS.toMillis(30)) {
-                        this.close();
+                        close();
                     }
                     Thread.sleep(10);
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                Thread.currentThread().interrupt();
+                Snow.instance.getLog().error("Receive thread interrupted: " + e.getMessage(), e);
             }
         }).start();
-
     }
 
     public boolean isConnected() {
         return isRunning;
     }
 
-    public void close() throws IOException {
-        for (ServerHandler thread : threads) {
-            thread.socket.close();
-            thread.isRunning = false;
+    public synchronized void close() {
+        if (!isRunning) return;
+        for (ServerHandler handler : handlers) {
+            try {
+                handler.socket.close();
+            } catch (IOException e) {
+                Snow.instance.getLog().error("Error closing socket: " + e.getMessage(), e);
+            }
+            handler.isRunning = false;
         }
+        handlers.clear();
         isRunning = false;
-        threads.clear();
     }
 
     public void receiveComm(Comm comm) throws InterruptedException {
-        receiveComms.add(new WrappedComm(comm, true));
+        receiveComms.add(comm);
         if (receiveComms.size() > 500) {
             for (int i = 0; i < 250; ++i) {
                 receiveComms.take();
@@ -90,48 +96,34 @@ public class ServerManager {
         }
     }
 
-    public void serializedComm(Comm comm) {
-        talkComms.add(new WrappedComm(comm, true));
+    public void sendComm(Comm comm) {
+        talkComms.add(comm);
     }
 
-    private static Socket connect(String ip, int port) throws IOException {
+    private static Socket createSocket(String ip, int port) throws IOException {
         Snow.instance.getLog().info("Connecting to snowflake");
         return new Socket(ip, port);
     }
 
     public void sendPacket(SnowflakePacket packet) {
-        this.serializedComm((out, in) -> {
+        sendComm((out, in) -> {
             packet.writeData(out);
             out.flush();
         });
     }
 
-
-    private static class WrappedComm {
-        Comm comm;
-        CompletableFuture<Boolean> done;
-        boolean serialized;
-
-        public WrappedComm(Comm comm, boolean serialized) {
-            this.comm = comm;
-            this.serialized = serialized;
-            this.done = new CompletableFuture<>();
-        }
-    }
-
     @FunctionalInterface
     public interface Comm {
-
         void run(DataOutputStream out, DataInputStream in) throws Exception;
     }
 
     private static class ServerHandler extends Thread {
         private final Socket socket;
-        private final LinkedBlockingQueue<WrappedComm> comms;
-        public boolean isRunning = false;
+        private final LinkedBlockingQueue<Comm> comms;
+        private boolean isRunning = false;
         private final boolean receiver;
 
-        public ServerHandler(Socket socket, boolean receiver, LinkedBlockingQueue<WrappedComm> comms) {
+        ServerHandler(Socket socket, boolean receiver, LinkedBlockingQueue<Comm> comms) {
             this.socket = socket;
             this.receiver = receiver;
             this.comms = comms;
@@ -139,38 +131,30 @@ public class ServerManager {
 
         @Override
         public void run() {
-            try {
+            try (DataOutputStream out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+                 DataInputStream in = new DataInputStream(new BufferedInputStream(socket.getInputStream()))) {
+
                 if (!receiver) {
                     Helper.addToast("Connected");
                 }
                 Snow.instance.getLog().info("Connected to snowflake");
                 this.isRunning = true;
-                DataOutputStream out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-                DataInputStream in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
 
                 out.writeBoolean(receiver);
-                // link receiver and talker
                 out.writeUTF(sharedSecret);
                 out.flush();
 
                 while (isRunning) {
-                    WrappedComm comm = comms.take();
-                    comm.comm.run(out, in);
-                    comm.done.complete(true);
+                    Comm comm = comms.take();
+                    comm.run(out, in);
                 }
-
-            } catch (Throwable th) {
-                th.printStackTrace();
-                Snow.getServerManager().isRunning = false;
-                isRunning = false;
+            } catch (Exception e) {
+                this.isRunning = false;
+                Snow.instance.getLog().info((receiver ? "Receiver" : "Sender") + " handler disconnected");
                 if (!receiver) {
                     Helper.addToast("Disconnected");
                 }
             }
-        }
-
-        public boolean isRunning() {
-            return this.isRunning;
         }
     }
 }

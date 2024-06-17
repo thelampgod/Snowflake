@@ -12,7 +12,6 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
@@ -20,7 +19,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 
-import java.io.IOException;
 
 import static com.github.thelampgod.snow.Helper.mc;
 
@@ -69,7 +67,6 @@ public class Snow implements ModInitializer {
         renderer = new WaypointRenderer();
         groupManager = new GroupManager();
         userManager = new UserManager();
-        serverManager = new ServerManager(IP, PORT);
     }
 
     public SnowScreen getOrCreateSnowScreen() {
@@ -82,12 +79,6 @@ public class Snow implements ModInitializer {
     private void shutdown() {
         LOGGER.info("Shutting down...");
         long now = System.currentTimeMillis();
-        try {
-            groupManager.save(serverManager.address);
-            serverManager.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         LOGGER.info("Shutdown in {}ms", System.currentTimeMillis() - now);
     }
 
@@ -114,10 +105,8 @@ public class Snow implements ModInitializer {
         return renderer;
     }
 
-    public void connect(String text) throws Exception {
+    public void connect(String address) {
         if (serverManager != null) {
-            groupManager.save(serverManager.address);
-
             serverManager.sendPacket(new DisconnectPacket());
             serverManager.close();
             serverManager = null;
@@ -130,10 +119,9 @@ public class Snow implements ModInitializer {
         }
         snowScreen.clear();
         snowScreen = null;
-        String[] parts = text.split(":");
+        String[] parts = address.split(":");
         if (parts.length < 2) return;
-        IP = parts[0];
-        PORT = Integer.parseInt(parts[1]);
-        getServerManager();
+        serverManager = new ServerManager(parts[0], Integer.parseInt(parts[1]));
+        serverManager.connect();
     }
 }
