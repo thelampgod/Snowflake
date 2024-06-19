@@ -82,7 +82,11 @@ public class Snow implements ModInitializer {
     private void shutdown() {
         LOGGER.info("Shutting down...");
         long now = System.currentTimeMillis();
-        identityManager.save();
+        try {
+            identityManager.save();
+        } catch (Exception e) {
+            Snow.instance.getLog().error("Error creating directories " + e.getMessage(), e);
+        }
         LOGGER.info("Shutdown in {}ms", System.currentTimeMillis() - now);
     }
 

@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
@@ -43,7 +44,12 @@ public class IdentityManager {
         return selectedIdentity;
     }
 
-    public void save() {
+    public void save() throws IOException {
+        Path path = Paths.get(IDENTITIES_PATH);
+        if (!path.toFile().exists()) {
+            Files.createDirectories(path);
+        }
+
         for (Map.Entry<String, Identity> entry : identityMap.entrySet()) {
             try (FileOutputStream os = new FileOutputStream(
                     IDENTITIES_PATH + "/" + entry.getKey() + ".key")) {
@@ -56,8 +62,13 @@ public class IdentityManager {
     }
 
     public void load() {
+        Path path = Paths.get(IDENTITIES_PATH);
+        if (!path.toFile().exists()) {
+            return;
+        }
+
         Snow.instance.getLog().debug("Loading identities...");
-        Arrays.stream(Paths.get(IDENTITIES_PATH).toFile().listFiles())
+        Arrays.stream(path.toFile().listFiles())
                 .filter(file -> file.getName().endsWith(".key"))
                 .forEach(keyFile -> {
                     try {
