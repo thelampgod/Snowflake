@@ -3,6 +3,7 @@ package com.github.thelampgod.snow;
 import com.github.thelampgod.snow.commands.impl.AuthenticateCommand;
 import com.github.thelampgod.snow.groups.GroupManager;
 import com.github.thelampgod.snow.gui.SnowScreen;
+import com.github.thelampgod.snow.identities.IdentityManager;
 import com.github.thelampgod.snow.packets.impl.DisconnectPacket;
 import com.github.thelampgod.snow.render.WaypointRenderer;
 import com.github.thelampgod.snow.users.UserManager;
@@ -34,6 +35,7 @@ public class Snow implements ModInitializer {
     private GroupManager groupManager;
     private UserManager userManager;
     private WaypointRenderer renderer;
+    private IdentityManager identityManager;
     private SnowScreen snowScreen;
     @Override
     public void onInitialize() {
@@ -64,6 +66,7 @@ public class Snow implements ModInitializer {
             }
         });
 
+        identityManager = new IdentityManager();
         renderer = new WaypointRenderer();
         groupManager = new GroupManager();
         userManager = new UserManager();
@@ -79,6 +82,7 @@ public class Snow implements ModInitializer {
     private void shutdown() {
         LOGGER.info("Shutting down...");
         long now = System.currentTimeMillis();
+        identityManager.save();
         LOGGER.info("Shutdown in {}ms", System.currentTimeMillis() - now);
     }
 
@@ -103,6 +107,10 @@ public class Snow implements ModInitializer {
 
     public WaypointRenderer getRenderer() {
         return renderer;
+    }
+
+    public IdentityManager getIdentityManager() {
+        return identityManager;
     }
 
     public void connect(String address) {

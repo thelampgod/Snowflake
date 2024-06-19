@@ -83,6 +83,7 @@ public class GroupManager {
     }
 
     public void load(String address) throws IOException {
+        //TODO: loadGroupsForIdentity(identity, address);
         final Path serverFolder = Paths.get(".snow", address.replaceAll(":", "\\_"));
 
         Path groupsPath = serverFolder.resolve("groups.txt");

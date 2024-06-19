@@ -14,8 +14,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
+import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
@@ -156,6 +158,29 @@ public class EncryptionUtil {
         final String generated = RandomStringUtils.random(16, 0, 0, true, true, null, new SecureRandom());
         System.out.println("generated " + generated);
         return generated.getBytes();
+    }
+
+    public static PrivateKey generateRsaPrivateKey() throws NoSuchAlgorithmException {
+        KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+        generator.initialize(2048);
+        KeyPair pair = generator.generateKeyPair();
+
+        return pair.getPrivate();
+    }
+
+    public static PrivateKey parseEncoded(byte[] encodedKey) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encodedKey);
+        return keyFactory.generatePrivate(keySpec);
+    }
+
+    public static PublicKey getPublicKeyFromPrivate(PrivateKey privateKey) throws InvalidKeySpecException, NoSuchAlgorithmException {
+        RSAPrivateCrtKey key = (RSAPrivateCrtKey)privateKey;
+
+        RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(key.getModulus(), key.getPublicExponent());
+
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        return keyFactory.generatePublic(publicKeySpec);
     }
 }
 
