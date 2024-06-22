@@ -5,6 +5,7 @@ import com.github.thelampgod.snow.Helper;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.packets.SnowflakePacket;
 import com.github.thelampgod.snow.packets.WrappedPacket;
+import com.github.thelampgod.snow.packets.impl.outgoing.GroupLeavePacket;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -70,7 +71,8 @@ public class EncryptedDataPacket extends SnowflakePacket {
                 packet.setSender(super.senderId);
                 packet.handle();
             } catch (Exception e) {
-                printModMessage("Failed to decrypt");
+                Snow.instance.getLog().error("Failed to decrypt (outdated password?) - leaving group: " + e.getMessage(), e);
+                Snow.getServerManager().sendPacket(new GroupLeavePacket(group.getId()));
                 e.printStackTrace();
             }
         }
