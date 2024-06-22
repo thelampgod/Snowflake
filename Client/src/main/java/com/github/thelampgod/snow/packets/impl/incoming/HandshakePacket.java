@@ -4,6 +4,7 @@ import com.github.thelampgod.snow.EncryptionUtil;
 import com.github.thelampgod.snow.Helper;
 import com.github.thelampgod.snow.ServerManager;
 import com.github.thelampgod.snow.Snow;
+import com.github.thelampgod.snow.identities.Identity;
 import com.github.thelampgod.snow.packets.SnowflakePacket;
 import com.github.thelampgod.snow.packets.impl.outgoing.HandshakeResponsePacket;
 import net.minecraft.network.encryption.NetworkEncryptionUtils;
@@ -30,11 +31,18 @@ public class HandshakePacket extends SnowflakePacket {
   @Override
   public void handle() {
     final ServerManager man = Snow.getServerManager();
+    final Identity identity = Snow.instance.getIdentityManager().getSelectedIdentity();
+    if (identity == null) {
+      Snow.instance.getLog().error("No identity selected");
+      man.close();
+      return;
+    }
+
     try {
-      final String decrypted = new String(EncryptionUtil.decrypt(encryptedSecret, Helper.getPrivateKey()));
+      final String decrypted = new String(EncryptionUtil.decrypt(encryptedSecret, identity.getPrivateKey()));
 
       System.out.println("Secret is " + decrypted);
-      man.sendPacket(new HandshakeResponsePacket(decrypted, mc.getSession().getUsername()));
+      man.sendPacket(new HandshakeResponsePacket(decrypted, identity.getName()));
     } catch (Exception e) {
         throw new RuntimeException(e);
     }

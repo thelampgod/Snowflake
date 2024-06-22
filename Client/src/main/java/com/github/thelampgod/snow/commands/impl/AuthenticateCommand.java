@@ -66,7 +66,7 @@ public class AuthenticateCommand {
 
     private static int authenticate(CommandContext<FabricClientCommandSource> ctx) {
         try {
-            PublicKey pub = mc.getProfileKeys().fetchKeyPair().get().get().publicKey().data().key();
+            PublicKey pub = Helper.getPublicKey();
             Snow.getServerManager().sendPacket(new LoginStartPacket(
                     EncryptionUtil.asciiArmored(pub)));
         } catch (Exception e) {

@@ -15,12 +15,12 @@ public class Helper {
 
     public static MinecraftClient mc = MinecraftClient.getInstance();
 
-    public static PrivateKey getPrivateKey() throws ExecutionException, InterruptedException {
-        return mc.getProfileKeys().fetchKeyPair().get().get().privateKey();
+    public static PrivateKey getPrivateKey() {
+        return Snow.instance.getIdentityManager().getSelectedIdentity().getPrivateKey();
     }
 
-    public static PublicKey getPublicKey() throws ExecutionException, InterruptedException {
-        return mc.getProfileKeys().fetchKeyPair().get().get().publicKey().data().key();
+    public static PublicKey getPublicKey() {
+        return Snow.instance.getIdentityManager().getSelectedIdentity().getPublicKey();
     }
 
     public static void printModMessage(String msg) {
