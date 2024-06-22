@@ -36,7 +36,18 @@ public class SnowScreen extends Screen {
     }
 
     public void clear() {
-        windowList.clear();
+        for (int i = windowList.size() - 1; i >= 0; --i) {
+            SnowWindow window = windowList.get(i);
+
+            if (!(window instanceof ConnectWindow
+                    || window instanceof GroupListWindow
+                    || window instanceof UserListWindow)) {
+                this.remove(window);
+                return;
+            }
+
+            window.clear();
+        }
     }
 
     @Override
