@@ -26,7 +26,8 @@ public class UserRemoveFromGroupListWindow extends ListWindow {
         updateButtons();
     }
 
-    private void updateButtons() {
+    @Override
+    public void updateButtons() {
         final Set<Integer> users = group.getUsers();
         int j = 0;
         for (final int userId : users) {

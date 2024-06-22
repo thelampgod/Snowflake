@@ -28,7 +28,8 @@ public class UserAddToGroupListWindow extends ListWindow {
         updateButtons();
     }
 
-    private void updateButtons() {
+    @Override
+    public void updateButtons() {
         final List<User> users = Snow.instance.getUserManager().getUsers();
         int j = 0;
         for (final User user : users) {

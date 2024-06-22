@@ -71,6 +71,7 @@ public class GroupListWindow extends ListWindow {
         }
     }
 
+    @Override
     public void updateButtons() {
         if (!hasInit) return;
         buttonListElement.clearButtons();

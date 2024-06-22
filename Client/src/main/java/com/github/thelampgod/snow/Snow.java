@@ -81,6 +81,9 @@ public class Snow implements ModInitializer {
         long now = System.currentTimeMillis();
         try {
             identityManager.save();
+            if (serverManager != null) {
+                serverManager.close();
+            }
         } catch (Exception e) {
             this.getLog().error("Error creating directories " + e.getMessage(), e);
         }

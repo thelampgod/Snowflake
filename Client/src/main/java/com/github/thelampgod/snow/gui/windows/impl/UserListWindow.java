@@ -19,6 +19,7 @@ public class UserListWindow extends ListWindow {
         updateButtons();
     }
 
+    @Override
     public void updateButtons() {
         if (!hasInit) return;
         buttonListElement.clearButtons();

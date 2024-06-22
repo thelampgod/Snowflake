@@ -23,8 +23,10 @@ public class IdentityManager {
 
     public IdentityManager() {
         this.load();
-        if (this.select(mc.getSession().getUsername()) == null) {
-            this.add(mc.getSession().getUsername());
+        String sessionName = mc.getSession().getUsername();
+        if (this.select(sessionName) == null) {
+            this.add(sessionName);
+            this.select(sessionName);
         }
     }
 
@@ -67,7 +69,7 @@ public class IdentityManager {
 
                 os.write(entry.getValue().getPrivateKey().getEncoded());
             } catch (IOException e) {
-                Snow.instance.getLog().error("Error saving identity " + e.getMessage(), e);
+                Snow.instance.getLog().error("Error saving identity: " + e.getMessage(), e);
             }
         }
     }
@@ -85,14 +87,14 @@ public class IdentityManager {
                 .filter(file -> file.getName().endsWith(".key"))
                 .forEach(keyFile -> {
                     try {
-                        String name = keyFile.getName();
+                        String name = keyFile.getName().substring(0, keyFile.getName().length() - 4);
                         byte[] keyBytes = Files.readAllBytes(keyFile.toPath());
 
                         Identity identity = new Identity(name, keyBytes);
                         identityMap.put(name, identity);
                         Snow.instance.getLog().debug("Loaded " + name);
                     } catch (Exception e) {
-                        Snow.instance.getLog().error("Error loading identity " + e.getMessage(), e);
+                        Snow.instance.getLog().error("Error loading identity: " + e.getMessage(), e);
                     }
                 });
     }

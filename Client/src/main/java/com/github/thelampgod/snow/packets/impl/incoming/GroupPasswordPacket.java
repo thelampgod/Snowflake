@@ -1,18 +1,14 @@
 package com.github.thelampgod.snow.packets.impl.incoming;
 
+import com.github.thelampgod.snow.EncryptionUtil;
 import com.github.thelampgod.snow.Helper;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.groups.Group;
 import com.github.thelampgod.snow.packets.SnowflakePacket;
-import net.minecraft.network.encryption.NetworkEncryptionException;
-import net.minecraft.network.encryption.NetworkEncryptionUtils;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-
-import static com.github.thelampgod.snow.Helper.printModMessage;
 
 public class GroupPasswordPacket extends SnowflakePacket {
 
@@ -34,11 +30,10 @@ public class GroupPasswordPacket extends SnowflakePacket {
         final Group group = Snow.instance.getGroupManager().get(groupId);
 
         try {
-            final byte[] password = NetworkEncryptionUtils.decrypt(Helper.getPrivateKey(), encryptedPassword);
+            final byte[] password = EncryptionUtil.decrypt(encryptedPassword, Helper.getPrivateKey());
             group.setPassword(password);
-        } catch (NetworkEncryptionException | ExecutionException | InterruptedException e) {
-            printModMessage("Couldn't decrypt");
-            e.printStackTrace();
+        } catch (Exception e) {
+            Snow.instance.getLog().error("Failed to decrypt group password: " + e.getMessage(), e);
         }
     }
 }
