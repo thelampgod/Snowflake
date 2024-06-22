@@ -4,7 +4,6 @@ import com.github.thelampgod.snow.commands.impl.AuthenticateCommand;
 import com.github.thelampgod.snow.groups.GroupManager;
 import com.github.thelampgod.snow.gui.SnowScreen;
 import com.github.thelampgod.snow.identities.IdentityManager;
-import com.github.thelampgod.snow.packets.impl.DisconnectPacket;
 import com.github.thelampgod.snow.render.WaypointRenderer;
 import com.github.thelampgod.snow.users.UserManager;
 import net.fabricmc.api.EnvType;
@@ -20,8 +19,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 
-
-import static com.github.thelampgod.snow.Helper.mc;
 
 @Environment(EnvType.CLIENT)
 public class Snow implements ModInitializer {
@@ -85,7 +82,7 @@ public class Snow implements ModInitializer {
         try {
             identityManager.save();
         } catch (Exception e) {
-            Snow.instance.getLog().error("Error creating directories " + e.getMessage(), e);
+            this.getLog().error("Error creating directories " + e.getMessage(), e);
         }
         LOGGER.info("Shutdown in {}ms", System.currentTimeMillis() - now);
     }
@@ -119,21 +116,33 @@ public class Snow implements ModInitializer {
 
     public void connect(String address) {
         if (serverManager != null) {
-            serverManager.sendPacket(new DisconnectPacket());
             serverManager.close();
-            serverManager = null;
         }
-        groupManager.clear();
-        userManager.clear();
-        renderer.clear();
-        if (mc.currentScreen instanceof SnowScreen screen) {
-            screen.close();
-        }
-        snowScreen.clear();
-        snowScreen = null;
+
         String[] parts = address.split(":");
         if (parts.length < 2) return;
         serverManager = new ServerManager(parts[0], Integer.parseInt(parts[1]));
         serverManager.connect();
+    }
+
+    public void save(String address) {
+        snowScreen.clear();
+        try {
+            groupManager.save(address);
+        } catch (Exception e) {
+            this.getLog().error("Error creating directories: " + e.getMessage(), e);
+        }
+        groupManager.clear();
+        //TODO: save user keys and notify if theres a change (evil server?)
+        userManager.clear();
+        renderer.clear();
+    }
+
+    public void load(String address) {
+        try {
+            groupManager.load(address);
+        } catch (Exception e) {
+            this.getLog().error("Error decrypting group passwords: " + e.getMessage(), e);
+        }
     }
 }

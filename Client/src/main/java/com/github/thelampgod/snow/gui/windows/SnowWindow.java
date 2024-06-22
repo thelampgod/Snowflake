@@ -176,6 +176,10 @@ public abstract class SnowWindow {
         }
     }
 
+    public void clear() {
+
+    }
+
     public void addHeaderButton(String icon, int fontHeight, String tooltip, Runnable runnable) {
         headerButtons.add(new TextButton(icon,
                 getWidth() - (padding + size) * (headerButtons.size() + 1),

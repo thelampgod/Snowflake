@@ -1,6 +1,7 @@
 package com.github.thelampgod.snow;
 
 import com.github.thelampgod.snow.packets.SnowflakePacket;
+import com.github.thelampgod.snow.packets.impl.DisconnectPacket;
 import com.github.thelampgod.snow.packets.impl.KeepAlivePacket;
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -40,6 +41,7 @@ public class ServerManager {
             talker.start();
             listenForReceive();
             this.isRunning = true;
+            Snow.instance.load(this.ip + ":" + this.port);
         } catch (IOException e) {
             this.isRunning = false;
             Snow.instance.getLog().error("Error connecting to server: " + e.getMessage(), e);
@@ -75,6 +77,7 @@ public class ServerManager {
 
     public synchronized void close() {
         if (!isRunning) return;
+        this.sendPacket(new DisconnectPacket());
         for (ServerHandler handler : handlers) {
             try {
                 handler.socket.close();
@@ -85,6 +88,7 @@ public class ServerManager {
         }
         handlers.clear();
         isRunning = false;
+        Snow.instance.save(this.ip + ":" + this.port);
     }
 
     public void receiveComm(Comm comm) throws InterruptedException {

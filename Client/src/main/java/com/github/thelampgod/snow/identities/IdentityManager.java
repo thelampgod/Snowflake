@@ -3,6 +3,7 @@ package com.github.thelampgod.snow.identities;
 import com.github.thelampgod.snow.Snow;
 import com.google.common.collect.Maps;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -67,8 +68,10 @@ public class IdentityManager {
             return;
         }
 
+        File[] files = path.toFile().listFiles();
+        if (files == null) return;
         Snow.instance.getLog().debug("Loading identities...");
-        Arrays.stream(path.toFile().listFiles())
+        Arrays.stream(files)
                 .filter(file -> file.getName().endsWith(".key"))
                 .forEach(keyFile -> {
                     try {

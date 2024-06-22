@@ -13,15 +13,6 @@ public class UserManager {
     private final List<User> users = Lists.newArrayList();
     private int me;
 
-    public UserManager() {
-        users.add(new User("l_amp", 0,null));
-        users.add(new User("Negative_Entropy", 1,null));
-        users.add(new User("munmap", 2,null));
-        users.add(new User("IronException", 3,null));
-        users.add(new User("n0pf0x", 4,null));
-
-    }
-
     public void clear() {
         users.clear();
     }
