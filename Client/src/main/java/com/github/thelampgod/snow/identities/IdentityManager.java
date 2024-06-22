@@ -12,6 +12,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
 
+import static com.github.thelampgod.snow.Helper.mc;
+
 public class IdentityManager {
     private final Map<String, Identity> identityMap = Maps.newHashMap();
 
@@ -21,15 +23,23 @@ public class IdentityManager {
 
     public IdentityManager() {
         this.load();
+        if (this.select(mc.getSession().getUsername()) == null) {
+            this.add(mc.getSession().getUsername());
+        }
     }
 
-    public void add(String name) throws Exception {
+    public void add(String name) {
         if (identityMap.values().stream()
                 .anyMatch(identity -> identity.getName().equalsIgnoreCase(name))) {
-            throw new Exception("Duplicate name not allowed");
+            Snow.instance.getLog().error("Duplicate name not allowed: " + name);
+            return;
         }
 
-        identityMap.put(name.toLowerCase(), new Identity(name));
+        try {
+            identityMap.put(name.toLowerCase(), new Identity(name));
+        } catch (Exception e) {
+            Snow.instance.getLog().error("Failed to generate keypair: " + e.getMessage(), e);
+        }
     }
 
     public void remove(String name) {
