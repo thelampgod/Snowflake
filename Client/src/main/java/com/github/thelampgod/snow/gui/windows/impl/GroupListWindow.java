@@ -34,6 +34,7 @@ public class GroupListWindow extends ListWindow {
     public void updateDimensions() {
         super.updateDimensions();
         newGroupField.setWidth(getWidth());
+        buttonListElement.setHeight(getHeight() - headerHeight - 20);
     }
 
     @Override

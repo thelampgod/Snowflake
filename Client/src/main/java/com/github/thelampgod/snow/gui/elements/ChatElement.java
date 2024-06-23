@@ -22,7 +22,6 @@ public class ChatElement {
     private final TextRenderer textRenderer;
 
     private int scrollPosition = 0;
-    private static final int SCROLL_SPEED = 9;
 
     public ChatElement(TextRenderer textRenderer, int x, int y, int height, int width) {
         this.textRenderer = textRenderer;
@@ -73,7 +72,7 @@ public class ChatElement {
         int messageHeight = getHeight(messages);
         if (messageHeight < height) return;
 
-        int diff = (messageHeight - height) / textRenderer.fontHeight + 3;
+        int diff = (messageHeight - height) / textRenderer.fontHeight + PADDING;
 
         scrollPosition += (verticalAmount < 0 ? 1 : -1);
         scrollPosition = MathHelper.clamp(scrollPosition, 0, diff);
