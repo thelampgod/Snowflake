@@ -38,32 +38,30 @@ public class DropdownListElement {
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         String selectedIdentityName = Snow.instance.getIdentityManager().getSelectedIdentityName();
         if (!dropdownOpened) {
-            options.get(selectedIdentityName)
-                    .render(ctx, mouseX, mouseY, 0);
+            options.get(selectedIdentityName).render(ctx, mouseX, mouseY, 0);
             return;
         }
 
         AtomicInteger yIndex = new AtomicInteger();
         options.values().stream()
                 .sorted(Comparator.comparing(
-                        OptionButton::getName,
-                        Comparator.comparing(s -> Objects.equals(s, selectedIdentityName)))
+                                OptionButton::getName,
+                                Comparator.comparing(s -> Objects.equals(s, selectedIdentityName)))
                         .reversed())
-                        .forEach(button -> button.render(ctx, mouseX, mouseY, yIndex.getAndIncrement()));
+                .forEach(button -> button.render(ctx, mouseX, mouseY, yIndex.getAndIncrement()));
     }
-
 
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (dropdownOpened) {
             // select mode
             String selectedIdentityName = Snow.instance.getIdentityManager().getSelectedIdentityName();
-            AtomicInteger y = new AtomicInteger();
+            AtomicInteger yIndex = new AtomicInteger();
             options.values().stream()
                     .sorted(Comparator.comparing(
                                     OptionButton::getName,
                                     Comparator.comparing(s -> Objects.equals(s, selectedIdentityName)))
                             .reversed())
-                    .forEach(b -> b.mouseClicked(mouseX, mouseY, y.getAndIncrement()));
+                    .forEach(b -> b.mouseClicked(mouseX, mouseY, yIndex.getAndIncrement()));
             dropdownOpened = false;
             return true;
         }
@@ -78,47 +76,43 @@ public class DropdownListElement {
         return mouseX - x > 0 && mouseX - x < width && mouseY - y > 0 && mouseY - y < height;
     }
 
-
     private class OptionButton {
         private final String name;
         private final Runnable onSelect;
+
         public OptionButton(String name, Runnable onSelect) {
             this.name = name;
             this.onSelect = onSelect;
         }
 
         public void render(DrawContext ctx, int mouseX, int mouseY, int yIndex) {
-            int tempY = y;
-            y += yIndex * height;
-            boolean hovered = mouseHover(mouseX, mouseY, y);
+            int buttonY = y + yIndex * height;
+            boolean hovered = mouseHover(mouseX, mouseY, buttonY);
 
             // Border
-            ctx.fill(x,y,x+width,y+height, Color.LIGHT_GRAY.getRGB());
+            ctx.fill(x, buttonY, x + width, buttonY + height, Color.LIGHT_GRAY.getRGB());
             // Background
-            ctx.fill(x+1,y+1, x + width - 1, y + height - 1, hovered ? Color.LIGHT_GRAY.getRGB() : Color.BLACK.getRGB());
+            ctx.fill(x + 1, buttonY + 1, x + width - 1, buttonY + height - 1, hovered ? Color.LIGHT_GRAY.getRGB() : Color.BLACK.getRGB());
             // Option name
             ctx.drawText(textRenderer,
                     name,
                     x + 3,
-                    y + (height - textRenderer.fontHeight) / 2,
+                    buttonY + (height - textRenderer.fontHeight) / 2,
                     name.equals(Snow.instance.getIdentityManager().getSelectedIdentityName())
                             ? Color.ORANGE.getRGB()
                             : Color.WHITE.getRGB(),
                     true);
-            y = tempY;
         }
 
-        private boolean mouseHover(double mouseX, double mouseY, int by) {
-            return mouseX - x > 0 && mouseX - x < width && mouseY - by > 0 && mouseY - by < height;
+        private boolean mouseHover(double mouseX, double mouseY, int buttonY) {
+            return mouseX - x > 0 && mouseX - x < width && mouseY - buttonY > 0 && mouseY - buttonY < height;
         }
 
         public void mouseClicked(double mouseX, double mouseY, int yIndex) {
-            int tempY = y;
-            y += yIndex * height;
-            if (mouseHover(mouseX, mouseY, y)) {
+            int buttonY = y + yIndex * height;
+            if (mouseHover(mouseX, mouseY, buttonY)) {
                 onSelect.run();
             }
-            y = tempY;
         }
 
         public String getName() {

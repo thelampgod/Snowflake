@@ -149,6 +149,11 @@ public class SnowScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (!Snow.getServerManager().isConnected()) {
+            connectWindow.mouseClicked(mouseX, mouseY, button);
+            return true;
+        }
+
         for (int i = windowList.size() - 1; i >= 0; i--) {
             SnowWindow liveWindow = windowList.get(i);
             if (liveWindow.cursorInWindow(mouseX, mouseY)) {

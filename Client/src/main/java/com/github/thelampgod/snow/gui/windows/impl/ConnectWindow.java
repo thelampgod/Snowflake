@@ -15,7 +15,6 @@ import net.minecraft.text.Text;
 
 import static com.github.thelampgod.snow.Helper.mc;
 
-
 public class ConnectWindow extends SnowWindow {
 
 
@@ -34,23 +33,24 @@ public class ConnectWindow extends SnowWindow {
         super.init(getWidth(), getHeight());
 
         int x = (width - 100) / 2;
-        int y = height / 2;
-        this.ipField = new TextFieldWidget(textRenderer, x, y - 8, 100, 17, Text.empty());
+        this.ipField = new TextFieldWidget(textRenderer, x, 0, 100, 17, Text.empty());
         this.ipField.setMaxLength(256);
         this.ipField.setFocused(true);
-        this.ipField.setText("127.0.0.1:2147");
-        this.identitiesDropdown = new DropdownListElement(textRenderer, x, y + 9, 100, 17);
+        this.ipField.setText(savedIp);
+
+        this.identitiesDropdown = new DropdownListElement(textRenderer, x, 17, 100, 17);
         IdentityManager identities = Snow.instance.getIdentityManager();
         for (Identity identity : identities.getIdentities()) {
             this.identitiesDropdown.addOption(identity.getName(), () -> identities.select(identity.getName()));
         }
 
-        this.connectButton = new SnowButton(textRenderer, "Connect", x,y + 9 + 17,100,17, this::connect);
+        this.connectButton = new SnowButton(textRenderer, "Connect", x, 17 * 2, 100, 17, this::connect);
     }
 
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         connectButton.render(ctx, (int) (mouseX - x), (int) (mouseY - y), delta);
         connectButton.setTitle("Disconnect");
+
         if (!Snow.getServerManager().isConnected()) {
             // Move window to the center of the screen
             this.x = (SnowScreen.scaledWidth - this.width) / 2;
@@ -64,7 +64,6 @@ public class ConnectWindow extends SnowWindow {
             this.y = SnowScreen.scaledHeight - height - 17 - 3;
         }
     }
-
 
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
         super.keyPressed(keyCode, scanCode, modifiers);
@@ -87,7 +86,6 @@ public class ConnectWindow extends SnowWindow {
         if (identitiesDropdown.mouseClicked(mouseX - x, mouseY - y, button)) return;
         connectButton.mouseClicked(mouseX - x, mouseY - y, button);
     }
-
 
     private void connect() {
         if (!Snow.getServerManager().isConnected()) {
