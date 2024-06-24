@@ -37,7 +37,7 @@ public class GroupWindow extends ChatWindow {
         }
 
         addHeaderButton("!", 7, "Start Location Share",
-                () -> mc.setScreen(new SnowConfirmScreen("Start location share with " + this.group.getName() + "?",
+                () -> mc.setScreen(new SnowConfirmScreen("Start location share with \"" + this.group.getName() + "\"?",
                         () -> this.startSharingTo(group))));
     }
 
