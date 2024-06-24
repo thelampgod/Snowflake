@@ -4,6 +4,7 @@ import com.github.thelampgod.snow.DrawUtil;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.users.User;
 import com.google.common.collect.Maps;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
@@ -50,6 +51,7 @@ public class WaypointRenderer {
         for (Map.Entry<Integer, PositionData> entry : toRender.entrySet()) {
             final PositionData position = transformPosition(entry.getValue());
             final User user = Snow.instance.getUserManager().get(entry.getKey());
+            if (user == null) return;
             final Vec3d renderPos = camera.getPos();
 
             double angle = Math.atan2(position.z - renderPos.z, position.x - renderPos.x);
@@ -97,6 +99,7 @@ public class WaypointRenderer {
         Vec3d pos = camera.getPos();
 
         double distance = Math.sqrt(dispatcher.getSquaredDistanceToCamera(x + pos.x, y + pos.y, z + pos.z));
+        String distanceString = String.format("%.2f", distance) + "m";
 
         float scale = (float) MathHelper.clamp(distance * 0.03f / 10, 0.03, Double.MAX_VALUE);
         stack.scale(-scale, -scale, scale);
@@ -106,6 +109,10 @@ public class WaypointRenderer {
         final float nameWidth = (float) mc.textRenderer.getWidth(text) / 2;
         Color color = new Color(-1);
         mc.textRenderer.drawWithOutline(Text.literal(text).asOrderedText(), -nameWidth, 0, color.getRGB(), new Color(0,0,0,0).getRGB(), matrix, consumers, 255);
+        final float distanceWidth = (float) mc.textRenderer.getWidth(distanceString) / 2;
+        mc.textRenderer.draw(distanceString, -distanceWidth, mc.textRenderer.fontHeight,
+                Color.WHITE.getRGB(), false, matrix, consumers, TextRenderer.TextLayerType.SEE_THROUGH,
+                0,255);
         stack.pop();
 
     }

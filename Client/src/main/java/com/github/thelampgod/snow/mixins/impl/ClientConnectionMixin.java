@@ -1,6 +1,7 @@
 package com.github.thelampgod.snow.mixins.impl;
 
 import com.github.thelampgod.snow.Snow;
+import com.github.thelampgod.snow.waypoints.share.WaypointSharer;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.PacketCallbacks;
 import net.minecraft.network.packet.Packet;
@@ -18,7 +19,9 @@ public class ClientConnectionMixin {
         if (packet instanceof PlayerMoveC2SPacket.PositionAndOnGround
         || packet instanceof PlayerMoveC2SPacket.Full) {
             PlayerMoveC2SPacket p = (PlayerMoveC2SPacket) packet;
-            Snow.instance.getSharer().onLocationSend(p);
+            WaypointSharer sharer = Snow.instance.getSharer();
+            if (sharer == null) return;
+            sharer.onLocationSend(p);
         }
     }
 }
