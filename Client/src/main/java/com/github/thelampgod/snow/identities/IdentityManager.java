@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 
 import static com.github.thelampgod.snow.Helper.mc;
@@ -57,17 +58,21 @@ public class IdentityManager {
         return selectedIdentity;
     }
 
+    public Collection<Identity> getIdentities() {
+        return identityMap.values();
+    }
+
     public void save() throws IOException {
         Path path = Paths.get(IDENTITIES_PATH);
         if (!path.toFile().exists()) {
             Files.createDirectories(path);
         }
 
-        for (Map.Entry<String, Identity> entry : identityMap.entrySet()) {
+        for (Identity identity : identityMap.values()) {
             try (FileOutputStream os = new FileOutputStream(
-                    IDENTITIES_PATH + "/" + entry.getKey() + ".key")) {
+                    IDENTITIES_PATH + "/" + identity.getName() + ".key")) {
 
-                os.write(entry.getValue().getPrivateKey().getEncoded());
+                os.write(identity.getPrivateKey().getEncoded());
             } catch (IOException e) {
                 Snow.instance.getLog().error("Error saving identity: " + e.getMessage(), e);
             }
@@ -91,7 +96,7 @@ public class IdentityManager {
                         byte[] keyBytes = Files.readAllBytes(keyFile.toPath());
 
                         Identity identity = new Identity(name, keyBytes);
-                        identityMap.put(name, identity);
+                        identityMap.put(name.toLowerCase(), identity);
                         Snow.instance.getLog().debug("Loaded " + name);
                     } catch (Exception e) {
                         Snow.instance.getLog().error("Error loading identity: " + e.getMessage(), e);

@@ -129,6 +129,7 @@ public class Snow implements ModInitializer {
             serverManager = new ServerManager(parts[0], Integer.parseInt(parts[1]));
             serverManager.connect();
         } catch (Exception e) {
+            Helper.addToast("Couldn't connect to server");
             this.getLog().error("Error parsing IP: " + e.getMessage(), e);
         }
     }

@@ -2,8 +2,11 @@ package com.github.thelampgod.snow.gui.windows.impl;
 
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.gui.SnowScreen;
+import com.github.thelampgod.snow.gui.elements.DropdownListElement;
 import com.github.thelampgod.snow.gui.elements.SnowButton;
 import com.github.thelampgod.snow.gui.windows.SnowWindow;
+import com.github.thelampgod.snow.identities.Identity;
+import com.github.thelampgod.snow.identities.IdentityManager;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
@@ -21,6 +24,7 @@ public class ConnectWindow extends SnowWindow {
 
     private TextFieldWidget ipField;
     private SnowButton connectButton;
+    private DropdownListElement identitiesDropdown;
 
     public ConnectWindow(int width, int height) {
         super("Connect", width, height, false);
@@ -36,6 +40,14 @@ public class ConnectWindow extends SnowWindow {
         this.ipField.setFocused(true);
         this.ipField.setText("127.0.0.1:2147");
         this.connectButton = new SnowButton(textRenderer, "Connect", x,y + 9,100,17, this::connect);
+        this.identitiesDropdown = new DropdownListElement(textRenderer, x, y + 9 + 17, 100, 17);
+        IdentityManager identities = Snow.instance.getIdentityManager();
+        for (Identity identity : identities.getIdentities()) {
+            this.identitiesDropdown.addOption(identity.getName(), () -> {
+                identities.select(identity.getName());
+                System.out.println("selected " + identity.getName());
+            });
+        }
     }
 
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
@@ -45,6 +57,7 @@ public class ConnectWindow extends SnowWindow {
             this.x = (SnowScreen.scaledWidth - this.width) / 2;
             this.y = (SnowScreen.scaledHeight - this.height) / 2;
             ipField.render(ctx, mouseX, mouseY, delta);
+            identitiesDropdown.render(ctx, (int) (mouseX - x), (int) (mouseY - y), delta);
             connectButton.setTitle("Connect");
         } else {
             // Move window to the bottom right corner of the screen
@@ -75,6 +88,7 @@ public class ConnectWindow extends SnowWindow {
 
     public void mouseClicked(double mouseX, double mouseY, int button) {
         connectButton.mouseClicked(mouseX - x, mouseY - y, button);
+        identitiesDropdown.mouseClicked(mouseX - x, mouseY - y, button);
     }
 
 
