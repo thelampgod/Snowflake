@@ -53,6 +53,7 @@ public class GroupManager {
     }
 
     public void save(String address) throws IOException {
+        if (groups.isEmpty()) return;
         final Path serverFolder = Paths.get(SERVERS_PATH, address.replaceAll(":", "\\_"));
 
         if (!serverFolder.toFile().exists()) {
