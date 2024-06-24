@@ -1,10 +1,7 @@
 package com.github.thelampgod.snow.packets.impl;
 
 import com.github.thelampgod.snow.Snow;
-import com.github.thelampgod.snow.groups.Group;
 import com.github.thelampgod.snow.packets.WrappedPacket;
-import com.github.thelampgod.snow.render.WaypointRenderer;
-import com.github.thelampgod.snow.users.User;
 
 import java.nio.charset.StandardCharsets;
 

@@ -1,7 +1,6 @@
 package com.github.thelampgod.snow.mixins.impl;
 
 import com.github.thelampgod.snow.Snow;
-import com.github.thelampgod.snow.render.WaypointRenderer;
 import net.minecraft.client.MinecraftClient;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

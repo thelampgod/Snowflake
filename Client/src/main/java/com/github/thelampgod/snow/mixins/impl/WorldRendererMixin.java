@@ -1,7 +1,6 @@
 package com.github.thelampgod.snow.mixins.impl;
 
 import com.github.thelampgod.snow.Snow;
-import com.github.thelampgod.snow.render.WaypointRenderer;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.LightmapTextureManager;

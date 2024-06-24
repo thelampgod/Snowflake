@@ -2,9 +2,12 @@ package com.github.thelampgod.snow.gui.windows.impl;
 
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.groups.Group;
+import com.github.thelampgod.snow.gui.SnowConfirmScreen;
 import com.github.thelampgod.snow.gui.SnowScreen;
 import com.github.thelampgod.snow.gui.windows.SnowWindow;
 import com.github.thelampgod.snow.packets.impl.outgoing.GroupLeavePacket;
+
+import static com.github.thelampgod.snow.Helper.mc;
 
 public class GroupWindow extends ChatWindow {
     private final Group group;
@@ -34,7 +37,13 @@ public class GroupWindow extends ChatWindow {
         }
 
         addHeaderButton("!", 7, "Start Location Share",
-                () -> System.out.println()); //TODO: confirmation screen
+                () -> mc.setScreen(new SnowConfirmScreen("Start location share with " + this.group.getName() + "?",
+                        () -> this.startSharingTo(group))));
+    }
+
+    private void startSharingTo(Group group) {
+//        Snow.instance.getSharer().select(group);
+        mc.setScreen(Snow.instance.getOrCreateSnowScreen());
     }
 
     private UserRemoveFromGroupListWindow getRemoveWindow(Group group) {

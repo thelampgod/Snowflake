@@ -1,4 +1,4 @@
-package com.github.thelampgod.snow.render;
+package com.github.thelampgod.snow.waypoints.render;
 
 import com.github.thelampgod.snow.DrawUtil;
 import com.github.thelampgod.snow.Snow;

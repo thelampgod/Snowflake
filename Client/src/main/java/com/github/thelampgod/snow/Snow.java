@@ -4,7 +4,7 @@ import com.github.thelampgod.snow.commands.impl.AuthenticateCommand;
 import com.github.thelampgod.snow.groups.GroupManager;
 import com.github.thelampgod.snow.gui.SnowScreen;
 import com.github.thelampgod.snow.identities.IdentityManager;
-import com.github.thelampgod.snow.render.WaypointRenderer;
+import com.github.thelampgod.snow.waypoints.render.WaypointRenderer;
 import com.github.thelampgod.snow.users.UserManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
