@@ -6,6 +6,7 @@ import com.github.thelampgod.snow.gui.SnowScreen;
 import com.github.thelampgod.snow.identities.IdentityManager;
 import com.github.thelampgod.snow.waypoints.render.WaypointRenderer;
 import com.github.thelampgod.snow.users.UserManager;
+import com.github.thelampgod.snow.waypoints.share.WaypointSharer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
@@ -32,6 +33,7 @@ public class Snow implements ModInitializer {
     private GroupManager groupManager;
     private UserManager userManager;
     private WaypointRenderer renderer;
+    private WaypointSharer sharer;
     private IdentityManager identityManager;
     private SnowScreen snowScreen;
     @Override
@@ -65,6 +67,7 @@ public class Snow implements ModInitializer {
 
         identityManager = new IdentityManager();
         renderer = new WaypointRenderer();
+        sharer = new WaypointSharer();
         groupManager = new GroupManager();
         userManager = new UserManager();
     }
@@ -117,6 +120,10 @@ public class Snow implements ModInitializer {
         return identityManager;
     }
 
+    public WaypointSharer getSharer() {
+        return sharer;
+    }
+
     public void connect(String address) {
         if (serverManager != null) {
             serverManager.close();
@@ -145,6 +152,7 @@ public class Snow implements ModInitializer {
         //TODO: save user keys and notify if theres a change (evil server?)
         userManager.clear();
         renderer.clear();
+        sharer.clear();
     }
 
     public void load(String address) {

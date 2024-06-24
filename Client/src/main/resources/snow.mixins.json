@@ -4,6 +4,7 @@
   "package": "com.github.thelampgod.snow.mixins",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "impl.ClientConnectionMixin"
   ],
   "client": [
     "impl.DrawContextMixin",

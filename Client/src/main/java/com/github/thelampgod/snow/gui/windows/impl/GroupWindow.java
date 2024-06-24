@@ -42,7 +42,7 @@ public class GroupWindow extends ChatWindow {
     }
 
     private void startSharingTo(Group group) {
-//        Snow.instance.getSharer().select(group);
+        Snow.instance.getSharer().select(group);
         mc.setScreen(Snow.instance.getOrCreateSnowScreen());
     }
 
