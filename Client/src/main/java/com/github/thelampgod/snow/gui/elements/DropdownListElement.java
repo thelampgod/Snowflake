@@ -43,16 +43,13 @@ public class DropdownListElement {
             return;
         }
 
-        AtomicInteger y = new AtomicInteger();
+        AtomicInteger yIndex = new AtomicInteger();
         options.values().stream()
                 .sorted(Comparator.comparing(
                         OptionButton::getName,
                         Comparator.comparing(s -> Objects.equals(s, selectedIdentityName)))
                         .reversed())
-                        .forEach(button -> button.render(ctx, mouseX, mouseY, y.getAndIncrement()));
-
-        // Border
-
+                        .forEach(button -> button.render(ctx, mouseX, mouseY, yIndex.getAndIncrement()));
     }
 
 
@@ -93,6 +90,9 @@ public class DropdownListElement {
             int tempY = y;
             y += yIndex * height;
             boolean hovered = mouseHover(mouseX, mouseY, y);
+
+            // Border
+            ctx.fill(x,y,x+width,y+height, Color.LIGHT_GRAY.getRGB());
             // Background
             ctx.fill(x+1,y+1, x + width - 1, y + height - 1, hovered ? Color.LIGHT_GRAY.getRGB() : Color.BLACK.getRGB());
             // Option name

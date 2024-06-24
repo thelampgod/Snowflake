@@ -43,10 +43,7 @@ public class ConnectWindow extends SnowWindow {
         this.identitiesDropdown = new DropdownListElement(textRenderer, x, y + 9 + 17, 100, 17);
         IdentityManager identities = Snow.instance.getIdentityManager();
         for (Identity identity : identities.getIdentities()) {
-            this.identitiesDropdown.addOption(identity.getName(), () -> {
-                identities.select(identity.getName());
-                System.out.println("selected " + identity.getName());
-            });
+            this.identitiesDropdown.addOption(identity.getName(), () -> identities.select(identity.getName()));
         }
     }
 
