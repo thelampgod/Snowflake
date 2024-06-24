@@ -121,11 +121,16 @@ public class Snow implements ModInitializer {
         if (serverManager != null) {
             serverManager.close();
         }
+        System.out.println("Connecting to " + address);
 
-        String[] parts = address.split(":");
-        if (parts.length < 2) return;
-        serverManager = new ServerManager(parts[0], Integer.parseInt(parts[1]));
-        serverManager.connect();
+        try {
+            String[] parts = address.split(":");
+            if (parts.length < 2) return;
+            serverManager = new ServerManager(parts[0], Integer.parseInt(parts[1]));
+            serverManager.connect();
+        } catch (Exception e) {
+            this.getLog().error("Error parsing IP: " + e.getMessage(), e);
+        }
     }
 
     public void save(String address) {

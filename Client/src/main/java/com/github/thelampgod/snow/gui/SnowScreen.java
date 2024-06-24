@@ -2,11 +2,13 @@ package com.github.thelampgod.snow.gui;
 
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.groups.Group;
+import com.github.thelampgod.snow.gui.elements.SnowButton;
 import com.github.thelampgod.snow.gui.windows.SnowWindow;
 import com.github.thelampgod.snow.gui.windows.impl.*;
 import com.github.thelampgod.snow.users.User;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 
 import java.awt.*;
@@ -23,11 +25,11 @@ public class SnowScreen extends Screen {
     public GroupListWindow groupListWindow;
     public UserListWindow userListWindow;
 
-    public ConnectWindow connectWindow;
+    private ConnectWindow connectWindow;
 
     public SnowScreen(Text title) {
         super(title);
-        connectWindow = new ConnectWindow(200, 60);
+        connectWindow = new ConnectWindow(100, 60);
         groupListWindow = new GroupListWindow(150, 210);
         userListWindow = new UserListWindow(150, 210);
         windowList.add(connectWindow);

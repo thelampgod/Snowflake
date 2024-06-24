@@ -1,19 +1,16 @@
 package com.github.thelampgod.snow.gui.windows.impl;
 
 import com.github.thelampgod.snow.Snow;
+import com.github.thelampgod.snow.gui.SnowScreen;
+import com.github.thelampgod.snow.gui.elements.SnowButton;
 import com.github.thelampgod.snow.gui.windows.SnowWindow;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 
-import java.awt.*;
-
 import static com.github.thelampgod.snow.Helper.mc;
-import static com.github.thelampgod.snow.Helper.printModMessage;
 
 
 public class ConnectWindow extends SnowWindow {
@@ -22,80 +19,70 @@ public class ConnectWindow extends SnowWindow {
     //TODO: actually save last ip
     public final static String savedIp = "127.0.0.1:2147";
 
-    private TextFieldWidget inputField;
-    private ButtonWidget connectButton;
+    private TextFieldWidget ipField;
+    private SnowButton connectButton;
 
     public ConnectWindow(int width, int height) {
         super("Connect", width, height, false);
     }
 
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        super.render(ctx, mouseX, mouseY, delta);
-        this.inputField.render(ctx, mouseX, mouseY, delta);
+    public void init(int width, int height) {
+        super.init(getWidth(), getHeight());
 
-        boolean hovered = connectButton.isMouseOver(mouseX - x, mouseY - y);
-        this.drawText(
-                connectButton.getMessage().getString(),
-                connectButton.getX(),
-                (getHeight() + headerHeight - textRenderer.fontHeight) / 2,
-                hovered ? Color.YELLOW.getRGB() : Color.WHITE.getRGB(), true, ctx);
+        int x = (width - 100) / 2;
+        int y = height / 2;
+        this.ipField = new TextFieldWidget(textRenderer, x, y - 8, 100, 17, Text.empty());
+        this.ipField.setMaxLength(256);
+        this.ipField.setFocused(true);
+        this.ipField.setText("127.0.0.1:2147");
+        this.connectButton = new SnowButton(textRenderer, "Connect", x,y + 9,100,17, this::connect);
+    }
+
+    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+        connectButton.setTitle("Disconnect");
+        if (!Snow.getServerManager().isConnected()) {
+            // Move window to the center of the screen
+            this.x = (SnowScreen.scaledWidth - this.width) / 2;
+            this.y = (SnowScreen.scaledHeight - this.height) / 2;
+            ipField.render(ctx, mouseX, mouseY, delta);
+            connectButton.setTitle("Connect");
+        } else {
+            // Move window to the bottom right corner of the screen
+            this.x = SnowScreen.scaledWidth - width - 3;
+            this.y = SnowScreen.scaledHeight - height - 3;
+        }
+
+        connectButton.render(ctx, (int) (mouseX - x), (int) (mouseY - y), delta);
     }
 
 
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
         super.keyPressed(keyCode, scanCode, modifiers);
         if (!focused) return;
-        this.inputField.keyPressed(keyCode, scanCode, modifiers);
-        if (keyCode == 259 || Screen.isCut(keyCode)) {
-            int messageLength = textRenderer.getWidth(this.inputField.getText());
-            this.inputField.setX((getWidth() - messageLength) / 2);
-            this.connectButton.setX((getWidth() + messageLength + 20) / 2);
-        }
+        ipField.keyPressed(keyCode, scanCode, modifiers);
 
-        if (this.inputField.isFocused() && (keyCode == 257 || keyCode == 335)) {
+        if (this.ipField.isFocused() && (keyCode == 257 || keyCode == 335)) {
             mc.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-            this.connectButton.onPress();
+            Snow.instance.connect(ipField.getText());
         }
     }
 
     public void charTyped(char chr, int modifiers) {
         super.charTyped(chr, modifiers);
         if (!focused) return;
-        this.inputField.charTyped(chr, modifiers);
-        int messageLength = textRenderer.getWidth(this.inputField.getText());
-        this.inputField.setX((getWidth() - messageLength) / 2);
-        this.connectButton.setX((getWidth() + messageLength + 20) / 2);
-    }
-
-    public void init(int width, int height) {
-        super.init(getWidth(), getHeight());
-
-        this.inputField = new TextFieldWidget(textRenderer, (getWidth() - textRenderer.getWidth("_")) / 2, (height + headerHeight - textRenderer.fontHeight) / 2, getWidth() - 18, 12, Text.literal("IP"));
-        this.inputField.setMaxLength(256);
-        this.inputField.setDrawsBackground(false);
-        this.inputField.setFocused(true);
-        this.inputField.setText(savedIp);
-
-        int buttonWidth = textRenderer.getWidth("Go") + 10;
-        this.connectButton = ButtonWidget.builder(Text.literal("Go"),(button -> this.connect()))
-                .dimensions(this.inputField.getX() + 20, (height + headerHeight - 12) / 2, buttonWidth, 12)
-                .build();
-    }
-
-    private void connect() {
-        final String ip = this.inputField.getText();
-        System.out.println("Connecting to " + ip);
-        try {
-            Snow.instance.connect(ip);
-        } catch (Throwable th) {
-            printModMessage("Couldn't connect to " + ip);
-            th.printStackTrace();
-        }
+        ipField.charTyped(chr, modifiers);
     }
 
     public void mouseClicked(double mouseX, double mouseY, int button) {
-        super.mouseClicked(mouseX, mouseY, button);
         connectButton.mouseClicked(mouseX - x, mouseY - y, button);
     }
 
+
+    private void connect() {
+        if (!Snow.getServerManager().isConnected()) {
+            Snow.instance.connect(ipField.getText());
+            return;
+        }
+        Snow.getServerManager().close();
+    }
 }
