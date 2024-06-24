@@ -45,7 +45,7 @@ public class SnowScreen extends Screen {
                     || window instanceof GroupListWindow
                     || window instanceof UserListWindow)) {
                 this.remove(window);
-                return;
+                continue;
             }
 
             window.clear();

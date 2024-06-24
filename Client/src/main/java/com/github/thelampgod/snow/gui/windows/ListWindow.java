@@ -35,12 +35,13 @@ public abstract class ListWindow extends SnowWindow {
         super.mouseClicked(mouseX, mouseY, buttonId);
         buttonListElement.mouseClicked(mouseX - x, mouseY - y, buttonId);
     }
-    public  void updateButtons() {
+    public void updateButtons() {
     }
 
     @Override
     public void clear() {
         super.clear();
-        this.updateButtons();
+        if (buttonListElement == null) return;
+        this.buttonListElement.clearButtons();
     }
 }
