@@ -36,7 +36,7 @@ public class DropdownListElement {
     }
 
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        String selectedIdentityName = Snow.instance.getIdentityManager().getSelectedIdentity().getName();
+        String selectedIdentityName = Snow.instance.getIdentityManager().getSelectedIdentityName();
         if (!dropdownOpened) {
             options.get(selectedIdentityName)
                     .render(ctx, mouseX, mouseY, 0);
@@ -53,10 +53,10 @@ public class DropdownListElement {
     }
 
 
-    public void mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (dropdownOpened) {
             // select mode
-            String selectedIdentityName = Snow.instance.getIdentityManager().getSelectedIdentity().getName();
+            String selectedIdentityName = Snow.instance.getIdentityManager().getSelectedIdentityName();
             AtomicInteger y = new AtomicInteger();
             options.values().stream()
                     .sorted(Comparator.comparing(
@@ -65,12 +65,13 @@ public class DropdownListElement {
                             .reversed())
                     .forEach(b -> b.mouseClicked(mouseX, mouseY, y.getAndIncrement()));
             dropdownOpened = false;
-            return;
+            return true;
         }
-        if (!cursorInElement(mouseX, mouseY)) return;
+        if (!cursorInElement(mouseX, mouseY)) return false;
 
         //open dropdown mode
         dropdownOpened = true;
+        return true;
     }
 
     private boolean cursorInElement(double mouseX, double mouseY) {
@@ -96,7 +97,14 @@ public class DropdownListElement {
             // Background
             ctx.fill(x+1,y+1, x + width - 1, y + height - 1, hovered ? Color.LIGHT_GRAY.getRGB() : Color.BLACK.getRGB());
             // Option name
-            ctx.drawText(textRenderer, name, x + 3, y + (height - textRenderer.fontHeight) / 2, Color.WHITE.getRGB(), true);
+            ctx.drawText(textRenderer,
+                    name,
+                    x + 3,
+                    y + (height - textRenderer.fontHeight) / 2,
+                    name.equals(Snow.instance.getIdentityManager().getSelectedIdentityName())
+                            ? Color.ORANGE.getRGB()
+                            : Color.WHITE.getRGB(),
+                    true);
             y = tempY;
         }
 

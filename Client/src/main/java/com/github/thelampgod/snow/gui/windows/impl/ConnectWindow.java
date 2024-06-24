@@ -39,15 +39,17 @@ public class ConnectWindow extends SnowWindow {
         this.ipField.setMaxLength(256);
         this.ipField.setFocused(true);
         this.ipField.setText("127.0.0.1:2147");
-        this.connectButton = new SnowButton(textRenderer, "Connect", x,y + 9,100,17, this::connect);
-        this.identitiesDropdown = new DropdownListElement(textRenderer, x, y + 9 + 17, 100, 17);
+        this.identitiesDropdown = new DropdownListElement(textRenderer, x, y + 9, 100, 17);
         IdentityManager identities = Snow.instance.getIdentityManager();
         for (Identity identity : identities.getIdentities()) {
             this.identitiesDropdown.addOption(identity.getName(), () -> identities.select(identity.getName()));
         }
+
+        this.connectButton = new SnowButton(textRenderer, "Connect", x,y + 9 + 17,100,17, this::connect);
     }
 
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+        connectButton.render(ctx, (int) (mouseX - x), (int) (mouseY - y), delta);
         connectButton.setTitle("Disconnect");
         if (!Snow.getServerManager().isConnected()) {
             // Move window to the center of the screen
@@ -59,10 +61,8 @@ public class ConnectWindow extends SnowWindow {
         } else {
             // Move window to the bottom right corner of the screen
             this.x = SnowScreen.scaledWidth - width - 3;
-            this.y = SnowScreen.scaledHeight - height - 3;
+            this.y = SnowScreen.scaledHeight - height - 17 - 3;
         }
-
-        connectButton.render(ctx, (int) (mouseX - x), (int) (mouseY - y), delta);
     }
 
 
@@ -84,8 +84,8 @@ public class ConnectWindow extends SnowWindow {
     }
 
     public void mouseClicked(double mouseX, double mouseY, int button) {
+        if (identitiesDropdown.mouseClicked(mouseX - x, mouseY - y, button)) return;
         connectButton.mouseClicked(mouseX - x, mouseY - y, button);
-        identitiesDropdown.mouseClicked(mouseX - x, mouseY - y, button);
     }
 
 

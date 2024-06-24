@@ -58,6 +58,11 @@ public class IdentityManager {
         return selectedIdentity;
     }
 
+    public String getSelectedIdentityName() {
+        return selectedIdentity.getName();
+    }
+
+
     public Collection<Identity> getIdentities() {
         return identityMap.values();
     }
