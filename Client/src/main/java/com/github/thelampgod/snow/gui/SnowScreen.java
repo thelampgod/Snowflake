@@ -194,6 +194,14 @@ public class SnowScreen extends Screen {
         return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
+    public void clearShareStatus() {
+        for (int i = 0; i < windowList.size(); ++i) {
+            if (windowList.get(i) instanceof GroupWindow window) {
+                window.updateShareButton();
+            }
+        }
+    }
+
     public void updateUserButtons() {
         userListWindow.updateButtons();
     }

@@ -13,6 +13,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
@@ -63,6 +64,10 @@ public class Snow implements ModInitializer {
             while (keyBinding.wasPressed()) {
                 client.setScreen(getOrCreateSnowScreen());
             }
+        });
+
+        ServerWorldEvents.UNLOAD.register((u, v) -> {
+            sharer.onWorldUnload();
         });
 
         identityManager = new IdentityManager();

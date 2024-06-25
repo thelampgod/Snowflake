@@ -42,6 +42,11 @@ public class WaypointSharer {
         }
     }
 
+    public void onWorldUnload() {
+        this.clear();
+        Snow.instance.getOrCreateSnowScreen().clearShareStatus();
+    }
+
     public void select(Group group) {
         selectedGroup = group;
     }
