@@ -4,6 +4,7 @@ import com.github.thelampgod.snow.EncryptionUtil;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.gui.SnowScreen;
 import com.github.thelampgod.snow.identities.Identity;
+import com.github.thelampgod.snow.waypoints.share.WaypointSharer;
 import com.google.common.collect.Maps;
 import org.apache.commons.compress.utils.Lists;
 
@@ -46,6 +47,10 @@ public class GroupManager {
     public void remove(Group group) {
         groups.remove(group);
 
+        WaypointSharer sharer = Snow.instance.getSharer();
+        if (group.equals(sharer.getSelectedGroup())) {
+            sharer.clear();
+        }
         SnowScreen screen = Snow.instance.getOrCreateSnowScreen();
         screen.updateGroupButtons();
         screen.removeGroupWindow(group);

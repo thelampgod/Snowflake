@@ -35,4 +35,8 @@ public class WaypointSharer {
     public void clear() {
         selectedGroup = null;
     }
+
+    public Group getSelectedGroup() {
+        return selectedGroup;
+    }
 }

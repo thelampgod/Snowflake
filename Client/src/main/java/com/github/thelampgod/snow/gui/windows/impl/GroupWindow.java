@@ -7,16 +7,20 @@ import com.github.thelampgod.snow.gui.SnowScreen;
 import com.github.thelampgod.snow.gui.windows.SnowWindow;
 import com.github.thelampgod.snow.packets.impl.outgoing.GroupLeavePacket;
 
+import java.awt.*;
+
 import static com.github.thelampgod.snow.Helper.mc;
 
 public class GroupWindow extends ChatWindow {
     private final Group group;
 
     // Crown character https://graphemica.com/%F0%9F%91%91
-    private final static String crown = "\uD83D\uDC51";
+    private final static String CROWN = "\uD83D\uDC51";
+
+    private TextButton locationShareButton;
 
     public GroupWindow(Group group) {
-        super(group.getId(), true, (group.isOwner() ? crown + " " : "") + group.getName(), 200, 100);
+        super(group.getId(), true, (group.isOwner() ? CROWN + " " : "") + group.getName(), 200, 100);
         this.group = group;
     }
 
@@ -36,14 +40,43 @@ public class GroupWindow extends ChatWindow {
                     () -> Snow.instance.getOrCreateSnowScreen().focusWindow(getRemoveWindow(this.group)));
         }
 
-        addHeaderButton("!", 7, "Start Location Share",
-                () -> mc.setScreen(new SnowConfirmScreen("Start location share with \"" + this.group.getName() + "\"?",
-                        () -> this.startSharingTo(group))));
+        locationShareButton = addHeaderButton("!", 7, "Start Location Share", Color.RED,
+                () -> this.toggleSharing(group));
+    }
+
+    private void toggleSharing(Group group) {
+        if (locationShareButton.getColor() == Color.RED.getRGB()) {
+            mc.setScreen(new SnowConfirmScreen("Start location share with \"" + this.group.getName() + "\"?",
+                    () -> this.startSharingTo(group)));
+            return;
+        }
+
+        stopSharing();
+    }
+
+    private void stopSharing() {
+        Snow.instance.getSharer().clear();
+        updateShareButton();
+    }
+
+    public void updateShareButton() {
+        locationShareButton.setColor(Color.RED.getRGB());
+        locationShareButton.setTooltip("Start Location Share");
     }
 
     private void startSharingTo(Group group) {
         Snow.instance.getSharer().select(group);
         mc.setScreen(Snow.instance.getOrCreateSnowScreen());
+        locationShareButton.setColor(Color.GREEN.getRGB());
+        locationShareButton.setTooltip("Stop Location Share");
+
+        // Toggle all other groups share buttons off
+        for (int i = 0; i < SnowScreen.windowList.size(); ++i) {
+            if (SnowScreen.windowList.get(i) instanceof GroupWindow window) {
+                if (window.equals(this)) continue;
+                window.updateShareButton();
+            }
+        }
     }
 
     private UserRemoveFromGroupListWindow getRemoveWindow(Group group) {

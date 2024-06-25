@@ -180,10 +180,16 @@ public abstract class SnowWindow {
 
     }
 
-    public void addHeaderButton(String icon, int fontHeight, String tooltip, Runnable runnable) {
-        headerButtons.add(new TextButton(icon,
+    public TextButton addHeaderButton(String icon, int fontHeight, String tooltip, Runnable runnable) {
+        return this.addHeaderButton(icon, fontHeight, tooltip, Color.BLACK, runnable);
+    }
+
+    public TextButton addHeaderButton(String icon, int fontHeight, String tooltip, Color color, Runnable runnable) {
+        TextButton button = new TextButton(icon,
                 getWidth() - (padding + size) * (headerButtons.size() + 1),
-                padding, size, Color.BLACK.getRGB(), fontHeight, tooltip, runnable));
+                padding, size, color.getRGB(), fontHeight, tooltip, runnable);
+        headerButtons.add(button);
+        return button;
     }
 
     public void drawOutlinedText(String title, int x, int y, int color, int bgColor, DrawContext ctx) {
@@ -222,9 +228,9 @@ public abstract class SnowWindow {
         private int bx;
         private final int by;
         private final int size;
-        private final int color;
+        private int color;
         private final int fontHeight;
-        private final String tooltipText;
+        private String tooltipText;
         private final Runnable runnable;
         public TextButton(String iconChar, int x, int y, int size, int color, int fontHeight, String tooltipText, Runnable runnable) {
             this.icon = iconChar;
@@ -263,6 +269,18 @@ public abstract class SnowWindow {
 
         public void setX(int x) {
             bx = x;
+        }
+
+        public int getColor() {
+            return color;
+        }
+
+        public void setColor(int color) {
+            this.color = color;
+        }
+
+        public void setTooltip(String tooltipText) {
+            this.tooltipText = tooltipText;
         }
     }
 }
