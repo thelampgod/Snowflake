@@ -91,6 +91,7 @@ public class ConnectionPacket extends SnowflakePacket {
       Helper.addToast("User disconnected!", this.getUser() + " left.");
 
       Snow.instance.getUserManager().remove(this.getId());
+      Snow.instance.getRenderer().removePoint(this.getId());
     }
   }
 }
