@@ -19,14 +19,22 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 
 @Environment(EnvType.CLIENT)
 public class Snow implements ModInitializer {
     public static Snow instance;
     private final Logger LOGGER = LogManager.getLogger("Snow");
 
-    private static String IP = "127.0.0.1";
-    private static int PORT = 2147;
+    private final static Path CONFIG_PATH = Path.of(".snow","config.txt");
+    private String lastAddress = "127.0.0.1:2147";
+    private int maxRange = 100_000;
     private static ServerManager serverManager;
 
     private GroupManager groupManager;
@@ -49,10 +57,10 @@ public class Snow implements ModInitializer {
         instance = this;
 
         KeyBinding keyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.snow.opengui", // The translation key of the keybinding's name
-                InputUtil.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
-                GLFW.GLFW_KEY_R, // The keycode of the key
-                "category.snow.gui" // The translation key of the keybinding's category.
+                "Open Snow GUI",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_R,
+                "Snow"
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -64,6 +72,26 @@ public class Snow implements ModInitializer {
         ServerWorldEvents.UNLOAD.register((u, v) -> {
             sharer.onWorldUnload();
         });
+
+
+        if (CONFIG_PATH.toFile().exists()) {
+            try {
+                Files.readAllLines(CONFIG_PATH).stream()
+                        .map(line -> line.split(","))
+                        .forEach(line -> {
+                            if (line[0].startsWith("lastAddress")) {
+                                lastAddress = line[1];
+                                return;
+                            }
+
+                            if (line[0].startsWith("maxRange")) {
+                                maxRange = Integer.parseInt(line[1]);
+                            }
+                        });
+            } catch (IOException e) {
+                this.getLog().error("Error reading config: " + e.getMessage(), e);
+            }
+        }
 
         identityManager = new IdentityManager();
         renderer = new WaypointRenderer();
@@ -87,6 +115,15 @@ public class Snow implements ModInitializer {
             if (serverManager != null) {
                 serverManager.close();
             }
+
+            if (!new File(".snow").exists()) {
+                Files.createDirectories(CONFIG_PATH);
+            }
+
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(CONFIG_PATH.toFile()))) {
+                writer.write("lastAddress," + lastAddress + "\n");
+                writer.write("maxRange," + maxRange + "\n");
+            }
         } catch (Exception e) {
             this.getLog().error("Error creating directories " + e.getMessage(), e);
         }
@@ -99,7 +136,7 @@ public class Snow implements ModInitializer {
 
     public static synchronized ServerManager getServerManager() {
         if (serverManager == null) {
-            serverManager = new ServerManager(IP, PORT);
+            serverManager = new ServerManager(instance.lastAddress);
         }
         return serverManager;
     }
@@ -124,6 +161,18 @@ public class Snow implements ModInitializer {
         return sharer;
     }
 
+    public String getLastAddress() {
+        return lastAddress;
+    }
+
+    public int getMaxRange() {
+        return maxRange;
+    }
+
+    public void setMaxRange(int maxRange) {
+        this.maxRange = maxRange;
+    }
+
     public void connect(String address) {
         if (serverManager != null) {
             serverManager.close();
@@ -135,6 +184,7 @@ public class Snow implements ModInitializer {
             if (parts.length < 2) return;
             serverManager = new ServerManager(parts[0], Integer.parseInt(parts[1]));
             serverManager.connect();
+            lastAddress = address;
         } catch (Exception e) {
             Helper.addToast("Couldn't connect to server");
             this.getLog().error("Error parsing IP: " + e.getMessage(), e);

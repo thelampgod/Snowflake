@@ -28,6 +28,12 @@ public class ServerManager {
         this.port = port;
     }
 
+    public ServerManager(String address) {
+        String[] split = address.split(":");
+        this.ip = split[0];
+        this.port = Integer.parseInt(split[1]);
+    }
+
     public synchronized void connect() {
         try {
             close();

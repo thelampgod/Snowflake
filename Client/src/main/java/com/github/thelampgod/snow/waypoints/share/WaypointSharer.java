@@ -31,11 +31,15 @@ public class WaypointSharer {
             return;
         }
 
-        lastPos = pos;
+        if (pos.distanceTo(Vec3d.ZERO) > Snow.instance.getMaxRange()) {
+            return;
+        }
+
         try {
             Snow.getServerManager().sendPacket(
                     new EncryptedDataPacket.Group(selectedGroup.getId(),
                             new LocationPacket(selectedGroup.getId(), x, y, z, dimension)));
+            lastPos = pos;
             lastPacketSent = System.currentTimeMillis();
         } catch (Exception e) {
             Snow.instance.getLog().error("Error encrypting location: " + e.getMessage(), e);
