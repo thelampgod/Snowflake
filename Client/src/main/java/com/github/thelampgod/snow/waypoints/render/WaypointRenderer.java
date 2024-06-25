@@ -31,6 +31,11 @@ public class WaypointRenderer {
         toRender.clear();
     }
 
+    public void removePoint(int userId) {
+        toProcess.remove(userId);
+        toRender.remove(userId);
+    }
+
     public void updatePoint(int userId, double x, double y, double z, byte dimension, int groupId) {
         toProcess.put(userId, new PositionData(x, y, z, dimension));
     }

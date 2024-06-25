@@ -53,6 +53,8 @@ public class GroupConnectionPacket extends SnowflakePacket {
         @Override
         public void handle() {
             final Group group = Snow.instance.getGroupManager().get(groupId);
+            Snow.instance.getRenderer().removePoint(clientId);
+
             if (clientId == Snow.instance.getUserManager().getMe()) {
                 Snow.instance.getGroupManager().remove(group);
                 return;
