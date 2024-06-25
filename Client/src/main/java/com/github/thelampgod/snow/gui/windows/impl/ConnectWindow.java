@@ -1,5 +1,7 @@
 package com.github.thelampgod.snow.gui.windows.impl;
 
+import com.github.thelampgod.snow.EncryptionUtil;
+import com.github.thelampgod.snow.Helper;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.gui.SnowScreen;
 import com.github.thelampgod.snow.gui.elements.DropdownListElement;
@@ -7,6 +9,7 @@ import com.github.thelampgod.snow.gui.elements.SnowButton;
 import com.github.thelampgod.snow.gui.windows.SnowWindow;
 import com.github.thelampgod.snow.identities.Identity;
 import com.github.thelampgod.snow.identities.IdentityManager;
+import com.github.thelampgod.snow.packets.impl.outgoing.LoginStartPacket;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
@@ -90,6 +93,9 @@ public class ConnectWindow extends SnowWindow {
     private void connect() {
         if (!Snow.getServerManager().isConnected()) {
             Snow.instance.connect(ipField.getText());
+
+            Snow.getServerManager().sendPacket(new LoginStartPacket(
+                    EncryptionUtil.asciiArmored(Helper.getPublicKey())));
             return;
         }
         Snow.getServerManager().close();
