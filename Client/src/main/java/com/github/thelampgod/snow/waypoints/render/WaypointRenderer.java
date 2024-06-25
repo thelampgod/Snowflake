@@ -40,6 +40,8 @@ public class WaypointRenderer {
     }
 
     public void updatePoint(int userId, double x, double y, double z, byte dimension, int groupId) {
+        if (Snow.instance.getUserManager().getMe() == userId) return;
+
         toProcess.put(userId, new PositionData(x, y, z, dimension));
         lastUpdateMap.put(userId, System.currentTimeMillis());
     }
