@@ -16,6 +16,7 @@ import org.joml.Matrix4f;
 
 import java.awt.*;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static com.github.thelampgod.snow.Helper.mc;
 
@@ -24,6 +25,8 @@ public class WaypointRenderer {
     //todo: different color background/text per group
     private final Map<Integer, PositionData> toProcess = Maps.newConcurrentMap();
     private final Map<Integer, PositionData> toRender = Maps.newConcurrentMap();
+
+    private final Map<Integer, Long> lastUpdateMap = Maps.newConcurrentMap();
 
     // Cleanup for new connection or disconnect
     public void clear() {
@@ -38,6 +41,7 @@ public class WaypointRenderer {
 
     public void updatePoint(int userId, double x, double y, double z, byte dimension, int groupId) {
         toProcess.put(userId, new PositionData(x, y, z, dimension));
+        lastUpdateMap.put(userId, System.currentTimeMillis());
     }
 
     public void tick() {
@@ -55,6 +59,10 @@ public class WaypointRenderer {
         if (mc.world == null || toRender.isEmpty()) return;
 
         for (Map.Entry<Integer, PositionData> entry : toRender.entrySet()) {
+            if (System.currentTimeMillis() > lastUpdateMap.get(entry.getKey()) + TimeUnit.SECONDS.toMillis(3)) {
+                this.removePoint(entry.getKey());
+            }
+
             final PositionData position = transformPosition(entry.getValue());
             final User user = Snow.instance.getUserManager().get(entry.getKey());
             if (user == null) return;
