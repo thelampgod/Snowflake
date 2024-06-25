@@ -41,6 +41,7 @@ public class GroupPasswordUpdatePacket extends SnowflakePacket {
 
         for (int user : group.getUsers()) {
             final ClientHandler client = Snowflake.INSTANCE.getServer().getClientReceiver(user).getConnection();
+            if (client == null) continue;
             client.sendPacket(this);
         }
 

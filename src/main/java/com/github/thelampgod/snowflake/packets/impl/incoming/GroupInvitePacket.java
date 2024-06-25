@@ -42,13 +42,15 @@ public class GroupInvitePacket extends SnowflakePacket {
         group.addUser(clientId);
         DatabaseUtil.addUserToGroup(clientId, group, Snowflake.INSTANCE.getDb());
 
-        final ClientHandler invitedUser = Snowflake.INSTANCE.getServer().getClientReceiver(clientId).getConnection();
+        final SocketClient invitedUser = Snowflake.INSTANCE.getServer().getClientReceiver(clientId);
+        if (invitedUser == null) return;
 
-        invitedUser.sendPacket(new GroupInfoPacket(group.getName(), group.getId(), false, group.getUsers()));
-        invitedUser.sendPacket(new GroupPasswordPacket(group.getId(), this.decryptKey));
+        invitedUser.getConnection().sendPacket(new GroupInfoPacket(group.getName(), group.getId(), false, group.getUsers()));
+        invitedUser.getConnection().sendPacket(new GroupPasswordPacket(group.getId(), this.decryptKey));
 
         for (int user : group.getUsers()) {
             final ClientHandler client = Snowflake.INSTANCE.getServer().getClientReceiver(user).getConnection();
+            if (client == null) continue;
             client.sendPacket(new GroupConnectionPacket.Added(group.getId(), clientId));
         }
     }

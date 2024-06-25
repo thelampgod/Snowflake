@@ -54,8 +54,8 @@ public class ClientHandler extends Thread {
             getLog().debug("Talker connected " + client);
             while (isRunning) {
                 SnowflakePacket packet = SnowflakePacket.fromId(in.readByte(), in, client);
-                packet.handle();
                 getLog().debug("Received a " + packet.getClass().getSimpleName() + " from " + client);
+                packet.handle();
             }
         } catch (Throwable ignored) {
             getServer().removeClient(client);
@@ -110,6 +110,7 @@ public class ClientHandler extends Thread {
     public void sendPacket(SnowflakePacket packet) throws IOException {
         if (!this.client.isReceiver()) {
             final SocketClient receiver = Snowflake.INSTANCE.getServer().getClientReceiver(this.client.getId());
+            if (receiver == null) return;
             receiver.getConnection().sendPacket(packet);
             return;
         }

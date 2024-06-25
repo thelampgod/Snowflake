@@ -27,7 +27,7 @@ public class GroupRemovePacket extends SnowflakePacket {
 
         for (int clientId : group.getUsers()) {
             SocketClient client = Snowflake.INSTANCE.getServer().getClientReceiver(clientId);
-
+            if (client == null) continue;
             client.getConnection().sendPacket(this);
         }
 

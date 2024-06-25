@@ -47,6 +47,7 @@ public class EncryptedDataPacket extends SnowflakePacket {
 
     private void forwardToUser(int id) throws IOException {
         SocketClient client = Snowflake.INSTANCE.getServer().getClientReceiver(id);
+        if (client == null) return;
         client.getConnection().sendPacket(this);
     }
 
@@ -55,6 +56,7 @@ public class EncryptedDataPacket extends SnowflakePacket {
 
         for (int user : group.getUsers()) {
             SocketClient client = Snowflake.INSTANCE.getServer().getClientReceiver(user);
+            if (client == null) continue;
             client.getConnection().sendPacket(this);
         }
     }

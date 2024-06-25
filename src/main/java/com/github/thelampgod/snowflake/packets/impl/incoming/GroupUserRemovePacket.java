@@ -34,9 +34,9 @@ public class GroupUserRemovePacket extends SnowflakePacket {
         final Group group = Snowflake.INSTANCE.getGroupManager().get(groupId);
 
         for (int clientId : group.getUsers()) {
-            final SocketClient user = Snowflake.INSTANCE.getServer().getClientReceiver(clientId);
-
-            user.getConnection().sendPacket(new GroupConnectionPacket.Removed(groupId, this.clientId));
+            final SocketClient client = Snowflake.INSTANCE.getServer().getClientReceiver(clientId);
+            if (client == null) continue;
+            client.getConnection().sendPacket(new GroupConnectionPacket.Removed(groupId, this.clientId));
         }
         group.removeUser(clientId);
         DatabaseUtil.removeUserFromGroup(clientId, group, Snowflake.INSTANCE.getDb());

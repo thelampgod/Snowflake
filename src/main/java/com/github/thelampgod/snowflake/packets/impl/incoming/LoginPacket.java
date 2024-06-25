@@ -63,6 +63,10 @@ public class LoginPacket extends SnowflakePacket {
         client.setSecret(secret);
 
         SocketClient receiver = Snowflake.INSTANCE.getServer().getClientReceiver(client.getLinkString());
+        if (receiver == null) {
+            Snowflake.INSTANCE.getServer().removeClient(client);
+            return;
+        }
         receiver.getConnection().sendPacket(new HandshakeStartPacket(encryptedMessage));
     }
 }

@@ -34,6 +34,7 @@ public class GroupLeavePacket extends SnowflakePacket {
 
         for (int clientId : group.getUsers()) {
             final SocketClient user = Snowflake.INSTANCE.getServer().getClientReceiver(clientId);
+            if (user == null) continue;
 
             user.getConnection().sendPacket(new GroupConnectionPacket.Removed(groupId, super.getSender().getId()));
         }
