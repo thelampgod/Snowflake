@@ -54,15 +54,18 @@ public class WaypointRenderer {
             if (user == null) return;
             final Vec3d renderPos = camera.getPos();
 
-            double angle = Math.atan2(position.z - renderPos.z, position.x - renderPos.x);
-            final double distanceTo = Math.tan((position.z - renderPos.z) / (position.x - renderPos.x));
-            double yAngle = Math.asin((position.y - renderPos.y) / distanceTo);
+            double deltaX = position.x - renderPos.x;
+            double deltaZ = position.z - renderPos.z;
+            double deltaY = position.y - renderPos.y;
+
+            double angle = Math.atan2(deltaZ, deltaX);
+            final double distanceTo = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+            double yAngle = Math.asin(deltaY / distanceTo);
 
             Vec3d pos = new Vec3d(
                     renderPos.x + 100 * Math.cos(angle),
                     renderPos.y + 100 * Math.sin(yAngle),
-                    renderPos.z + 100 * Math.sin(angle));
-
+                    renderPos.z + 100 * Math.sin(angle)).subtract(renderPos);
 
             if (distanceTo < 100) {
                 pos = new Vec3d(
@@ -71,7 +74,7 @@ public class WaypointRenderer {
                         DrawUtil.interpolate(position.prevZ, position.z, tickDelta)).subtract(renderPos);
             }
 
-            renderWaypoint(user.getName(), pos.x, pos.y, pos.z, stack, camera, tickDelta);
+            renderWaypoint(user.getName(), pos.x, pos.y, pos.z, stack, camera, distanceTo);
         }
     }
 
@@ -88,7 +91,7 @@ public class WaypointRenderer {
         return positionData.toNether();
     }
 
-    private static void renderWaypoint(String text, double x, double y, double z, MatrixStack stack, Camera camera, float tickDelta) {
+    private static void renderWaypoint(String text, double x, double y, double z, MatrixStack stack, Camera camera, double distance) {
         final EntityRenderDispatcher dispatcher = mc.getEntityRenderDispatcher();
         final VertexConsumerProvider consumers = mc.getBufferBuilders().getEntityVertexConsumers();
 
@@ -98,10 +101,10 @@ public class WaypointRenderer {
 
         Vec3d pos = camera.getPos();
 
-        double distance = Math.sqrt(dispatcher.getSquaredDistanceToCamera(x + pos.x, y + pos.y, z + pos.z));
+        double camDistance = Math.sqrt(dispatcher.getSquaredDistanceToCamera(x + pos.x, y + pos.y, z + pos.z));
         String distanceString = String.format("%.2f", distance) + "m";
 
-        float scale = (float) MathHelper.clamp(distance * 0.03f / 10, 0.03, Double.MAX_VALUE);
+        float scale = (float) MathHelper.clamp(camDistance * 0.03f / 10, 0.03, Double.MAX_VALUE);
         stack.scale(-scale, -scale, scale);
         Matrix4f matrix = stack.peek().getPositionMatrix();
 
