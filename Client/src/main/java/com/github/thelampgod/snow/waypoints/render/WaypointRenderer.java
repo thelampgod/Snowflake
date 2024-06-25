@@ -30,8 +30,9 @@ public class WaypointRenderer {
         toProcess.clear();
         toRender.clear();
     }
+
     public void updatePoint(int userId, double x, double y, double z, byte dimension, int groupId) {
-        toProcess.put(userId, new PositionData(x,y,z,dimension));
+        toProcess.put(userId, new PositionData(x, y, z, dimension));
     }
 
     public void tick() {
@@ -79,16 +80,16 @@ public class WaypointRenderer {
     }
 
     private PositionData transformPosition(PositionData positionData) {
-        final boolean isNether = mc.world.getDimension().coordinateScale() == 8.0d;
-        if (positionData.dimension != -1 && !isNether) {
+        final int myDimension = mc.world.getDimension().coordinateScale() == 8.0d ? -1 : 0;
+
+        if (myDimension == positionData.dimension) {
             return positionData;
         }
-
-        if (!isNether) {
-            return positionData.toOverworld();
+        if (myDimension == -1) {
+            return positionData.toNether();
         }
 
-        return positionData.toNether();
+        return positionData.toOverworld();
     }
 
     private static void renderWaypoint(String text, double x, double y, double z, MatrixStack stack, Camera camera, double distance) {
@@ -111,11 +112,11 @@ public class WaypointRenderer {
         //draw text
         final float nameWidth = (float) mc.textRenderer.getWidth(text) / 2;
         Color color = new Color(-1);
-        mc.textRenderer.drawWithOutline(Text.literal(text).asOrderedText(), -nameWidth, 0, color.getRGB(), new Color(0,0,0,0).getRGB(), matrix, consumers, 255);
+        mc.textRenderer.drawWithOutline(Text.literal(text).asOrderedText(), -nameWidth, 0, color.getRGB(), new Color(0, 0, 0, 0).getRGB(), matrix, consumers, 255);
         final float distanceWidth = (float) mc.textRenderer.getWidth(distanceString) / 2;
         mc.textRenderer.draw(distanceString, -distanceWidth, mc.textRenderer.fontHeight,
                 Color.WHITE.getRGB(), false, matrix, consumers, TextRenderer.TextLayerType.SEE_THROUGH,
-                0,255);
+                0, 255);
         stack.pop();
 
     }
