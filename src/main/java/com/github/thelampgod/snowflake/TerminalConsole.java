@@ -28,7 +28,7 @@ public class TerminalConsole extends SimpleTerminalConsole {
 
         try {
             for (SocketClient client : snowflake.getServer().connectedClients) {
-                if (!client.isReceiver()) return;
+                if (!client.isReceiver()) continue;
 
                 client.getConnection().sendPacket(new PlainMessagePacket(command));
             }
