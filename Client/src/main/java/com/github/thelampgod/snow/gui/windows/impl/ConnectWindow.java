@@ -36,14 +36,14 @@ public class ConnectWindow extends SnowWindow {
     public void init(int width, int height) {
         super.init(getWidth(), getHeight());
 
-        this.maxRange = Snow.instance.getMaxRange();
+        this.maxRange = Integer.parseInt(Snow.instance.getOption("maxRange"));
 
         int x = (width - 100) / 2;
         this.ipField = new TextFieldWidget(textRenderer, x, 0, 100, 17, Text.empty());
         this.ipField.setPlaceholder(Text.of("127.0.0.1:2147"));
         this.ipField.setMaxLength(256);
         this.ipField.setFocused(true);
-        this.ipField.setText(Snow.instance.getLastAddress());
+        this.ipField.setText(Snow.instance.getOption("lastAddress"));
 
         this.maxRangeField = new TextFieldWidget(textRenderer, x, 17, 100, 17, Text.empty());
         this.maxRangeField.setPlaceholder(Text.of("Max Range..."));
@@ -89,7 +89,7 @@ public class ConnectWindow extends SnowWindow {
 
         if (this.ipField.isFocused() && (keyCode == 257 || keyCode == 335)) {
             mc.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-            Snow.instance.connect(ipField.getText());
+            this.connect();
         }
     }
 
@@ -114,7 +114,7 @@ public class ConnectWindow extends SnowWindow {
 
             try {
                 maxRange = Integer.parseInt(maxRangeField.getText());
-                Snow.instance.setMaxRange(maxRange);
+                Snow.instance.getConfigManager().addOption("maxRange", maxRange);
             } catch (NumberFormatException e) {
                 Helper.addToast("Failed to parse", "Couldn't parse max range: " + maxRangeField.getText());
                 Snow.instance.getLog().error("Failed to parse range: " + e.getMessage(), e);

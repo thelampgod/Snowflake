@@ -19,24 +19,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 
 @Environment(EnvType.CLIENT)
 public class Snow implements ModInitializer {
     public static Snow instance;
     private final Logger LOGGER = LogManager.getLogger("Snow");
-
-    private final static Path CONFIG_PATH = Path.of(".snow","config.txt");
     private String lastAddress = "127.0.0.1:2147";
     private int maxRange = 100_000;
     private static ServerManager serverManager;
 
+    private ConfigManager configManager;
     private GroupManager groupManager;
     private UserManager userManager;
     private WaypointRenderer renderer;
@@ -73,26 +65,7 @@ public class Snow implements ModInitializer {
             sharer.onWorldUnload();
         });
 
-
-        if (CONFIG_PATH.toFile().exists()) {
-            try {
-                Files.readAllLines(CONFIG_PATH).stream()
-                        .map(line -> line.split(","))
-                        .forEach(line -> {
-                            if (line[0].startsWith("lastAddress")) {
-                                lastAddress = line[1];
-                                return;
-                            }
-
-                            if (line[0].startsWith("maxRange")) {
-                                maxRange = Integer.parseInt(line[1]);
-                            }
-                        });
-            } catch (IOException e) {
-                this.getLog().error("Error reading config: " + e.getMessage(), e);
-            }
-        }
-
+        configManager = new ConfigManager();
         identityManager = new IdentityManager();
         renderer = new WaypointRenderer();
         sharer = new WaypointSharer();
@@ -116,14 +89,8 @@ public class Snow implements ModInitializer {
                 serverManager.close();
             }
 
-            if (!new File(".snow").exists()) {
-                Files.createDirectories(CONFIG_PATH);
-            }
+            configManager.save();
 
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(CONFIG_PATH.toFile()))) {
-                writer.write("lastAddress," + lastAddress + "\n");
-                writer.write("maxRange," + maxRange + "\n");
-            }
         } catch (Exception e) {
             this.getLog().error("Error creating directories " + e.getMessage(), e);
         }
@@ -161,16 +128,8 @@ public class Snow implements ModInitializer {
         return sharer;
     }
 
-    public String getLastAddress() {
-        return lastAddress;
-    }
-
-    public int getMaxRange() {
-        return maxRange;
-    }
-
-    public void setMaxRange(int maxRange) {
-        this.maxRange = maxRange;
+    public ConfigManager getConfigManager() {
+        return configManager;
     }
 
     public void connect(String address) {
@@ -184,7 +143,7 @@ public class Snow implements ModInitializer {
             if (parts.length < 2) return;
             serverManager = new ServerManager(parts[0], Integer.parseInt(parts[1]));
             serverManager.connect();
-            lastAddress = address;
+            configManager.addOption("lastAddress", address);
         } catch (Exception e) {
             Helper.addToast("Couldn't connect to server");
             this.getLog().error("Error parsing IP: " + e.getMessage(), e);
@@ -211,5 +170,9 @@ public class Snow implements ModInitializer {
         } catch (Exception e) {
             this.getLog().error("Error decrypting group passwords: " + e.getMessage(), e);
         }
+    }
+
+    public String getOption(String option) {
+        return configManager.getOption(option);
     }
 }
