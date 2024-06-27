@@ -40,6 +40,13 @@ public class HandshakeResponsePacket extends SnowflakePacket {
 
             client.setName(name);
             int id = DatabaseUtil.insertUser(client);
+
+            // check that user is not already connected and authenticated
+            if (Snowflake.INSTANCE.getServer().getClientReceiver(id) != null) {
+                client.getConnection().sendPacket(new DisconnectPacket("You're already connected! Choose another identity.", client));
+                return;
+            }
+
             client.setId(id);
             client.setAuthenticated(true);
 

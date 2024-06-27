@@ -124,7 +124,10 @@ public class ClientHandler extends Thread {
 
     public void sendPacket(SnowflakePacket packet) throws IOException {
         if (!this.client.isReceiver()) {
-            final SocketClient receiver = Snowflake.INSTANCE.getServer().getClientReceiver(this.client.getId());
+            SocketClient receiver = Snowflake.INSTANCE.getServer().getClientReceiver(this.client.getId());
+            if (!this.client.isAuthenticated()) {
+                receiver = Snowflake.INSTANCE.getServer().getClientReceiver(this.client.getLinkString());
+            }
             if (receiver == null) return;
             receiver.getConnection().sendPacket(packet);
             return;
