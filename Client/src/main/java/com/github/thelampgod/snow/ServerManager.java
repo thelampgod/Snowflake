@@ -23,15 +23,21 @@ public class ServerManager {
     private final String ip;
     private final int port;
 
-    public ServerManager(String ip, int port) {
+    private final String password;
+
+    private static final String PROTOCOL_VERSION = "hNnRaVtqtNGECREZVhSNUbCwmcUjVlOZ";
+
+    public ServerManager(String ip, int port, String password) {
         this.ip = ip;
         this.port = port;
+        this.password = password;
     }
 
     public ServerManager(String address) {
         String[] split = address.split(":");
         this.ip = split[0];
         this.port = Integer.parseInt(split[1]);
+        this.password = "";
     }
 
     public synchronized void connect() {
@@ -40,7 +46,7 @@ public class ServerManager {
             this.isRunning = false;
             sharedSecret = RandomStringUtils.random(10, 0, 0, true, true, null, new SecureRandom());
             ServerHandler receiver = new ServerHandler(createSocket(ip, port), true, receiveComms);
-            ServerHandler talker = new ServerHandler(createSocket(ip, port), false, talkComms);
+            ServerHandler talker = new ServerHandler(createSocket(ip, port), false, talkComms, password);
             handlers.add(receiver);
             handlers.add(talker);
             receiver.start();
@@ -130,13 +136,19 @@ public class ServerManager {
     private static class ServerHandler extends Thread {
         private final Socket socket;
         private final LinkedBlockingQueue<Comm> comms;
+        private final String password;
         private boolean isRunning = false;
         private final boolean receiver;
 
-        ServerHandler(Socket socket, boolean receiver, LinkedBlockingQueue<Comm> comms) {
+        ServerHandler(Socket socket, boolean receiver, LinkedBlockingQueue<Comm> comms, String password) {
             this.socket = socket;
             this.receiver = receiver;
             this.comms = comms;
+            this.password = password;
+        }
+
+        ServerHandler(Socket socket, boolean receiver, LinkedBlockingQueue<Comm> comms) {
+            this(socket, receiver, comms, "");
         }
 
         @Override
@@ -153,6 +165,12 @@ public class ServerManager {
                 out.writeBoolean(receiver);
                 out.writeUTF(sharedSecret);
                 out.flush();
+
+                if (!receiver) {
+                    out.writeUTF(PROTOCOL_VERSION);
+                    out.writeUTF(password);
+                    out.flush();
+                }
 
                 while (isRunning) {
                     Comm comm = comms.take();

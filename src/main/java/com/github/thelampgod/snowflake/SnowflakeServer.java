@@ -10,16 +10,21 @@ import java.util.*;
 import static com.github.thelampgod.snowflake.util.Helper.*;
 
 public class SnowflakeServer {
+    private final String password;
     private ServerSocket server;
 
     public final Set<SocketClient> connectedClients = Sets.newConcurrentHashSet();
     public final Set<ClientHandler> threads = Sets.newConcurrentHashSet();
 
+    public SnowflakeServer(String password) {
+        this.password = password;
+    }
+
     public void start(int port) {
         try {
             server = new ServerSocket(port);
             while (true) {
-                ClientHandler thread = new ClientHandler(server.accept());
+                ClientHandler thread = new ClientHandler(server.accept(), password);
                 threads.add(thread);
                 thread.start();
             }

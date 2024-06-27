@@ -25,6 +25,8 @@ public class Snowflake {
     private final GroupManager groupManager;
     private final Database database;
 
+    private String password = "";
+
     public final Logger logger = new SimpleLogger("Snowflake", Level.DEBUG,
             true, false, true, false,
             "hh:mm:ss",
@@ -34,8 +36,8 @@ public class Snowflake {
         if (INSTANCE == null) {
             INSTANCE = this;
         }
-        if (args != null && args.length > 0 && args[0].equals("--debug")) {
-//            StatusLogger.getLogger().setLevel(Level.DEBUG);
+        if (args != null && args.length > 0 && args[0].equals("--password")) {
+            this.password = args[1];
         }
 
         try {
@@ -51,7 +53,7 @@ public class Snowflake {
         groupManager.load(this.database);
 
         logger.info("Starting Snowflake server on port " + PORT);
-        this.server = new SnowflakeServer();
+        this.server = new SnowflakeServer(password);
 
         final Thread terminalConsoleHandler = new Thread(() -> new TerminalConsole(this).start(), "Terminal console handler");
         terminalConsoleHandler.setDaemon(true);

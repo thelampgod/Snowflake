@@ -24,8 +24,6 @@ import org.lwjgl.glfw.GLFW;
 public class Snow implements ModInitializer {
     public static Snow instance;
     private final Logger LOGGER = LogManager.getLogger("Snow");
-    private String lastAddress = "127.0.0.1:2147";
-    private int maxRange = 100_000;
     private static ServerManager serverManager;
 
     private ConfigManager configManager;
@@ -103,7 +101,7 @@ public class Snow implements ModInitializer {
 
     public static synchronized ServerManager getServerManager() {
         if (serverManager == null) {
-            serverManager = new ServerManager(instance.lastAddress);
+            serverManager = new ServerManager(instance.configManager.getOption("lastAddress"));
         }
         return serverManager;
     }
@@ -132,7 +130,7 @@ public class Snow implements ModInitializer {
         return configManager;
     }
 
-    public void connect(String address) {
+    public void connect(String address, String password) {
         if (serverManager != null) {
             serverManager.close();
         }
@@ -141,9 +139,10 @@ public class Snow implements ModInitializer {
         try {
             String[] parts = address.split(":");
             if (parts.length < 2) return;
-            serverManager = new ServerManager(parts[0], Integer.parseInt(parts[1]));
+            serverManager = new ServerManager(parts[0], Integer.parseInt(parts[1]), password);
             serverManager.connect();
             configManager.addOption("lastAddress", address);
+            configManager.addOption("serverPassword", password);
         } catch (Exception e) {
             Helper.addToast("Couldn't connect to server");
             this.getLog().error("Error parsing IP: " + e.getMessage(), e);

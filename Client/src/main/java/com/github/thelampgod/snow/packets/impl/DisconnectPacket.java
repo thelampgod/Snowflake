@@ -1,5 +1,6 @@
 package com.github.thelampgod.snow.packets.impl;
 
+import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.packets.SnowflakePacket;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -35,5 +36,6 @@ public class DisconnectPacket extends SnowflakePacket {
         Text.literal("You got disconnected. Reason: ").formatted(Formatting.WHITE)
             .append(Text.literal(this.reason).formatted(Formatting.ITALIC)
             ));
+    Snow.getServerManager().close();
   }
 }

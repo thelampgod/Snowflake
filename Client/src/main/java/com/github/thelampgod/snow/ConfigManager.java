@@ -37,7 +37,9 @@ public class ConfigManager {
             try {
                 Files.readAllLines(CONFIG_PATH).stream()
                         .map(line -> line.split(","))
-                        .forEach(line -> options.put(line[0], line[1]));
+                        .forEach(line -> {
+                            options.put(line[0], line.length < 2 ? "" : line[1]);
+                        });
             } catch (IOException e) {
                 Snow.instance.getLog().error("Error reading config: " + e.getMessage(), e);
             }

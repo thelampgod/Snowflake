@@ -17,14 +17,18 @@ import static com.github.thelampgod.snowflake.util.Helper.*;
 
 public class ClientHandler extends Thread {
     final SocketClient client;
+    private final String password;
+
+    private static final String PROTOCOL_VERSION = "hNnRaVtqtNGECREZVhSNUbCwmcUjVlOZ";
     public boolean isRunning = true;
     private DataOutputStream out;
     private DataInputStream in;
     private final Queue<SnowflakePacket> outboundPacketsQueue = new ConcurrentLinkedQueue<>();
     private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
-    public ClientHandler(Socket socket) throws IOException {
+    public ClientHandler(Socket socket, String password) throws IOException {
         this.client = new SocketClient(socket, this);
+        this.password = password;
         getServer().addClient(this.client);
     }
 
@@ -37,6 +41,17 @@ public class ClientHandler extends Thread {
             boolean receiver = in.readBoolean();
             String secret = in.readUTF();
             client.setLinker(secret);
+
+            if (!receiver) {
+                if (!in.readUTF().equals(PROTOCOL_VERSION)) {
+                    this.sendPacket(new DisconnectPacket("Outdated client or server", client));
+                    return;
+                }
+                if (!in.readUTF().equals(password) && !password.isEmpty()) {
+                    this.sendPacket(new DisconnectPacket("Wrong password", client));
+                    return;
+                }
+            }
 
             if (receiver) {
                 runSendTick();

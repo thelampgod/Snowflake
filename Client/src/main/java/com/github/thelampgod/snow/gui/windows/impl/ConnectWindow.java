@@ -23,6 +23,7 @@ import static com.github.thelampgod.snow.Helper.mc;
 public class ConnectWindow extends SnowWindow {
 
     private TextFieldWidget ipField;
+    private TextFieldWidget serverPassField;
     private TextFieldWidget maxRangeField;
     private SnowButton connectButton;
     private DropdownListElement identitiesDropdown;
@@ -39,16 +40,19 @@ public class ConnectWindow extends SnowWindow {
         this.maxRange = Integer.parseInt(Snow.instance.getOption("maxRange"));
 
         int x = (width - 100) / 2;
-        this.ipField = new TextFieldWidget(textRenderer, x, 0, 100, 17, Text.empty());
+        this.ipField = new TextFieldWidget(textRenderer, x, -17 * 3, 100, 17, Text.empty());
         this.ipField.setPlaceholder(Text.of("127.0.0.1:2147"));
         this.ipField.setMaxLength(256);
         this.ipField.setFocused(true);
         this.ipField.setText(Snow.instance.getOption("lastAddress"));
 
-        this.maxRangeField = new TextFieldWidget(textRenderer, x, 17, 100, 17, Text.empty());
+        this.serverPassField = new TextFieldWidget(textRenderer, x, -17 * 2, 100, 17, Text.empty());
+        this.serverPassField.setPlaceholder(Text.of("Server Password..."));
+        this.serverPassField.setMaxLength(256);
+        this.serverPassField.setText(Snow.instance.getOption("serverPassword"));
+
+        this.maxRangeField = new TextFieldWidget(textRenderer, x, 0, 100, 17, Text.empty());
         this.maxRangeField.setPlaceholder(Text.of("Max Range..."));
-        this.maxRangeField.setEditableColor(Color.WHITE.getRGB());
-        this.maxRangeField.setUneditableColor(Color.GRAY.getRGB());
         this.maxRangeField.setMaxLength(9);
         this.maxRangeField.setText(""+maxRange);
 
@@ -62,16 +66,30 @@ public class ConnectWindow extends SnowWindow {
     }
 
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+        setFieldColor(ipField);
+        setFieldColor(serverPassField);
+        setFieldColor(maxRangeField);
+
         connectButton.render(ctx, (int) (mouseX - x), (int) (mouseY - y), delta);
         connectButton.setTitle("Disconnect");
+        int centerX = (getWidth()) / 2;
 
+        ctx.drawCenteredTextWithShadow(textRenderer, "Max Range:", centerX, -10, Color.WHITE.getRGB());
         maxRangeField.render(ctx, mouseX, mouseY, delta);
 
         if (!Snow.getServerManager().isConnected()) {
             // Move window to the center of the screen
             this.x = (SnowScreen.scaledWidth - this.width) / 2;
             this.y = (SnowScreen.scaledHeight - this.height) / 2;
+            ctx.drawCenteredTextWithShadow(textRenderer, "Server address:", centerX, -17 * 3 -10, Color.WHITE.getRGB());
             ipField.render(ctx, mouseX, mouseY, delta);
+
+            String temp = serverPassField.getText();
+            serverPassField.setText("*".repeat(temp.length()));
+            serverPassField.render(ctx, mouseX, mouseY, delta);
+            serverPassField.setText(temp);
+
+            ctx.drawCenteredTextWithShadow(textRenderer, "Identities:", centerX, 17 * 2 -10, Color.WHITE.getRGB());
             identitiesDropdown.render(ctx, (int) (mouseX - x), (int) (mouseY - y), delta);
             connectButton.setTitle("Connect");
         } else {
@@ -81,10 +99,19 @@ public class ConnectWindow extends SnowWindow {
         }
     }
 
+    private void setFieldColor(TextFieldWidget field) {
+        if (field.getText().isEmpty()) {
+            field.setEditableColor(Color.GRAY.getRGB());
+        } else {
+            field.setEditableColor(Color.WHITE.getRGB());
+        }
+    }
+
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
         super.keyPressed(keyCode, scanCode, modifiers);
         if (!focused) return;
         ipField.keyPressed(keyCode, scanCode, modifiers);
+        serverPassField.keyPressed(keyCode, scanCode, modifiers);
         maxRangeField.keyPressed(keyCode, scanCode, modifiers);
 
         if (this.ipField.isFocused() && (keyCode == 257 || keyCode == 335)) {
@@ -97,6 +124,7 @@ public class ConnectWindow extends SnowWindow {
         super.charTyped(chr, modifiers);
         if (!focused) return;
         ipField.charTyped(chr, modifiers);
+        serverPassField.charTyped(chr, modifiers);
         maxRangeField.charTyped(chr, modifiers);
     }
 
@@ -105,12 +133,13 @@ public class ConnectWindow extends SnowWindow {
         connectButton.mouseClicked(mouseX - x, mouseY - y, button);
 
         ipField.setFocused(ipField.mouseClicked(mouseX - x, mouseY - y, button));
+        serverPassField.setFocused(serverPassField.mouseClicked(mouseX - x, mouseY - y, button));
         maxRangeField.setFocused(maxRangeField.mouseClicked(mouseX - x, mouseY - y, button));
     }
 
     private void connect() {
         if (!Snow.getServerManager().isConnected()) {
-            Snow.instance.connect(ipField.getText());
+            Snow.instance.connect(ipField.getText(), serverPassField.getText());
 
             try {
                 maxRange = Integer.parseInt(maxRangeField.getText());
