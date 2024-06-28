@@ -42,6 +42,11 @@ public class WaypointRenderer {
     public void updatePoint(int userId, double x, double y, double z, byte dimension, int groupId) {
         if (Snow.instance.getUserManager().getMe() == userId) return;
 
+        Vec3d pos = new Vec3d(x,y,z);
+        if (pos.distanceTo(Vec3d.ZERO) > Integer.parseInt(Snow.instance.getOption("maxRange"))) {
+            return;
+        }
+
         toProcess.put(userId, new PositionData(x, y, z, dimension));
         lastUpdateMap.put(userId, System.currentTimeMillis());
     }
