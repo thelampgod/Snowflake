@@ -9,6 +9,7 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.projectile.FireworkRocketEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -39,7 +40,7 @@ public class WaypointRenderer {
         toRender.remove(userId);
     }
 
-    public void updatePoint(int userId, double x, double y, double z, byte dimension, int groupId) {
+    public void updatePoint(int userId, double x, double y, double z, String dimension, int groupId) {
         if (Snow.instance.getUserManager().getMe() == userId) return;
 
         Vec3d pos = new Vec3d(x,y,z);
@@ -81,12 +82,14 @@ public class WaypointRenderer {
 
             double angle = Math.atan2(deltaZ, deltaX);
             final double distanceTo = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+            final double distanceToIgnoringY = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
             double yAngle = Math.asin(deltaY / distanceTo);
 
             Vec3d pos = new Vec3d(
-                    renderPos.x + 100 * Math.cos(angle),
+                    Math.abs(distanceToIgnoringY) < 100 ? position.x : renderPos.x + 100 * Math.cos(angle),
                     renderPos.y + 100 * Math.sin(yAngle),
-                    renderPos.z + 100 * Math.sin(angle)).subtract(renderPos);
+                    Math.abs(distanceToIgnoringY) < 100 ? position.z : renderPos.z + 100 * Math.sin(angle)).subtract(renderPos);
+
 
             if (distanceTo < 100) {
                 pos = new Vec3d(
@@ -95,24 +98,25 @@ public class WaypointRenderer {
                         DrawUtil.interpolate(position.prevZ, position.z, tickDelta)).subtract(renderPos);
             }
 
-            renderWaypoint(user.getName(), pos.x, pos.y, pos.z, stack, camera, distanceTo);
+            renderWaypoint(user.getName(), pos.x, pos.y, pos.z, stack, camera, distanceTo, position.dimension);
         }
     }
 
     private PositionData transformPosition(PositionData positionData) {
-        final int myDimension = mc.world.getDimension().coordinateScale() == 8.0d ? -1 : 0;
+        final String myDimension = mc.world.getDimensionKey().getValue().getPath();
 
-        if (myDimension == positionData.dimension) {
-            return positionData;
+        if (myDimension.equals("overworld") && positionData.dimension.equals("the_nether")) {
+            return positionData.toOverworld();
         }
-        if (myDimension == -1) {
+
+        if (myDimension.equals("the_nether") && positionData.dimension.equals("overworld")) {
             return positionData.toNether();
         }
 
-        return positionData.toOverworld();
+        return positionData;
     }
 
-    private static void renderWaypoint(String text, double x, double y, double z, MatrixStack stack, Camera camera, double distance) {
+    private void renderWaypoint(String text, double x, double y, double z, MatrixStack stack, Camera camera, double distance, String dimension) {
         final EntityRenderDispatcher dispatcher = mc.getEntityRenderDispatcher();
         final VertexConsumerProvider consumers = mc.getBufferBuilders().getEntityVertexConsumers();
 
@@ -133,12 +137,23 @@ public class WaypointRenderer {
         final float nameWidth = (float) mc.textRenderer.getWidth(text) / 2;
         Color color = new Color(-1);
         mc.textRenderer.drawWithOutline(Text.literal(text).asOrderedText(), -nameWidth, 0, color.getRGB(), new Color(0, 0, 0, 0).getRGB(), matrix, consumers, 255);
-        final float distanceWidth = (float) mc.textRenderer.getWidth(distanceString) / 2;
-        mc.textRenderer.draw(distanceString, -distanceWidth, mc.textRenderer.fontHeight,
-                Color.WHITE.getRGB(), false, matrix, consumers, TextRenderer.TextLayerType.SEE_THROUGH,
-                0, 255);
+        int yPos = 1;
+        this.drawText(distanceString, yPos++, matrix, consumers);
+
+        if (!mc.world.getDimensionKey().getValue().getPath().equals(dimension)) {
+            this.drawText(dimension, yPos, matrix, consumers);
+        }
+
+
         stack.pop();
 
+    }
+
+    private void drawText(String text, int yPos, Matrix4f matrix, VertexConsumerProvider consumers) {
+        final float distanceWidth = (float) mc.textRenderer.getWidth(text) / 2;
+        mc.textRenderer.draw(text, -distanceWidth, yPos * mc.textRenderer.fontHeight,
+                Color.WHITE.getRGB(), false, matrix, consumers, TextRenderer.TextLayerType.SEE_THROUGH,
+                0, 255);
     }
 
     public static class PositionData {
@@ -148,16 +163,16 @@ public class WaypointRenderer {
         private double prevX;
         private double prevY;
         private double prevZ;
-        private byte dimension;
+        private String dimension;
 
-        public PositionData(double x, double y, double z, byte dimension) {
+        public PositionData(double x, double y, double z, String dimension) {
             this.x = x;
             this.y = y;
             this.z = z;
             this.dimension = dimension;
         }
 
-        public PositionData(double x, double y, double z, double prevX, double prevY, double prevZ, byte dimension) {
+        public PositionData(double x, double y, double z, double prevX, double prevY, double prevZ, String dimension) {
             this.x = x;
             this.y = y;
             this.z = z;
@@ -198,7 +213,7 @@ public class WaypointRenderer {
             return new PositionData(x, this.y, z, prevX, this.prevY, prevZ, this.dimension);
         }
 
-        public void setDimension(byte dimension) {
+        public void setDimension(String dimension) {
             this.dimension = dimension;
         }
 

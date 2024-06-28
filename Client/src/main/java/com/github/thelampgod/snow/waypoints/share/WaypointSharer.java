@@ -20,11 +20,12 @@ public class WaypointSharer {
     public void onLocationSend(PlayerMoveC2SPacket packet) {
         if (mc.world == null) return;
         if (selectedGroup == null) return;
+        float height = mc.player.getHeight();
 
         double x = packet.getX(0);
-        double y = packet.getY(0);
+        double y = packet.getY(0) + height;
         double z = packet.getZ(0);
-        byte dimension = (byte) (mc.world.getDimension().coordinateScale() == 8.0d ? -1 : 0);
+        String dimension = mc.world.getDimensionKey().getValue().getPath();
 
         Vec3d pos = new Vec3d(x, y, z);
         if (pos.equals(lastPos) && System.currentTimeMillis() < lastPacketSent + TimeUnit.SECONDS.toMillis(1)) {
