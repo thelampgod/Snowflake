@@ -44,17 +44,17 @@ public class ChatElement {
             prevSender = message.sender;
 
             // Draw sender name
-            if (!sameSender && textY > y && textY < y + height) {
+            if (!sameSender && inBounds(textY)) {
                 ctx.drawText(this.textRenderer, message.sender, x + PADDING, textY, Color.YELLOW.getRGB(), false);
                 textY += textRenderer.fontHeight;
             }
 
             // Draw message
-            if (textY > y && textY < y + height) {
+            if (inBounds(textY)) {
                 if (textRenderer.getWidth(message.message) > width - PADDING * 2) {
                     List<OrderedText> wrapped = textRenderer.wrapLines(Text.of(message.message), width - PADDING * 2);
                     for (OrderedText text : wrapped) {
-                        if (textY > y && textY < y + height) {
+                        if (inBounds(textY)) {
                             ctx.drawText(this.textRenderer, text, x + PADDING, textY, message.color, false);
                             textY += textRenderer.fontHeight;
                         }
@@ -67,19 +67,27 @@ public class ChatElement {
         }
     }
 
+    private boolean inBounds(int textY) {
+        return textY > y && textY < y + height - textRenderer.fontHeight;
+    }
+
     public void mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         if (!cursorInElement(mouseX, mouseY)) return;
         int messageHeight = getHeight(messages);
-        if (messageHeight < height) return;
+        if (messageHeight < height) {
+            scrollPosition = 0;
+            return;
+        }
 
-        int diff = (messageHeight - height) / textRenderer.fontHeight + PADDING;
+        // how many lines that are not rendered currently
+        int diff = (messageHeight - height) / textRenderer.fontHeight + 1;
 
         scrollPosition += (verticalAmount < 0 ? 1 : -1);
-        scrollPosition = MathHelper.clamp(scrollPosition, 0, diff);
+        scrollPosition = MathHelper.clamp(scrollPosition, 0, Math.min(messages.size() - 1, diff));
     }
 
     private int getHeight(List<ChatMessage> messages) {
-        int height = 0;
+        int height = PADDING;
         String prevSender = "";
         for (ChatMessage message : messages) {
             boolean sameSender = prevSender == null || prevSender.equals(message.sender) || message.sender == null;
@@ -92,9 +100,10 @@ public class ChatElement {
 
             if (textRenderer.getWidth(message.message) > width - PADDING * 2) {
                 List<OrderedText> wrapped = textRenderer.wrapLines(Text.of(message.message), width - PADDING * 2);
-                height += wrapped.size();
+                height += (wrapped.size() - 1) * textRenderer.fontHeight;
             }
         }
+        System.out.println(height + " windowHeight: " + this.height + " scrollPos: " + scrollPosition);
         return height;
     }
 
@@ -115,9 +124,15 @@ public class ChatElement {
 
         // Scroll down to latest message
         int messageHeight = getHeight(messages);
-        if (messageHeight < height) return;
+        if (messageHeight < height) {
+            scrollPosition = 0;
+            return;
+        }
 
-        scrollPosition = (messageHeight - height) / textRenderer.fontHeight + 3;
+        // how many lines that are not rendered currently
+        int diff = (messageHeight - height) / textRenderer.fontHeight + 1;
+        scrollPosition = diff;
+        scrollPosition = MathHelper.clamp(scrollPosition, 0, Math.min(messages.size() - 1, diff));
     }
 
     public void setWidth(int width) {
