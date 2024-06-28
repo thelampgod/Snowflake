@@ -9,7 +9,7 @@ import net.minecraft.util.math.Vec3d;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.github.thelampgod.snow.Helper.mc;
+import static com.github.thelampgod.snow.util.Helper.mc;
 
 public class WaypointSharer {
     private Group selectedGroup;

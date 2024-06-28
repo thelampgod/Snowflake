@@ -1,6 +1,6 @@
 package com.github.thelampgod.snow.identities;
 
-import com.github.thelampgod.snow.EncryptionUtil;
+import com.github.thelampgod.snow.util.EncryptionUtil;
 
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;

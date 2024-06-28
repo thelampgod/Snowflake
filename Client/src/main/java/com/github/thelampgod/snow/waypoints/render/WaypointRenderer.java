@@ -1,6 +1,6 @@
 package com.github.thelampgod.snow.waypoints.render;
 
-import com.github.thelampgod.snow.DrawUtil;
+import com.github.thelampgod.snow.util.DrawUtil;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.users.User;
 import com.google.common.collect.Maps;
@@ -9,7 +9,6 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.projectile.FireworkRocketEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -19,7 +18,7 @@ import java.awt.*;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.thelampgod.snow.Helper.mc;
+import static com.github.thelampgod.snow.util.Helper.mc;
 
 public class WaypointRenderer {
 

@@ -1,5 +1,6 @@
-package com.github.thelampgod.snow;
+package com.github.thelampgod.snow.util;
 
+import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.groups.Group;
 import com.github.thelampgod.snow.packets.WrappedPacket;
 import com.github.thelampgod.snow.users.User;

@@ -13,7 +13,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.thelampgod.snow.Helper.mc;
+import static com.github.thelampgod.snow.util.Helper.mc;
 
 public abstract class SnowWindow {
     public double x;

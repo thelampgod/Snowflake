@@ -9,7 +9,7 @@ import com.github.thelampgod.snow.packets.impl.outgoing.GroupLeavePacket;
 
 import java.awt.*;
 
-import static com.github.thelampgod.snow.Helper.mc;
+import static com.github.thelampgod.snow.util.Helper.mc;
 
 public class GroupWindow extends ChatWindow {
     private final Group group;

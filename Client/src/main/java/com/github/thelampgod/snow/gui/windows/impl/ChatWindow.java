@@ -1,6 +1,6 @@
 package com.github.thelampgod.snow.gui.windows.impl;
 
-import com.github.thelampgod.snow.Helper;
+import com.github.thelampgod.snow.util.Helper;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.gui.elements.ChatElement;
 import com.github.thelampgod.snow.gui.windows.SnowWindow;

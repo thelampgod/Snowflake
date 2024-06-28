@@ -3,6 +3,7 @@ package com.github.thelampgod.snow;
 import com.github.thelampgod.snow.packets.SnowflakePacket;
 import com.github.thelampgod.snow.packets.impl.DisconnectPacket;
 import com.github.thelampgod.snow.packets.impl.KeepAlivePacket;
+import com.github.thelampgod.snow.util.Helper;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.io.*;

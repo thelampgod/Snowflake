@@ -1,10 +1,10 @@
 package com.github.thelampgod.snow.users;
 
-import com.github.thelampgod.snow.EncryptionUtil;
+import com.github.thelampgod.snow.util.EncryptionUtil;
 
 import java.security.PublicKey;
 
-import static com.github.thelampgod.snow.Helper.printModMessage;
+import static com.github.thelampgod.snow.util.Helper.printModMessage;
 
 public class User {
     private final String name;

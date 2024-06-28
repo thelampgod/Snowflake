@@ -1,6 +1,6 @@
 package com.github.thelampgod.snow.packets.impl.incoming;
 
-import com.github.thelampgod.snow.Helper;
+import com.github.thelampgod.snow.util.Helper;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.packets.SnowflakePacket;
 import com.github.thelampgod.snow.packets.impl.outgoing.KeyRequestPacket;
@@ -12,7 +12,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static com.github.thelampgod.snow.Helper.printModMessage;
+import static com.github.thelampgod.snow.util.Helper.printModMessage;
 
 public class ConnectionPacket extends SnowflakePacket {
   private final boolean connect;

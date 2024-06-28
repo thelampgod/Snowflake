@@ -1,18 +1,16 @@
 package com.github.thelampgod.snow.packets.impl.incoming;
 
-import com.github.thelampgod.snow.EncryptionUtil;
+import com.github.thelampgod.snow.util.EncryptionUtil;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.groups.Group;
 import com.github.thelampgod.snow.packets.SnowflakePacket;
 import com.github.thelampgod.snow.packets.impl.GroupPasswordUpdatePacket;
-import org.apache.commons.lang3.RandomStringUtils;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.security.SecureRandom;
 
-import static com.github.thelampgod.snow.Helper.printModMessage;
+import static com.github.thelampgod.snow.util.Helper.printModMessage;
 
 public class GroupConnectionPacket extends SnowflakePacket {
     protected final int groupId;

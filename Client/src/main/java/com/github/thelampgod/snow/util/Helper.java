@@ -1,5 +1,6 @@
-package com.github.thelampgod.snow;
+package com.github.thelampgod.snow.util;
 
+import com.github.thelampgod.snow.Snow;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.toast.SystemToast;

@@ -3,6 +3,7 @@ package com.github.thelampgod.snow;
 import com.github.thelampgod.snow.groups.GroupManager;
 import com.github.thelampgod.snow.gui.SnowScreen;
 import com.github.thelampgod.snow.identities.IdentityManager;
+import com.github.thelampgod.snow.util.Helper;
 import com.github.thelampgod.snow.waypoints.render.WaypointRenderer;
 import com.github.thelampgod.snow.users.UserManager;
 import com.github.thelampgod.snow.waypoints.share.WaypointSharer;

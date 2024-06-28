@@ -1,7 +1,7 @@
 package com.github.thelampgod.snow.gui.windows.impl;
 
-import com.github.thelampgod.snow.EncryptionUtil;
-import com.github.thelampgod.snow.Helper;
+import com.github.thelampgod.snow.util.EncryptionUtil;
+import com.github.thelampgod.snow.util.Helper;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.gui.SnowScreen;
 import com.github.thelampgod.snow.gui.elements.DropdownListElement;
@@ -18,7 +18,7 @@ import net.minecraft.text.Text;
 
 import java.awt.*;
 
-import static com.github.thelampgod.snow.Helper.mc;
+import static com.github.thelampgod.snow.util.Helper.mc;
 
 public class ConnectWindow extends SnowWindow {
 

@@ -9,7 +9,7 @@ import net.minecraft.text.Text;
 
 import java.util.List;
 
-import static com.github.thelampgod.snow.Helper.mc;
+import static com.github.thelampgod.snow.util.Helper.mc;
 
 public class SnowConfirmScreen extends Screen {
     private final Runnable onAccept;

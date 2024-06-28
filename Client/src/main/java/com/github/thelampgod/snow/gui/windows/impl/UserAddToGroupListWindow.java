@@ -1,7 +1,7 @@
 package com.github.thelampgod.snow.gui.windows.impl;
 
-import com.github.thelampgod.snow.EncryptionUtil;
-import com.github.thelampgod.snow.Helper;
+import com.github.thelampgod.snow.util.EncryptionUtil;
+import com.github.thelampgod.snow.util.Helper;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.groups.Group;
 import com.github.thelampgod.snow.gui.elements.ButtonListElement;
@@ -11,7 +11,7 @@ import com.github.thelampgod.snow.users.User;
 
 import java.util.List;
 
-import static com.github.thelampgod.snow.Helper.printModMessage;
+import static com.github.thelampgod.snow.util.Helper.printModMessage;
 
 public class UserAddToGroupListWindow extends ListWindow {
     private final Group group;

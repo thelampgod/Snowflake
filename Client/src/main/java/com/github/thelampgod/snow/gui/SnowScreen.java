@@ -2,20 +2,18 @@ package com.github.thelampgod.snow.gui;
 
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.groups.Group;
-import com.github.thelampgod.snow.gui.elements.SnowButton;
 import com.github.thelampgod.snow.gui.windows.SnowWindow;
 import com.github.thelampgod.snow.gui.windows.impl.*;
 import com.github.thelampgod.snow.users.User;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.thelampgod.snow.Helper.mc;
+import static com.github.thelampgod.snow.util.Helper.mc;
 
 public class SnowScreen extends Screen {
     public static int scaledWidth;

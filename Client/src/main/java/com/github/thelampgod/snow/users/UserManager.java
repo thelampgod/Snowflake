@@ -6,8 +6,6 @@ import org.apache.commons.compress.utils.Lists;
 
 import java.util.List;
 
-import static com.github.thelampgod.snow.Helper.mc;
-
 public class UserManager {
 
     private final List<User> users = Lists.newArrayList();

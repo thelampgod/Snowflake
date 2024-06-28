@@ -1,6 +1,6 @@
 package com.github.thelampgod.snow.packets.impl.incoming;
 
-import com.github.thelampgod.snow.EncryptionUtil;
+import com.github.thelampgod.snow.util.EncryptionUtil;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.groups.Group;
 import com.github.thelampgod.snow.packets.SnowflakePacket;

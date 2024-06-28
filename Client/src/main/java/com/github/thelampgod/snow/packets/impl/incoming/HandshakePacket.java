@@ -1,19 +1,15 @@
 package com.github.thelampgod.snow.packets.impl.incoming;
 
-import com.github.thelampgod.snow.EncryptionUtil;
-import com.github.thelampgod.snow.Helper;
+import com.github.thelampgod.snow.util.EncryptionUtil;
 import com.github.thelampgod.snow.ServerManager;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.identities.Identity;
 import com.github.thelampgod.snow.packets.SnowflakePacket;
 import com.github.thelampgod.snow.packets.impl.outgoing.HandshakeResponsePacket;
-import net.minecraft.network.encryption.NetworkEncryptionUtils;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-
-import static com.github.thelampgod.snow.Helper.mc;
 
 public class HandshakePacket extends SnowflakePacket {
   private final byte[] encryptedSecret;

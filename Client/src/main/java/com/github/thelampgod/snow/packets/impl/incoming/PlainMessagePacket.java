@@ -6,7 +6,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static com.github.thelampgod.snow.Helper.printModMessage;
+import static com.github.thelampgod.snow.util.Helper.printModMessage;
 
 public class PlainMessagePacket extends SnowflakePacket {
   private final String message;
