@@ -103,7 +103,6 @@ public class ChatElement {
                 height += (wrapped.size() - 1) * textRenderer.fontHeight;
             }
         }
-        System.out.println(height + " windowHeight: " + this.height + " scrollPos: " + scrollPosition);
         return height;
     }
 
