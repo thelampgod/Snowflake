@@ -9,7 +9,7 @@ import java.io.IOException;
 public abstract class WrappedPacket extends SnowflakePacket {
     private int sender;
 
-    protected final static String DIVIDER = "\u00a7";
+    protected final static String DIVIDER = "\r\n";
 
     public int getSender() {
         return sender;
