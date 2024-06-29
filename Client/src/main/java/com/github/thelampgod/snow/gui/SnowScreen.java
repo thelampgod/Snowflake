@@ -28,10 +28,10 @@ public class SnowScreen extends Screen {
     public SnowScreen(Text title) {
         super(title);
         connectWindow = new ConnectWindow(100, 60);
-        groupListWindow = new GroupListWindow(150, 210);
-        userListWindow = new UserListWindow(150, 210);
         windowList.add(connectWindow);
+        groupListWindow = new GroupListWindow(150, 210);
         windowList.add(groupListWindow);
+        userListWindow = new UserListWindow(150, 210);
         windowList.add(userListWindow);
     }
 

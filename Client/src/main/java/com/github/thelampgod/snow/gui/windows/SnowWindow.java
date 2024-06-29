@@ -76,6 +76,8 @@ public abstract class SnowWindow {
 
 
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+        if (!hasInit) return;
+
         // Border
         ctx.fill(-1, -1, (getWidth() + 1), getHeight() + 1, (focused ? Color.WHITE.getRGB() : Color.BLACK.getRGB()));
         // Window
