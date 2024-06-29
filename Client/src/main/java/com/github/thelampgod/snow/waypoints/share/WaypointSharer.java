@@ -9,6 +9,7 @@ import net.minecraft.util.math.Vec3d;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.github.thelampgod.snow.util.Helper.getDimensionId;
 import static com.github.thelampgod.snow.util.Helper.mc;
 
 public class WaypointSharer {
@@ -25,7 +26,7 @@ public class WaypointSharer {
         double x = packet.getX(0);
         double y = packet.getY(0) + height;
         double z = packet.getZ(0);
-        String dimension = mc.world.getDimensionKey().getValue().getPath();
+        byte dimension = getDimensionId(mc.world.getDimensionKey().getValue().getPath());
 
         Vec3d pos = new Vec3d(x, y, z);
         if (pos.equals(lastPos) && System.currentTimeMillis() < lastPacketSent + TimeUnit.SECONDS.toMillis(1)) {

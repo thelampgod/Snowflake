@@ -10,9 +10,9 @@ public class LocationPacket extends WrappedPacket {
     private final double x;
     private final double y;
     private final double z;
-    private final String dimension;
+    private final byte dimension;
 
-    public LocationPacket(int groupId, double x, double y, double z, String dimension) {
+    public LocationPacket(int groupId, double x, double y, double z, byte dimension) {
         this.groupId = groupId;
         this.x = x;
         this.y = y;
@@ -27,7 +27,7 @@ public class LocationPacket extends WrappedPacket {
         this.x = Double.parseDouble(parts[1]);
         this.y = Double.parseDouble(parts[2]);
         this.z = Double.parseDouble(parts[3]);
-        this.dimension = parts[4];
+        this.dimension = Byte.parseByte(parts[4]);
     }
 
     @Override

@@ -18,6 +18,7 @@ import java.awt.*;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static com.github.thelampgod.snow.util.Helper.getDimensionFromId;
 import static com.github.thelampgod.snow.util.Helper.mc;
 
 public class WaypointRenderer {
@@ -39,13 +40,15 @@ public class WaypointRenderer {
         toRender.remove(userId);
     }
 
-    public void updatePoint(int userId, double x, double y, double z, String dimension, int groupId) {
+    public void updatePoint(int userId, double x, double y, double z, byte dimensionId, int groupId) {
         if (Snow.instance.getUserManager().getMe() == userId) return;
 
         Vec3d pos = new Vec3d(x,y,z);
         if (pos.distanceTo(Vec3d.ZERO) > Integer.parseInt(Snow.instance.getOption("maxRange"))) {
             return;
         }
+
+        String dimension = getDimensionFromId(dimensionId);
 
         toProcess.put(userId, new PositionData(x, y, z, dimension));
         lastUpdateMap.put(userId, System.currentTimeMillis());
@@ -90,7 +93,8 @@ public class WaypointRenderer {
                     Math.abs(distanceToIgnoringY) < 100 ? position.z : renderPos.z + 100 * Math.sin(angle)).subtract(renderPos);
 
 
-            if (distanceTo < 100) {
+            //TODO: setting
+            if (distanceTo < 70) {
                 if (mc.world.getDimensionKey().getValue().getPath().equals(position.dimension)) {
                     // Don't render
                     continue;

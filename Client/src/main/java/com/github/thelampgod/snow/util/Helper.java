@@ -63,4 +63,21 @@ public class Helper {
             printMessage(title + "\n" + description);
         }
     }
+
+    public static String getDimensionFromId(byte dimensionId) {
+        return switch (dimensionId) {
+            case -1 -> "the_nether";
+            case 1 -> "the_end";
+            default -> "overworld";
+        };
+    }
+
+    public static byte getDimensionId(String dimension) {
+        return switch (dimension) {
+            case "the_nether" -> -1;
+            case "the_end" -> 1;
+            default -> 0;
+        };
+    }
+
 }
