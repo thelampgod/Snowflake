@@ -91,6 +91,11 @@ public class WaypointRenderer {
 
 
             if (distanceTo < 100) {
+                if (mc.world.getDimensionKey().getValue().getPath().equals(position.dimension)) {
+                    // Don't render
+                    continue;
+                }
+
                 pos = new Vec3d(
                         DrawUtil.interpolate(position.prevX, position.x, tickDelta),
                         DrawUtil.interpolate(position.prevY, position.y, tickDelta),
@@ -140,7 +145,7 @@ public class WaypointRenderer {
         this.drawText(distanceString, yPos++, matrix, consumers);
 
         if (!mc.world.getDimensionKey().getValue().getPath().equals(dimension)) {
-            this.drawText(dimension, yPos, matrix, consumers);
+            this.drawText("(" + dimension + ")", yPos, matrix, consumers);
         }
 
 
