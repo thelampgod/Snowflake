@@ -73,7 +73,7 @@ public class SocketClient {
     @Override
     public String toString() {
         if (isAuthenticated()) {
-            return String.format("%s (%s:%s)", this.name, this.socket.getInetAddress().getHostName(), this.socket.getPort());
+            return String.format("[%s] %s (%s:%s)", this.getId(), this.name, this.socket.getInetAddress().getHostName(), this.socket.getPort());
         }
 
         return this.socket.getInetAddress().getHostName() + ":" + this.socket.getPort();

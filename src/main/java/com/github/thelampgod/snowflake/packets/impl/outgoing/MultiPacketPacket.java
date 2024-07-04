@@ -2,10 +2,12 @@ package com.github.thelampgod.snowflake.packets.impl.outgoing;
 
 import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
+import com.google.common.collect.Sets;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Queue;
+import java.util.Set;
 
 public class MultiPacketPacket extends SnowflakePacket {
     private final Queue<SnowflakePacket> packets;
@@ -23,5 +25,9 @@ public class MultiPacketPacket extends SnowflakePacket {
             packet.writeData(out);
         }
         out.writeBoolean(true);
+    }
+
+    public Set<SnowflakePacket> getPackets() {
+        return Sets.newHashSet(packets);
     }
 }

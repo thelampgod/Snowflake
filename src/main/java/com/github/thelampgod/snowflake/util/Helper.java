@@ -4,7 +4,7 @@ import com.github.thelampgod.snowflake.Snowflake;
 import com.github.thelampgod.snowflake.SnowflakeServer;
 import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.database.Database;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 
 import java.util.Set;
 

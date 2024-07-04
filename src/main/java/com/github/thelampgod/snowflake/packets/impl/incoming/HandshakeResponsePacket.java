@@ -7,6 +7,7 @@ import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.*;
 import com.github.thelampgod.snowflake.packets.impl.DisconnectPacket;
 import com.github.thelampgod.snowflake.util.DatabaseUtil;
+import com.github.thelampgod.snowflake.util.Helper;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

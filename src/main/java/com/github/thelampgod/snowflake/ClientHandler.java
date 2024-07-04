@@ -112,7 +112,14 @@ public class ClientHandler extends Thread {
     }
 
     private void dispatchPacket(SnowflakePacket packet) throws IOException {
-        getLog().debug("Sending a " + packet.getClass().getSimpleName() + " to " + client);
+        if (packet instanceof MultiPacketPacket multi) {
+            for (SnowflakePacket p : multi.getPackets()) {
+                getLog().debug("    Sending a " + p.getClass().getSimpleName() + " to " + client);
+            }
+        } else {
+            getLog().debug("Sending a " + packet.getClass().getSimpleName() + " to " + client);
+
+        }
         packet.writeData(out);
         out.flush();
 

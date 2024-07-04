@@ -7,11 +7,9 @@ import java.net.URL;
 
 import com.github.thelampgod.snowflake.groups.GroupManager;
 import com.google.common.io.Resources;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.message.ParameterizedNoReferenceMessageFactory;
 import org.apache.logging.log4j.simple.SimpleLogger;
-import org.apache.logging.log4j.util.PropertiesUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
@@ -27,15 +25,13 @@ public class Snowflake {
 
     private String password = "";
 
-    public final Logger logger = new SimpleLogger("Snowflake", Level.DEBUG,
-            true, false, true, false,
-            "hh:mm:ss",
-            ParameterizedNoReferenceMessageFactory.INSTANCE, new PropertiesUtil("log4j2.StatusLogger.properties"), System.err);
+    public Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
     public Snowflake(String[] args) {
         if (INSTANCE == null) {
             INSTANCE = this;
         }
+
         if (args != null && args.length > 0 && args[0].equals("--password")) {
             this.password = args[1];
         }
