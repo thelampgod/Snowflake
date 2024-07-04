@@ -4,6 +4,8 @@ import com.github.thelampgod.snowflake.Snowflake;
 import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.database.Database;
 import com.github.thelampgod.snowflake.groups.Group;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import java.sql.*;
 import java.util.*;
@@ -83,24 +85,27 @@ public class DatabaseUtil {
     }
 
     public static Collection<? extends Group> getGroupsFromDb(Database db) {
-        List<Group> temp = new ArrayList<>();
+        Map<Integer, Group> temp = Maps.newHashMap();
 
         try (Connection conn = db.getConnection()) {
             ResultSet result = DatabaseUtil.runQuery(
                     "select id, name, owner_id, user_id from groups join group_users on id=group_id", conn).getResultSet();
             while (result.next()) {
-                Group group = new Group(
-                        result.getString("name"),
-                        result.getInt("id"),
-                        result.getInt("owner_id"));
+                int groupId = result.getInt("id");
+                String name = result.getString("name");
+                int owner = result.getInt("owner_id");
+                Group group = temp.computeIfAbsent(groupId, id -> new Group(
+                        name,
+                        id,
+                        owner));
+
                 group.addUser(result.getInt("user_id"));
-                temp.add(group);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return temp;
+        return temp.values();
     }
 
     public static void removeGroup(Group group, Database db) {

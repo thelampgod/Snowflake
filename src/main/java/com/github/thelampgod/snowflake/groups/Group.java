@@ -3,6 +3,7 @@ package com.github.thelampgod.snowflake.groups;
 import com.github.thelampgod.snowflake.SocketClient;
 import com.google.common.collect.Sets;
 
+import java.util.Objects;
 import java.util.Set;
 
 public class Group {
@@ -68,5 +69,18 @@ public class Group {
 
     public Set<Integer> getUsers() {
         return users;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Group group = (Group) o;
+        return groupId == group.groupId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(groupId);
     }
 }
