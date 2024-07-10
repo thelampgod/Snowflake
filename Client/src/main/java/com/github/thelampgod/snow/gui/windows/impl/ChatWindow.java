@@ -46,13 +46,14 @@ public class ChatWindow extends SnowWindow {
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        super.render(ctx, mouseX, mouseY, delta);
+    public boolean render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+        if (!super.render(ctx, mouseX, mouseY, delta)) return false;
 
         if (!focused && chatInput.isFocused()) chatInput.setFocused(false);
         if (focused && !chatInput.isFocused()) chatInput.setFocused(true);
         chatInput.render(ctx, mouseX, mouseY, delta);
         chatElement.render(ctx, mouseX, mouseY, delta);
+        return true;
     }
 
     @Override

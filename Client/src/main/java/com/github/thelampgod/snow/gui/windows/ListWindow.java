@@ -19,10 +19,11 @@ public abstract class ListWindow extends SnowWindow {
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        super.render(ctx, mouseX, mouseY, delta);
+    public boolean render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+        if (!super.render(ctx, mouseX, mouseY, delta)) return false;
 
         buttonListElement.render(ctx, (int) (mouseX - x), (int) (mouseY - y), delta);
+        return true;
     }
 
     @Override

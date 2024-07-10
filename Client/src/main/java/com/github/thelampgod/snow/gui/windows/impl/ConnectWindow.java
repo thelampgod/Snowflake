@@ -65,7 +65,7 @@ public class ConnectWindow extends SnowWindow {
         this.connectButton = new SnowButton(textRenderer, "Connect", x, 17 * 3, 100, 17, this::connect);
     }
 
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+    public boolean render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         setFieldColor(ipField);
         setFieldColor(serverPassField);
         setFieldColor(maxRangeField);
@@ -97,6 +97,7 @@ public class ConnectWindow extends SnowWindow {
             this.x = SnowScreen.scaledWidth - width - 3;
             this.y = SnowScreen.scaledHeight - height - 17 - 3;
         }
+        return true;
     }
 
     private void setFieldColor(TextFieldWidget field) {

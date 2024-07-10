@@ -75,8 +75,8 @@ public abstract class SnowWindow {
     }
 
 
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        if (!hasInit) return;
+    public boolean render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+        if (!hasInit) return false;
 
         // Border
         ctx.fill(-1, -1, (getWidth() + 1), getHeight() + 1, (focused ? Color.WHITE.getRGB() : Color.BLACK.getRGB()));
@@ -97,6 +97,7 @@ public abstract class SnowWindow {
         for (TextButton button : headerButtons) {
             button.render(ctx, mouseX, mouseY);
         }
+        return true;
     }
 
 

@@ -38,13 +38,15 @@ public class GroupListWindow extends ListWindow {
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        super.render(ctx, mouseX, mouseY, delta);
+    public boolean render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+        if (!super.render(ctx, mouseX, mouseY, delta)) return false;
+
         if (!newGroupField.getText().isEmpty() || (focused && newGroupField.isMouseOver(mouseX - x, mouseY - y))) {
             newGroupField.render(ctx, mouseX, mouseY, delta);
         } else {
             ctx.drawTextWithShadow(textRenderer, "+ New Group", 10, headerHeight + textRenderer.fontHeight, Color.WHITE.getRGB());
         }
+        return true;
     }
 
     @Override
