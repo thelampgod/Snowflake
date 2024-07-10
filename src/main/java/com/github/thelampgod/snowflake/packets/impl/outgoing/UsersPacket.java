@@ -1,6 +1,5 @@
 package com.github.thelampgod.snowflake.packets.impl.outgoing;
 
-import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 
 import java.io.DataOutputStream;
@@ -9,8 +8,7 @@ import java.util.Map;
 
 public class UsersPacket extends SnowflakePacket {
     private final Map<Integer, String> idToNameMap;
-    public UsersPacket(Map<Integer, String> idToNameMap) throws IOException {
-        super(SocketClient.Snowflake());
+    public UsersPacket(Map<Integer, String> idToNameMap) {
         this.idToNameMap = idToNameMap;
     }
 

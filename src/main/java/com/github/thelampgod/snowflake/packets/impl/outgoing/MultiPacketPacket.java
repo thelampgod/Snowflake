@@ -1,6 +1,5 @@
 package com.github.thelampgod.snowflake.packets.impl.outgoing;
 
-import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 import com.google.common.collect.Sets;
 
@@ -11,8 +10,7 @@ import java.util.Set;
 
 public class MultiPacketPacket extends SnowflakePacket {
     private final Queue<SnowflakePacket> packets;
-    public MultiPacketPacket(Queue<SnowflakePacket> packets) throws IOException {
-        super(SocketClient.Snowflake());
+    public MultiPacketPacket(Queue<SnowflakePacket> packets) {
         this.packets = packets;
     }
 
@@ -20,7 +18,7 @@ public class MultiPacketPacket extends SnowflakePacket {
     public void writeData(DataOutputStream out) throws IOException {
         out.writeByte(14);
         while (!packets.isEmpty()) {
-            out.writeBoolean(false); //tell client if its the last or not
+            out.writeBoolean(false); //tell client if it is the last or not
             SnowflakePacket packet = packets.poll();
             packet.writeData(out);
         }

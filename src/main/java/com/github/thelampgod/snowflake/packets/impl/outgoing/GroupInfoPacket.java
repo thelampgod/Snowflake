@@ -1,6 +1,5 @@
 package com.github.thelampgod.snowflake.packets.impl.outgoing;
 
-import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 
 import java.io.DataOutputStream;
@@ -13,8 +12,7 @@ public class GroupInfoPacket extends SnowflakePacket {
     private final int id;
     private final boolean isOwner;
     private final Set<Integer> users;
-    public GroupInfoPacket(String name, int id, boolean isOwner, Set<Integer> users) throws IOException {
-        super(SocketClient.Snowflake());
+    public GroupInfoPacket(String name, int id, boolean isOwner, Set<Integer> users) {
         this.name = name;
         this.id = id;
         this.isOwner = isOwner;

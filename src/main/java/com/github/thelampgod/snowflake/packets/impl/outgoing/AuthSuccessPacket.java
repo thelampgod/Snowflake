@@ -1,6 +1,5 @@
 package com.github.thelampgod.snowflake.packets.impl.outgoing;
 
-import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 
 import java.io.DataOutputStream;
@@ -10,8 +9,7 @@ public class AuthSuccessPacket extends SnowflakePacket {
 
     private final int authedUserId;
 
-    public AuthSuccessPacket(int id) throws IOException {
-        super(SocketClient.Snowflake());
+    public AuthSuccessPacket(int id) {
         this.authedUserId = id;
     }
 

@@ -1,6 +1,5 @@
 package com.github.thelampgod.snowflake.packets.impl.outgoing;
 
-import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 
 import java.io.DataOutputStream;
@@ -11,8 +10,7 @@ public class ConnectionPacket extends SnowflakePacket {
     private final int id;
     private final String name;
 
-    public ConnectionPacket(boolean connect, int id, String name) throws IOException {
-        super(SocketClient.Snowflake());
+    public ConnectionPacket(boolean connect, int id, String name) {
         this.connect = connect;
         this.id = id;
         this.name = name;
@@ -27,13 +25,13 @@ public class ConnectionPacket extends SnowflakePacket {
 
 
     public static class Connect extends ConnectionPacket {
-        public Connect(int id, String name) throws IOException {
+        public Connect(int id, String name) {
             super(true, id, name);
         }
     }
 
     public static class Disconnect extends ConnectionPacket {
-        public Disconnect(int id, String name) throws IOException {
+        public Disconnect(int id, String name) {
             super(false, id, name);
         }
     }

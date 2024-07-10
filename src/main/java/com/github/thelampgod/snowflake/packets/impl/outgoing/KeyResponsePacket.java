@@ -1,6 +1,5 @@
 package com.github.thelampgod.snowflake.packets.impl.outgoing;
 
-import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 
 import java.io.DataOutputStream;
@@ -9,8 +8,7 @@ import java.io.IOException;
 public class KeyResponsePacket extends SnowflakePacket {
     private final int id;
     private final String key;
-    public KeyResponsePacket(int id, String key) throws IOException {
-        super(SocketClient.Snowflake());
+    public KeyResponsePacket(int id, String key) {
         this.id = id;
         this.key = key;
     }

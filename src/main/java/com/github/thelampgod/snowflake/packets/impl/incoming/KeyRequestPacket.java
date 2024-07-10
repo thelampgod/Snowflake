@@ -1,6 +1,6 @@
 package com.github.thelampgod.snowflake.packets.impl.incoming;
 
-import com.github.thelampgod.snowflake.SocketClient;
+import com.github.thelampgod.snowflake.ClientHandler;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.KeyResponsePacket;
 import com.github.thelampgod.snowflake.util.DatabaseUtil;
@@ -16,7 +16,7 @@ import static com.github.thelampgod.snowflake.util.Helper.getDb;
 
 public class KeyRequestPacket extends SnowflakePacket {
     private final int id;
-    public KeyRequestPacket(DataInputStream in, SocketClient sender) throws IOException {
+    public KeyRequestPacket(DataInputStream in, ClientHandler sender) throws IOException {
         super(sender);
         this.id = in.readInt();
     }
@@ -43,10 +43,10 @@ public class KeyRequestPacket extends SnowflakePacket {
         }
 
         if (!key.isEmpty()) {
-            this.getSender().getConnection().sendPacket(new KeyResponsePacket(id, key));
+            this.getSender().sendPacket(new KeyResponsePacket(id, key));
         } else {
             // write invalid
-            this.getSender().getConnection().sendPacket(new KeyResponsePacket(-1, ""));
+            this.getSender().sendPacket(new KeyResponsePacket(-1, ""));
         }
     }
 }

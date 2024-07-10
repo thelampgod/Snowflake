@@ -1,6 +1,5 @@
 package com.github.thelampgod.snowflake.packets.impl.outgoing;
 
-import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 
 import java.io.DataOutputStream;
@@ -13,8 +12,7 @@ public class GroupConnectionPacket extends SnowflakePacket {
     private final int clientId;
 
 
-    public GroupConnectionPacket(int action, int groupId, int clientId) throws IOException {
-        super(SocketClient.Snowflake());
+    public GroupConnectionPacket(int action, int groupId, int clientId) {
         this.action = action;
         this.groupId = groupId;
         this.clientId = clientId;
@@ -29,25 +27,25 @@ public class GroupConnectionPacket extends SnowflakePacket {
     }
 
     public static class Added extends GroupConnectionPacket {
-        public Added(int groupId, int clientId) throws IOException {
+        public Added(int groupId, int clientId) {
             super(0, groupId, clientId);
         }
     }
 
     public static class Removed extends GroupConnectionPacket {
-        public Removed(int groupId, int clientId) throws IOException {
+        public Removed(int groupId, int clientId) {
             super(1, groupId, clientId);
         }
     }
 
     public static class Joined extends GroupConnectionPacket {
-        public Joined(int groupId, int clientId) throws IOException {
+        public Joined(int groupId, int clientId) {
             super(2, groupId, clientId);
         }
     }
 
     public static class Left extends GroupConnectionPacket {
-        public Left(int groupId, int clientId) throws IOException {
+        public Left(int groupId, int clientId) {
             super(3, groupId, clientId);
         }
     }

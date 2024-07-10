@@ -63,10 +63,10 @@ public class Snowflake {
 
     public void shutdown() {
         logger.info("Shutting down");
-        server.stop();
         try {
+            server.stop();
             database.getConnection().close();
-        } catch (SQLException e) {
+        } catch (SQLException | IOException e) {
             throw new RuntimeException(e);
         }
     }

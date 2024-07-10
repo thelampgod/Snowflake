@@ -1,5 +1,7 @@
 package com.github.thelampgod.snowflake.packets.impl.incoming;
 
+import com.github.thelampgod.snowflake.ClientHandler;
+import com.github.thelampgod.snowflake.ConnectionPair;
 import com.github.thelampgod.snowflake.Snowflake;
 import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.groups.Group;
@@ -7,21 +9,19 @@ import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.*;
 import com.github.thelampgod.snowflake.packets.impl.DisconnectPacket;
 import com.github.thelampgod.snowflake.util.DatabaseUtil;
-import com.github.thelampgod.snowflake.util.Helper;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Set;
 
-import static com.github.thelampgod.snowflake.util.Helper.getConnectedClients;
 import static com.github.thelampgod.snowflake.util.Helper.getLog;
 
 public class HandshakeResponsePacket extends SnowflakePacket {
     private final String secret;
     private final String name;
 
-    public HandshakeResponsePacket(DataInputStream in, SocketClient sender) throws IOException {
+    public HandshakeResponsePacket(DataInputStream in, ClientHandler sender) throws IOException {
         super(sender);
         this.secret = in.readUTF();
         this.name = in.readUTF();
@@ -34,7 +34,7 @@ public class HandshakeResponsePacket extends SnowflakePacket {
 
     @Override
     public void handle() throws IOException {
-        final SocketClient client = this.getSender();
+        final SocketClient client = this.getSender().client;
         if (this.secret.equals(client.getSecret())) {
             final String pubKey = client.getPubKey();
             final String name = this.name;
@@ -44,32 +44,27 @@ public class HandshakeResponsePacket extends SnowflakePacket {
 
             // check that user is not already connected and authenticated
             if (Snowflake.INSTANCE.getServer().getClientReceiver(id) != null) {
-                client.getConnection().sendPacket(new DisconnectPacket("You're already connected! Choose another identity.", client));
+                client.getConnection().sendPacket(new DisconnectPacket("You're already connected! Choose another identity."));
                 return;
             }
 
             client.setId(id);
             client.setAuthenticated(true);
 
-            getConnectedClients().stream()
-                    .filter(c -> c.getLinkString().equals(client.getLinkString()))
-                    .filter(SocketClient::isReceiver)
-                    .forEach(c -> {
-                        c.setPubKey(pubKey);
-                        c.setName(name);
-                        c.setId(id);
-                        c.setAuthenticated(true);
-                        getLog().debug(c + " authenticated.");
-                    });
+            SocketClient receiver = Snowflake.INSTANCE.getServer().getClientReceiver(client.getLinkString()).client;
+            receiver.setPubKey(pubKey);
+            receiver.setName(name);
+            receiver.setId(id);
+            receiver.setAuthenticated(true);
             getLog().info(client + " authenticated.");
 
             final Set<Group> userGroups = Snowflake.INSTANCE.getGroupManager().findUserGroups(client.getId());
             for (Group group : userGroups) {
                 client.getConnection().sendPacket(new GroupInfoPacket(group.getName(), group.getId(), group.getOwnerId() == client.getId(), group.getUsers()));
-                for (int groupUsersIds : group.getUsers()) {
-                    final SocketClient groupUser = Snowflake.INSTANCE.getServer().getClientReceiver(groupUsersIds);
+                for (int groupUserId : group.getUsers()) {
+                    final ClientHandler groupUser = Snowflake.INSTANCE.getServer().getClientReceiver(groupUserId);
                     if (groupUser == null) continue;
-                    groupUser.getConnection().sendPacket(new GroupConnectionPacket.Joined(group.getId(), client.getId()));
+                    groupUser.sendPacket(new GroupConnectionPacket.Joined(group.getId(), client.getId()));
                 }
             }
 
@@ -77,16 +72,16 @@ public class HandshakeResponsePacket extends SnowflakePacket {
             client.getConnection().sendPacket(new AuthSuccessPacket(client.getId()));
             sendConnectionMsg();
         } else {
-            client.getConnection().sendPacket(new DisconnectPacket("Wrong password", client));
+            client.getConnection().sendPacket(new DisconnectPacket("Wrong password"));
         }
     }
 
-    private void sendConnectionMsg() throws IOException {
-        for (SocketClient receiver : getConnectedClients()) {
-            if (!receiver.isReceiver()) continue;
-            if (!receiver.isAuthenticated()) continue;
+    private void sendConnectionMsg() {
+        for (ConnectionPair pair : Snowflake.INSTANCE.getServer().getConnections()) {
+            ClientHandler receiver = pair.getReceiver();
+            if (!receiver.client.isAuthenticated()) continue;
 
-            receiver.getConnection().sendPacket(new ConnectionPacket.Connect(this.getSender().getId(), this.getSender().getName()));
+            receiver.sendPacket(new ConnectionPacket.Connect(this.getSender().client.getId(), this.getSender().client.getName()));
         }
     }
 }

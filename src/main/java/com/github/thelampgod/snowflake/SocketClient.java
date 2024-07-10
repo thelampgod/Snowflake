@@ -2,6 +2,7 @@ package com.github.thelampgod.snowflake;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Objects;
 
 public class SocketClient {
     private Socket socket;
@@ -14,7 +15,7 @@ public class SocketClient {
     private String name = "not_authenticated_user";
     private String pubKey = null;
     private boolean authenticated = false;
-    private int id;
+    private int id = -1;
     private boolean receiver = false;
     private String linkString;
 
@@ -30,7 +31,7 @@ public class SocketClient {
     public SocketClient() {
     }
 
-    public static SocketClient Snowflake() throws IOException {
+    public static SocketClient Snowflake() {
         return new SocketClient();
     }
 
@@ -121,5 +122,18 @@ public class SocketClient {
 
     public String getSecret() {
         return this.secret;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SocketClient that = (SocketClient) o;
+        return Objects.equals(linkString, that.linkString);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(linkString);
     }
 }

@@ -1,23 +1,20 @@
 package com.github.thelampgod.snowflake.packets.impl.incoming;
 
+import com.github.thelampgod.snowflake.ClientHandler;
+import com.github.thelampgod.snowflake.ConnectionPair;
+import com.github.thelampgod.snowflake.Snowflake;
 import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
-import com.github.thelampgod.snowflake.packets.impl.outgoing.PlainMessagePacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.UsersPacket;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.github.thelampgod.snowflake.util.Helper.getConnectedClients;
-
 public class ListUsersPacket extends SnowflakePacket {
 
-    public ListUsersPacket(SocketClient sender) {
+    public ListUsersPacket(ClientHandler sender) {
         super(sender);
     }
 
@@ -33,11 +30,12 @@ public class ListUsersPacket extends SnowflakePacket {
         }
 
         final Map<Integer, String> idToNameMap = new HashMap<>();
-        for (SocketClient client : getConnectedClients()) {
-            if (client.getId() == 0) continue;
+        for (ConnectionPair pair : Snowflake.INSTANCE.getServer().getConnections()) {
+            SocketClient client = pair.getReceiver().client;
+            if (client.getId() == -1) continue;
             idToNameMap.put(client.getId(), client.getName());
         }
 
-        this.getSender().getConnection().sendPacket(new UsersPacket(idToNameMap));
+        this.getSender().sendPacket(new UsersPacket(idToNameMap));
     }
 }

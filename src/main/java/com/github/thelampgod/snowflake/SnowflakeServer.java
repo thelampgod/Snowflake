@@ -1,7 +1,8 @@
 package com.github.thelampgod.snowflake;
 
+import com.github.thelampgod.snowflake.packets.impl.DisconnectPacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.ConnectionPacket;
-import com.google.common.collect.Sets;
+import com.google.common.collect.Maps;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -13,8 +14,8 @@ public class SnowflakeServer {
     private final String password;
     private ServerSocket server;
 
-    public final Set<SocketClient> connectedClients = Sets.newConcurrentHashSet();
-    public final Set<ClientHandler> threads = Sets.newConcurrentHashSet();
+
+    private final Map<String, ConnectionPair> connections = Maps.newConcurrentMap();
 
     public SnowflakeServer(String password) {
         this.password = password;
@@ -25,80 +26,103 @@ public class SnowflakeServer {
             server = new ServerSocket(port);
             while (true) {
                 ClientHandler thread = new ClientHandler(server.accept(), password);
-                threads.add(thread);
                 thread.start();
             }
         } catch (IOException ignored) {
         }
     }
 
-    public void stop() {
-        try {
-            for (SocketClient client : connectedClients) {
-                this.removeClient(client);
+    public void stop() throws IOException {
+        for (ConnectionPair pair : connections.values()) {
+            removeClient(pair);
+        }
+        server.close();
+    }
+
+    public void addClient(boolean receiver, ClientHandler thread) {
+        final SocketClient client = thread.client;
+        ConnectionPair pair = connections.computeIfAbsent(client.getLinkString(), secret -> {
+            ConnectionPair p = new ConnectionPair(secret);
+            if (receiver) {
+                p.setReceiver(thread);
+            } else {
+                p.setTalker(thread);
             }
-            server.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            return p;
+        });
+
+        if (receiver) {
+            pair.setReceiver(thread);
+        } else {
+            pair.setTalker(thread);
+        }
+
+        getLog().debug(client + " connected.");
+    }
+
+    private void removeClient(ConnectionPair pair) {
+        if (!connections.containsKey(pair.getSecret())) return;
+        pair.getReceiver().sendPacketInstant(new DisconnectPacket("Disconnected"));
+        pair.close();
+        connections.remove(pair.getSecret());
+
+        if (pair.isPaired()) {
+            SocketClient receiver = pair.getReceiver().client;
+            getLog().info(receiver + " disconnected.");
+            if (!receiver.isAuthenticated()) return;
+
+            this.sendDisconnectMessage(receiver);
+        }
+    }
+
+    public void removeClient(SocketClient client) throws IOException {
+        final ConnectionPair pair = connections.get(client.getLinkString());
+        if (pair == null) return;
+        this.removeClient(pair);
+    }
+
+    public void removeClient(ClientHandler connection) {
+        final ConnectionPair pair = connections.get(connection.client.getLinkString());
+        if (pair == null) return;
+        this.removeClient(pair);
+    }
+
+    private void sendDisconnectMessage(SocketClient client) {
+        for (ConnectionPair pair : connections.values()) {
+            if (!pair.getReceiver().client.isAuthenticated()) return;
+            pair.getReceiver().sendPacket(new ConnectionPacket.Disconnect(client.getId(), client.getName()));
         }
 
     }
 
-    public void addClient(SocketClient client) {
-        this.connectedClients.add(client);
-        getLog().debug(client.toString() + " connected.");
-    }
-
-    public void removeClient(SocketClient client) {
-        connectedClients.stream()
-                .filter(c -> c.getLinkString() == null || c.getLinkString().equals(client.getLinkString()))
-                .forEach(c -> {
-                    connectedClients.remove(c);
-                    getLog().debug(c + " disconnected.");
-                    try {
-                        c.getSocket().close();
-                    } catch (IOException ignored) {
-                    }
-                });
-        threads.stream()
-                .filter(th -> th.client.getLinkString() == null || th.client.getLinkString().equals(client.getLinkString()))
-                .forEach(th -> {
-                    th.isRunning = false;
-                    threads.remove(th);
-                });
-
-        getLog().info(client + " disconnected.");
-
-        try {
-            if (!client.isAuthenticated() || client.isReceiver()) return;
-            sendDisconnectMessage(client);
-        } catch (IOException e) {
-            e.printStackTrace();
+    public ClientHandler getClientReceiver(int id) {
+        for (ConnectionPair pair : connections.values()) {
+            if (!pair.isPaired()) continue;
+            ClientHandler receiver = pair.getReceiver();
+            if (receiver.client.getId() == id) {
+                return receiver;
+            }
         }
+        return null;
     }
 
-    private void sendDisconnectMessage(SocketClient client) throws IOException {
-        for (SocketClient receiver : getConnectedClients()) {
-            if (!receiver.isReceiver()) continue;
-
-            receiver.getConnection().sendPacket(new ConnectionPacket.Disconnect(client.getId(), client.getName()));
-        }
-
+    public ClientHandler getClientReceiver(ClientHandler connection) {
+        return this.getClientReceiver(connection.client);
     }
 
-    public SocketClient getClientReceiver(int clientId) {
-        return this.connectedClients.stream()
-                .filter(client -> client.getId() == clientId)
-                .filter(SocketClient::isReceiver)
-                .findAny()
-                .orElse(null);
+    public ClientHandler getClientReceiver(SocketClient client) {
+        return this.getClientReceiver(client.getLinkString());
     }
 
-    public SocketClient getClientReceiver(String linker) {
-        return this.connectedClients.stream()
-                .filter(client -> client.getLinkString().equals(linker))
-                .filter(SocketClient::isReceiver)
-                .findAny()
-                .orElse(null);
+    public ClientHandler getClientReceiver(String linker) {
+        return connections.get(linker).getReceiver();
+    }
+
+    public Collection<ConnectionPair> getConnections() {
+        return connections.values();
+    }
+
+    public ConnectionPair get(SocketClient client) {
+        return connections.get(client.getLinkString());
     }
 }

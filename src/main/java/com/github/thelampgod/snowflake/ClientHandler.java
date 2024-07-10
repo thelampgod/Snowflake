@@ -16,9 +16,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import static com.github.thelampgod.snowflake.util.Helper.*;
 
 public class ClientHandler extends Thread {
-    final SocketClient client;
+    //TODO: move id and stuff out of SocketClient
+    public final SocketClient client;
     private final String password;
-
     private static final String PROTOCOL_VERSION = "hNnRaVtqtNGECREZVhSNUbCwmcUjVlOZ";
     public boolean isRunning = true;
     private DataOutputStream out;
@@ -29,7 +29,6 @@ public class ClientHandler extends Thread {
     public ClientHandler(Socket socket, String password) throws IOException {
         this.client = new SocketClient(socket, this);
         this.password = password;
-        getServer().addClient(this.client);
     }
 
     @Override
@@ -42,13 +41,15 @@ public class ClientHandler extends Thread {
             String secret = in.readUTF();
             client.setLinker(secret);
 
+            getServer().addClient(receiver, this);
+
             if (!receiver) {
                 if (!in.readUTF().equals(PROTOCOL_VERSION)) {
-                    this.sendPacket(new DisconnectPacket("Outdated client or server", client));
+                    this.sendPacket(new DisconnectPacket("Outdated client or server"));
                     return;
                 }
                 if (!in.readUTF().equals(password) && !password.isEmpty()) {
-                    this.sendPacket(new DisconnectPacket("Wrong password", client));
+                    this.sendPacket(new DisconnectPacket("Wrong password"));
                     return;
                 }
             }
@@ -68,12 +69,16 @@ public class ClientHandler extends Thread {
             getLog().info(client + " connected.");
             getLog().debug("Talker connected " + client);
             while (isRunning) {
-                SnowflakePacket packet = SnowflakePacket.fromId(in.readByte(), in, client);
+                SnowflakePacket packet = SnowflakePacket.fromId(in.readByte(), in, this);
                 getLog().debug("Received a " + packet.getClass().getSimpleName() + " from " + client);
                 packet.handle();
             }
         } catch (Throwable ignored) {
-            getServer().removeClient(client);
+            try {
+                getServer().removeClient(client);
+            } catch (IOException e) {
+
+            }
         }
     }
 
@@ -118,25 +123,31 @@ public class ClientHandler extends Thread {
             }
         } else {
             getLog().debug("Sending a " + packet.getClass().getSimpleName() + " to " + client);
-
         }
+
         packet.writeData(out);
         out.flush();
 
         if (packet instanceof DisconnectPacket disconnect) {
+            if (disconnect.getSender() == null) return;
             getServer().removeClient(disconnect.getSender());
-            getLog().debug(disconnect.getSender() + " disconnected. Reason: " + disconnect.getReason());
+            getLog().debug(disconnect.getSender().client + " disconnected. Reason: " + disconnect.getReason());
         }
     }
 
-    public void sendPacket(SnowflakePacket packet) throws IOException {
+    public void sendPacketInstant(SnowflakePacket packet) {
+        try {
+            this.dispatchPacket(packet);
+        } catch (IOException e) {
+            getLog().error("Error sending packet: " + e.getMessage(), e);
+        }
+    }
+
+    public void sendPacket(SnowflakePacket packet) {
         if (!this.client.isReceiver()) {
-            SocketClient receiver = Snowflake.INSTANCE.getServer().getClientReceiver(this.client.getId());
-            if (!this.client.isAuthenticated()) {
-                receiver = Snowflake.INSTANCE.getServer().getClientReceiver(this.client.getLinkString());
-            }
+            ClientHandler receiver = Snowflake.INSTANCE.getServer().getClientReceiver(this.client);
             if (receiver == null) return;
-            receiver.getConnection().sendPacket(packet);
+            receiver.sendPacket(packet);
             return;
         }
 
@@ -151,7 +162,7 @@ public class ClientHandler extends Thread {
 
     private void sendKeepAlive() throws IOException {
         if (!client.responded) {
-            this.sendPacket(new DisconnectPacket("Timed out.", client));
+            this.sendPacket(new DisconnectPacket("Timed out."));
             return;
         }
         client.responded = false;

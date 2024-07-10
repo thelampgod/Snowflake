@@ -1,7 +1,7 @@
 package com.github.thelampgod.snowflake.packets;
 
+import com.github.thelampgod.snowflake.ClientHandler;
 import com.github.thelampgod.snowflake.Snowflake;
-import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.groups.Group;
 import com.github.thelampgod.snowflake.packets.impl.*;
 import com.github.thelampgod.snowflake.packets.impl.incoming.GroupInvitePacket;
@@ -13,17 +13,21 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public abstract class SnowflakePacket {
-    private final SocketClient sender;
+    private final ClientHandler sender;
 
-    public SnowflakePacket(SocketClient sender) {
+    public SnowflakePacket(ClientHandler sender) {
         this.sender = sender;
     }
 
-    public SocketClient getSender() {
+    public SnowflakePacket() {
+        this.sender = null;
+    }
+
+    public ClientHandler getSender() {
         return sender;
     }
 
-    public static SnowflakePacket fromId(byte id, DataInputStream in, SocketClient sender) throws IOException {
+    public static SnowflakePacket fromId(byte id, DataInputStream in, ClientHandler sender) throws IOException {
         switch (id) {
             case -1:
                 return new DisconnectPacket("Disconnected", sender);
@@ -61,18 +65,18 @@ public abstract class SnowflakePacket {
     public void handle() throws IOException {
     }
 
-    public boolean isAuthenticated() throws IOException {
-        if (!this.getSender().isAuthenticated()) {
-            this.getSender().getConnection().sendPacket(new PlainMessagePacket("Not authenticated."));
+    public boolean isAuthenticated() {
+        if (!this.getSender().client.isAuthenticated()) {
+            this.getSender().sendPacket(new PlainMessagePacket("Not authenticated."));
             return false;
         }
         return true;
     }
 
-    public boolean isOwner(int groupId) throws IOException {
+    public boolean isOwner(int groupId) {
         final Group group = Snowflake.INSTANCE.getGroupManager().get(groupId);
-        if (group.getOwnerId() != this.getSender().getId()) {
-            this.getSender().getConnection().sendPacket(new PlainMessagePacket("You are not the owner of this group."));
+        if (group.getOwnerId() != this.getSender().client.getId()) {
+            this.getSender().sendPacket(new PlainMessagePacket("You are not the owner of this group."));
             return false;
         }
         return true;

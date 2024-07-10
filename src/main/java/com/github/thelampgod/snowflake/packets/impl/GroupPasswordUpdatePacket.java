@@ -2,12 +2,8 @@ package com.github.thelampgod.snowflake.packets.impl;
 
 import com.github.thelampgod.snowflake.ClientHandler;
 import com.github.thelampgod.snowflake.Snowflake;
-import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.groups.Group;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
-import com.github.thelampgod.snowflake.packets.impl.outgoing.GroupConnectionPacket;
-import com.github.thelampgod.snowflake.packets.impl.outgoing.GroupPasswordPacket;
-import com.github.thelampgod.snowflake.packets.impl.outgoing.PlainMessagePacket;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -17,7 +13,7 @@ public class GroupPasswordUpdatePacket extends SnowflakePacket {
 
     private final int groupId;
     private final byte[] password;
-    public GroupPasswordUpdatePacket(DataInputStream in, SocketClient sender) throws IOException {
+    public GroupPasswordUpdatePacket(DataInputStream in, ClientHandler sender) throws IOException {
         super(sender);
         this.groupId = in.readInt();
         this.password = new byte[in.readInt()];
@@ -40,7 +36,7 @@ public class GroupPasswordUpdatePacket extends SnowflakePacket {
         final Group group = Snowflake.INSTANCE.getGroupManager().get(groupId);
 
         for (int user : group.getUsers()) {
-            final ClientHandler client = Snowflake.INSTANCE.getServer().getClientReceiver(user).getConnection();
+            final ClientHandler client = Snowflake.INSTANCE.getServer().getClientReceiver(user);
             if (client == null) continue;
             client.sendPacket(this);
         }

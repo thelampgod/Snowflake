@@ -1,7 +1,7 @@
 package com.github.thelampgod.snowflake.packets.impl;
 
+import com.github.thelampgod.snowflake.ClientHandler;
 import com.github.thelampgod.snowflake.Snowflake;
-import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.groups.Group;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 
@@ -14,7 +14,7 @@ public class EncryptedDataPacket extends SnowflakePacket {
     private final boolean group;
     private final int id;
     private final byte[] data;
-    public EncryptedDataPacket(DataInputStream in, SocketClient sender) throws IOException {
+    public EncryptedDataPacket(DataInputStream in, ClientHandler sender) throws IOException {
         super(sender);
         this.group = in.readBoolean();
         this.id = in.readInt();
@@ -26,7 +26,7 @@ public class EncryptedDataPacket extends SnowflakePacket {
     public void writeData(DataOutputStream out) throws IOException {
         out.writeByte(21);
         out.writeBoolean(group);
-        out.writeInt(this.getSender().getId());
+        out.writeInt(this.getSender().client.getId());
         out.writeInt(id);
         out.writeInt(data.length);
         out.write(data);
@@ -45,19 +45,19 @@ public class EncryptedDataPacket extends SnowflakePacket {
         forwardToUser(id);
     }
 
-    private void forwardToUser(int id) throws IOException {
-        SocketClient client = Snowflake.INSTANCE.getServer().getClientReceiver(id);
+    private void forwardToUser(int id) {
+        ClientHandler client = Snowflake.INSTANCE.getServer().getClientReceiver(id);
         if (client == null) return;
-        client.getConnection().sendPacket(this);
+        client.sendPacket(this);
     }
 
-    private void forwardToGroup(int id) throws IOException {
+    private void forwardToGroup(int id) {
         final Group group = Snowflake.INSTANCE.getGroupManager().get(id);
 
         for (int user : group.getUsers()) {
-            SocketClient client = Snowflake.INSTANCE.getServer().getClientReceiver(user);
+            ClientHandler client = Snowflake.INSTANCE.getServer().getClientReceiver(user);
             if (client == null) continue;
-            client.getConnection().sendPacket(this);
+            client.sendPacket(this);
         }
     }
 }
