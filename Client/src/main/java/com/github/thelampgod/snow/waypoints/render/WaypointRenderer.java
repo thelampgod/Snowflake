@@ -15,6 +15,7 @@ import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 
 import java.awt.*;
+import java.awt.desktop.PreferencesEvent;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -66,6 +67,7 @@ public class WaypointRenderer {
 
 
     public void render(MatrixStack stack, float tickDelta, Camera camera) {
+        if (mc.options.hudHidden) return;
         if (mc.world == null || toRender.isEmpty()) return;
 
         for (Map.Entry<Integer, PositionData> entry : toRender.entrySet()) {
@@ -78,20 +80,20 @@ public class WaypointRenderer {
             if (user == null) return;
             final Vec3d renderPos = camera.getPos();
 
-            double deltaX = position.x - renderPos.x;
-            double deltaZ = position.z - renderPos.z;
-            double deltaY = position.y - renderPos.y;
+            double interpolatedX = DrawUtil.interpolate(position.prevX, position.x, tickDelta);
+            double interpolatedY = DrawUtil.interpolate(position.prevY, position.y, tickDelta);
+            double interpolatedZ = DrawUtil.interpolate(position.prevZ, position.z, tickDelta);
+
+            double deltaX = interpolatedX - renderPos.x;
+            double deltaZ = interpolatedZ - renderPos.z;
+            double deltaY = interpolatedY - renderPos.y;
 
             double angle = Math.atan2(deltaZ, deltaX);
             final double distanceTo = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
             final double distanceToIgnoringY = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
             double yAngle = Math.asin(deltaY / distanceTo);
 
-            Vec3d pos = new Vec3d(
-                    Math.abs(distanceToIgnoringY) < 100 ? position.x : renderPos.x + 100 * Math.cos(angle),
-                    renderPos.y + 100 * Math.sin(yAngle),
-                    Math.abs(distanceToIgnoringY) < 100 ? position.z : renderPos.z + 100 * Math.sin(angle)).subtract(renderPos);
-
+            Vec3d pos;
 
             //TODO: setting
             if (distanceTo < 70) {
@@ -100,10 +102,12 @@ public class WaypointRenderer {
                     continue;
                 }
 
+                pos = new Vec3d(interpolatedX, interpolatedY, interpolatedZ).subtract(renderPos);
+            } else {
                 pos = new Vec3d(
-                        DrawUtil.interpolate(position.prevX, position.x, tickDelta),
-                        DrawUtil.interpolate(position.prevY, position.y, tickDelta),
-                        DrawUtil.interpolate(position.prevZ, position.z, tickDelta)).subtract(renderPos);
+                        Math.abs(distanceToIgnoringY) < 100 ? interpolatedX : renderPos.x + 100 * Math.cos(angle),
+                        renderPos.y + 100 * Math.sin(yAngle),
+                        Math.abs(distanceToIgnoringY) < 100 ? interpolatedZ : renderPos.z + 100 * Math.sin(angle)).subtract(renderPos);
             }
 
             renderWaypoint(user.getName(), pos.x, pos.y, pos.z, stack, camera, distanceTo, position.dimension);
