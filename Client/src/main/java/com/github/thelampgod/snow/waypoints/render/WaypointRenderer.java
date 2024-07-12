@@ -88,13 +88,7 @@ public class WaypointRenderer {
             double deltaZ = interpolatedZ - renderPos.z;
             double deltaY = interpolatedY - renderPos.y;
 
-            double yaw = Math.atan2(deltaZ, deltaX);
             final double distanceTo = deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
-            final double distanceToIgnoringY = deltaX * deltaX + deltaZ * deltaZ;
-            double pitch = Math.atan2(Math.sqrt(deltaZ * deltaZ + deltaX * deltaX), deltaY);
-
-            Vec3d pos;
-            Vec3d dir = new Vec3d(Math.sin(pitch) * Math.cos(yaw), Math.cos(pitch), Math.sin(pitch) * Math.sin(yaw));
 
             //TODO: setting
             if (distanceTo < 70 * 70) {
@@ -102,14 +96,16 @@ public class WaypointRenderer {
                     // Don't render
                     continue;
                 }
-
-                pos = new Vec3d(interpolatedX, interpolatedY, interpolatedZ).subtract(renderPos);
-            } else {
-                pos = new Vec3d(
-                        distanceToIgnoringY < 10 ? interpolatedX : renderPos.x + 3 * dir.x,
-                        distanceToIgnoringY < 10 ? interpolatedY : renderPos.y + 3 * dir.y,
-                        distanceToIgnoringY < 10 ? interpolatedZ : renderPos.z + 3 * dir.z).subtract(renderPos);
             }
+
+            double yaw = Math.atan2(deltaZ, deltaX);
+            double pitch = Math.atan2(Math.sqrt(deltaZ * deltaZ + deltaX * deltaX), deltaY);
+
+            Vec3d dir = new Vec3d(Math.sin(pitch) * Math.cos(yaw), Math.cos(pitch), Math.sin(pitch) * Math.sin(yaw));
+            Vec3d pos = new Vec3d(
+                    renderPos.x + 0.3 * dir.x,
+                    renderPos.y + 0.3 * dir.y,
+                    renderPos.z + 0.3 * dir.z).subtract(renderPos);
 
             renderWaypoint(user.getName(), pos.x, pos.y, pos.z, stack, camera, distanceTo, position.dimension);
         }
@@ -142,7 +138,8 @@ public class WaypointRenderer {
         double camDistance = Math.sqrt(dispatcher.getSquaredDistanceToCamera(x + pos.x, y + pos.y, z + pos.z));
         String distanceString = String.format("%.2f", Math.sqrt(distance)) + "m";
 
-        float scale = (float) MathHelper.clamp(camDistance * 0.03f / 10, 0.003, Double.MAX_VALUE);
+        //TODO: setting
+        float scale = (float) MathHelper.clamp(camDistance * 0.03f / 10, 0.001, Double.MAX_VALUE);
         stack.scale(-scale, -scale, scale);
         Matrix4f matrix = stack.peek().getPositionMatrix();
 
