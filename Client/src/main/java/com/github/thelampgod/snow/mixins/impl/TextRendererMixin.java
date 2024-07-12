@@ -7,8 +7,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(TextRenderer.class)
 public class TextRendererMixin {
-    @Redirect(method = "drawWithOutline", at = @At(value = "FIELD", target = "Lnet/minecraft/client/font/TextRenderer$TextLayerType;POLYGON_OFFSET:Lnet/minecraft/client/font/TextRenderer$TextLayerType;"))
-    public TextRenderer.TextLayerType fixTransparency() {
-        return TextRenderer.TextLayerType.SEE_THROUGH;
-    }
+//    @Redirect(method = "drawWithOutline", at = @At(value = "FIELD", target = "Lnet/minecraft/client/font/TextRenderer$TextLayerType;POLYGON_OFFSET:Lnet/minecraft/client/font/TextRenderer$TextLayerType;"))
+//    public TextRenderer.TextLayerType fixTransparency() {
+//        return TextRenderer.TextLayerType.SEE_THROUGH;
+//    }
 }

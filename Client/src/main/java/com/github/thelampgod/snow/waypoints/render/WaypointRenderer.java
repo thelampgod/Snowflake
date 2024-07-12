@@ -88,15 +88,16 @@ public class WaypointRenderer {
             double deltaZ = interpolatedZ - renderPos.z;
             double deltaY = interpolatedY - renderPos.y;
 
-            double angle = Math.atan2(deltaZ, deltaX);
-            final double distanceTo = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
-            final double distanceToIgnoringY = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
-            double yAngle = Math.asin(deltaY / distanceTo);
+            double yaw = Math.atan2(deltaZ, deltaX);
+            final double distanceTo = deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
+            final double distanceToIgnoringY = deltaX * deltaX + deltaZ * deltaZ;
+            double pitch = Math.atan2(Math.sqrt(deltaZ * deltaZ + deltaX * deltaX), deltaY);
 
             Vec3d pos;
+            Vec3d dir = new Vec3d(Math.sin(pitch) * Math.cos(yaw), Math.cos(pitch), Math.sin(pitch) * Math.sin(yaw));
 
             //TODO: setting
-            if (distanceTo < 70) {
+            if (distanceTo < 70 * 70) {
                 if (mc.world.getDimensionKey().getValue().getPath().equals(position.dimension)) {
                     // Don't render
                     continue;
@@ -105,9 +106,9 @@ public class WaypointRenderer {
                 pos = new Vec3d(interpolatedX, interpolatedY, interpolatedZ).subtract(renderPos);
             } else {
                 pos = new Vec3d(
-                        Math.abs(distanceToIgnoringY) < 100 ? interpolatedX : renderPos.x + 100 * Math.cos(angle),
-                        renderPos.y + 100 * Math.sin(yAngle),
-                        Math.abs(distanceToIgnoringY) < 100 ? interpolatedZ : renderPos.z + 100 * Math.sin(angle)).subtract(renderPos);
+                        distanceToIgnoringY < 10 ? interpolatedX : renderPos.x + 3 * dir.x,
+                        distanceToIgnoringY < 10 ? interpolatedY : renderPos.y + 3 * dir.y,
+                        distanceToIgnoringY < 10 ? interpolatedZ : renderPos.z + 3 * dir.z).subtract(renderPos);
             }
 
             renderWaypoint(user.getName(), pos.x, pos.y, pos.z, stack, camera, distanceTo, position.dimension);
@@ -139,9 +140,9 @@ public class WaypointRenderer {
         Vec3d pos = camera.getPos();
 
         double camDistance = Math.sqrt(dispatcher.getSquaredDistanceToCamera(x + pos.x, y + pos.y, z + pos.z));
-        String distanceString = String.format("%.2f", distance) + "m";
+        String distanceString = String.format("%.2f", Math.sqrt(distance)) + "m";
 
-        float scale = (float) MathHelper.clamp(camDistance * 0.03f / 10, 0.03, Double.MAX_VALUE);
+        float scale = (float) MathHelper.clamp(camDistance * 0.03f / 10, 0.003, Double.MAX_VALUE);
         stack.scale(-scale, -scale, scale);
         Matrix4f matrix = stack.peek().getPositionMatrix();
 
