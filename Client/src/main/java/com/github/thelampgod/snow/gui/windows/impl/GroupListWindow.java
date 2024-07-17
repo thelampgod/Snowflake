@@ -5,6 +5,7 @@ import com.github.thelampgod.snow.groups.Group;
 import com.github.thelampgod.snow.gui.elements.ButtonListElement;
 import com.github.thelampgod.snow.gui.windows.ListWindow;
 import com.github.thelampgod.snow.packets.impl.outgoing.CreateGroupPacket;
+import com.github.thelampgod.snow.util.DrawUtil;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
@@ -44,7 +45,7 @@ public class GroupListWindow extends ListWindow {
         if (!newGroupField.getText().isEmpty() || (focused && newGroupField.isMouseOver(mouseX - x, mouseY - y))) {
             newGroupField.render(ctx, mouseX, mouseY, delta);
         } else {
-            ctx.drawTextWithShadow(textRenderer, "+ New Group", 10, headerHeight + textRenderer.fontHeight, Color.WHITE.getRGB());
+            DrawUtil.drawText(textRenderer, "+ New Group", 10, headerHeight + textRenderer.fontHeight, Color.WHITE.getRGB(), true, ctx);
         }
         return true;
     }

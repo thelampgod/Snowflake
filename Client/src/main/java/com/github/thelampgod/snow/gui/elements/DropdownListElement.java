@@ -1,6 +1,7 @@
 package com.github.thelampgod.snow.gui.elements;
 
 import com.github.thelampgod.snow.Snow;
+import com.github.thelampgod.snow.util.DrawUtil;
 import com.google.common.collect.Maps;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -94,14 +95,14 @@ public class DropdownListElement {
             // Background
             ctx.fill(x + 1, buttonY + 1, x + width - 1, buttonY + height - 1, hovered ? Color.LIGHT_GRAY.getRGB() : Color.BLACK.getRGB());
             // Option name
-            ctx.drawText(textRenderer,
+            DrawUtil.drawText(textRenderer,
                     name,
                     x + 3,
                     buttonY + (height - textRenderer.fontHeight) / 2,
                     name.equals(Snow.instance.getIdentityManager().getSelectedIdentityName())
                             ? Color.ORANGE.getRGB()
                             : Color.WHITE.getRGB(),
-                    true);
+                    true, ctx);
         }
 
         private boolean mouseHover(double mouseX, double mouseY, int buttonY) {

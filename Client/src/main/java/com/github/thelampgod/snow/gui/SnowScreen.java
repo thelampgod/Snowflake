@@ -5,9 +5,16 @@ import com.github.thelampgod.snow.groups.Group;
 import com.github.thelampgod.snow.gui.windows.SnowWindow;
 import com.github.thelampgod.snow.gui.windows.impl.*;
 import com.github.thelampgod.snow.users.User;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.debug.DebugRenderer;
+import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.text.Text;
+import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -112,16 +119,21 @@ public class SnowScreen extends Screen {
         //TODO: Green / red circle
         ctx.drawText(textRenderer, (connected ? "Connected" : "Disconnected"), 10, scaledHeight - 10, Color.WHITE.getRGB(), true);
 
+        ctx.getMatrices().push();
+        RenderSystem.depthMask(false);
         if (!connected) {
             focusWindow(connectWindow);
             connectWindow.preRender(ctx, mouseX, mouseY, delta);
             return;
         }
 
+
         for (int i = 0; i < windowList.size(); ++i) {
             SnowWindow window = windowList.get(i);
             window.preRender(ctx, mouseX, mouseY, delta);
         }
+        RenderSystem.depthMask(true);
+        ctx.getMatrices().pop();
     }
 
     @Override

@@ -9,7 +9,6 @@
   "client": [
     "impl.DrawContextMixin",
     "impl.MinecraftClientMixin",
-    "impl.TextRendererMixin",
     "impl.WorldRendererMixin"
   ],
   "injectors": {

@@ -1,5 +1,6 @@
 package com.github.thelampgod.snow.gui.elements;
 
+import com.github.thelampgod.snow.util.DrawUtil;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.OrderedText;
@@ -45,7 +46,7 @@ public class ChatElement {
 
             // Draw sender name
             if (!sameSender && inBounds(textY)) {
-                ctx.drawText(this.textRenderer, message.sender, x + PADDING, textY, Color.YELLOW.getRGB(), false);
+                DrawUtil.drawText(this.textRenderer, message.sender, x + PADDING, textY, Color.YELLOW.getRGB(), false, ctx);
                 textY += textRenderer.fontHeight;
             }
 
@@ -55,12 +56,12 @@ public class ChatElement {
                     List<OrderedText> wrapped = textRenderer.wrapLines(Text.of(message.message), width - PADDING * 2);
                     for (OrderedText text : wrapped) {
                         if (inBounds(textY)) {
-                            ctx.drawText(this.textRenderer, text, x + PADDING, textY, message.color, false);
+                            DrawUtil.drawText(this.textRenderer, text, x + PADDING, textY, message.color, false, ctx);
                             textY += textRenderer.fontHeight;
                         }
                     }
                 } else {
-                    ctx.drawText(this.textRenderer, message.message, x + PADDING, textY, message.color, false);
+                    DrawUtil.drawText(this.textRenderer, message.message, x + PADDING, textY, message.color, false, ctx);
                     textY += textRenderer.fontHeight;
                 }
             }

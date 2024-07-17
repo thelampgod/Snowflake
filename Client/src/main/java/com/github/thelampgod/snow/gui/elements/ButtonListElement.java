@@ -1,5 +1,6 @@
 package com.github.thelampgod.snow.gui.elements;
 
+import com.github.thelampgod.snow.util.DrawUtil;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.math.MathHelper;
@@ -123,14 +124,14 @@ public class ButtonListElement {
             }
 
             // Name
-            ctx.drawTextWithShadow(textRenderer, name, x + 10, y, color);
+            DrawUtil.drawText(textRenderer, name, x + 10, y, color, true, ctx);
             if (size != 0) {
                 // Group member count
-                ctx.drawTextWithShadow(
+                DrawUtil.drawText(
                         textRenderer,
                         String.valueOf(size),
                         x + width - textRenderer.getWidth(String.valueOf(size)) - 10,
-                        y, Color.GRAY.getRGB()
+                        y, Color.GRAY.getRGB(), true, ctx
                 );
             }
             // Divider

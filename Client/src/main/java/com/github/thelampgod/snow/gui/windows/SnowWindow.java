@@ -2,11 +2,17 @@ package com.github.thelampgod.snow.gui.windows;
 
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.gui.SnowScreen;
+import com.github.thelampgod.snow.util.DrawUtil;
+import net.minecraft.client.font.FontStorage;
+import net.minecraft.client.font.Glyph;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import org.joml.Matrix4f;
 
 
 import java.awt.*;
@@ -86,12 +92,13 @@ public abstract class SnowWindow {
         ctx.fill(0, 0, getWidth(), headerHeight, headerColor.getRGB());
         // Header Title
         int headerX = titleCentered ? ((getWidth() - textRenderer.getWidth(title)) / 2) : 5;
-        this.drawOutlinedText(
+        //TODO: fix drawOutlinedText
+        DrawUtil.drawText(textRenderer,
                 title,
                 headerX,
                 (headerHeight - textRenderer.fontHeight) / 2,
                 Formatting.GOLD.getColorValue(),
-                0,
+                true,
                 ctx);
         // Header buttons (close, etc)
         for (TextButton button : headerButtons) {
@@ -206,17 +213,6 @@ public abstract class SnowWindow {
                 ctx.getVertexConsumers(), 255);
     }
 
-    public void drawText(String title, int x, int y, int color, boolean shadow, DrawContext ctx) {
-        textRenderer.draw(
-                Text.literal(title).asOrderedText(),
-                (float) x,
-                (float) y,
-                color,
-                shadow,
-                ctx.getMatrices().peek().getPositionMatrix(),
-                ctx.getVertexConsumers(), TextRenderer.TextLayerType.SEE_THROUGH, 0, 255);
-    }
-
     public int getWidth() {
         return (int) width;
     }
@@ -252,7 +248,7 @@ public abstract class SnowWindow {
             if (mouseHover(mouseX, mouseY)) {
                 ctx.fill(0, 0, size, size, headerColor.brighter().getRGB());
             }
-            ctx.drawText(textRenderer, icon, (size - textRenderer.getWidth(icon)) / 2 + 1, (size - fontHeight) / 2, color, false);
+            DrawUtil.drawText(textRenderer, icon, (size - textRenderer.getWidth(icon)) / 2 + 1, (size - fontHeight) / 2, color, false, ctx);
             if (!tooltipText.isEmpty() && mouseHover(mouseX, mouseY)) {
                 ctx.drawTooltip(textRenderer, Text.literal(tooltipText), 0, 0);
             }
