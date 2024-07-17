@@ -44,7 +44,7 @@ public class WaypointRenderer {
     public void updatePoint(int userId, double x, double y, double z, byte dimensionId, int groupId) {
         if (Snow.instance.getUserManager().getMe() == userId) return;
 
-        Vec3d pos = new Vec3d(x,y,z);
+        Vec3d pos = new Vec3d(x, y, z);
         if (pos.distanceTo(Vec3d.ZERO) > Integer.parseInt(Snow.instance.getOption("maxRange"))) {
             return;
         }
@@ -136,7 +136,7 @@ public class WaypointRenderer {
         Vec3d pos = camera.getPos();
 
         double camDistance = Math.sqrt(dispatcher.getSquaredDistanceToCamera(x + pos.x, y + pos.y, z + pos.z));
-        String distanceString = String.format("%.2f", Math.sqrt(distance)) + "m";
+        String distanceString = formatDistance(Math.sqrt(distance));
 
         //TODO: setting
         float scale = (float) MathHelper.clamp(camDistance * 0.03f / 10, 0.001, Double.MAX_VALUE);
@@ -157,6 +157,24 @@ public class WaypointRenderer {
 
         stack.pop();
 
+    }
+
+    public static String formatDistance(double distanceInMeters) {
+        if (distanceInMeters < 1000) {
+            return String.format("%.0fm", distanceInMeters);
+        } else if (distanceInMeters < 1000000) {
+            double distanceInKilometers = distanceInMeters / 1000;
+            if (distanceInKilometers % 1 == 0) {
+                return String.format("%.0fkm", distanceInKilometers);
+            }
+            return String.format("%.1fkm", distanceInKilometers);
+        } else {
+            double distanceInMillions = distanceInMeters / 1000000;
+            if (distanceInMillions % 1 == 0) {
+                return String.format("%.0fM", distanceInMillions);
+            }
+            return String.format("%.1fM", distanceInMillions);
+        }
     }
 
     private void drawText(String text, int yPos, Matrix4f matrix, VertexConsumerProvider consumers) {
