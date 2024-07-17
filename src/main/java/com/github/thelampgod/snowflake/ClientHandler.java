@@ -19,7 +19,7 @@ public class ClientHandler extends Thread {
     //TODO: move id and stuff out of SocketClient
     public final SocketClient client;
     private final String password;
-    private static final String PROTOCOL_VERSION = "hNnRaVtqtNGECREZVhSNUbCwmcUjVlOZ";
+    private static final String PROTOCOL_VERSION = "UHHFDIUS89UNfdsj5";
     public boolean isRunning = true;
     private DataOutputStream out;
     private DataInputStream in;
