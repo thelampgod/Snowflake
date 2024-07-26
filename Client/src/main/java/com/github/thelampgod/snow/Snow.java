@@ -27,6 +27,8 @@ public class Snow implements ModInitializer {
     private final Logger LOGGER = LogManager.getLogger("Snow");
     private static ServerManager serverManager;
 
+    public boolean xaeroLoaded = false;
+
     private ConfigManager configManager;
     private GroupManager groupManager;
     private UserManager userManager;
@@ -63,6 +65,14 @@ public class Snow implements ModInitializer {
         ServerWorldEvents.UNLOAD.register((u, v) -> {
             sharer.onWorldUnload();
         });
+
+        try {
+            Class.forName("xaero.common.minimap.radar.tracker.synced.ClientSyncedTrackedPlayerManager");
+            xaeroLoaded = true;
+            this.getLog().info("Xaeros Minimap found.");
+        } catch (Throwable th) {
+            this.getLog().error("Xaeros not loaded: " + th.getMessage(), th);
+        }
 
         configManager = new ConfigManager();
         identityManager = new IdentityManager();

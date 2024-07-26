@@ -8,9 +8,10 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.concurrent.ExecutionException;
+import java.util.UUID;
 
 public class Helper {
 
@@ -78,6 +79,19 @@ public class Helper {
             case "the_end" -> 1;
             default -> 0;
         };
+    }
+
+    public static UUID uuidFromId(int id) {
+        String idString = String.valueOf(id);
+        idString = String.format("%032d", new BigInteger(idString));
+
+        String uuidString = idString.substring(0, 8) + "-" +
+                idString.substring(8, 12) + "-" +
+                idString.substring(12, 16) + "-" +
+                idString.substring(16, 20) + "-" +
+                idString.substring(20);
+
+        return UUID.fromString(uuidString);
     }
 
 }

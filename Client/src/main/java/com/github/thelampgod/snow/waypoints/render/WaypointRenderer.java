@@ -1,21 +1,32 @@
 package com.github.thelampgod.snow.waypoints.render;
 
+import com.github.thelampgod.snow.mixins.impl.ClientPlayNetworkHandlerAccessor;
 import com.github.thelampgod.snow.util.DrawUtil;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.users.User;
+import com.github.thelampgod.snow.util.Helper;
 import com.google.common.collect.Maps;
+import com.mojang.authlib.GameProfile;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.network.OtherClientPlayerEntity;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
+import net.minecraft.network.packet.s2c.play.PlayerRemoveS2CPacket;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 
-import java.awt.*;
+import java.awt.Color;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.thelampgod.snow.util.Helper.getDimensionFromId;
@@ -26,11 +37,13 @@ public class WaypointRenderer {
     //todo: different color background/text per group
     private final Map<Integer, PositionData> toProcess = Maps.newConcurrentMap();
     private final Map<Integer, PositionData> toRender = Maps.newConcurrentMap();
-
     private final Map<Integer, Long> lastUpdateMap = Maps.newConcurrentMap();
 
     // Cleanup for new connection or disconnect
     public void clear() {
+        for (int id : toRender.keySet()) {
+            this.removePlayerRender(id);
+        }
         toProcess.clear();
         toRender.clear();
     }
@@ -38,6 +51,7 @@ public class WaypointRenderer {
     public void removePoint(int userId) {
         toProcess.remove(userId);
         toRender.remove(userId);
+        this.removePlayerRender(userId);
     }
 
     public void updatePoint(int userId, double x, double y, double z, byte dimensionId, int groupId) {
@@ -88,14 +102,25 @@ public class WaypointRenderer {
             double deltaY = interpolatedY - renderPos.y;
 
             final double distanceTo = deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
+            final double distanceToIgnoringY = deltaX * deltaX + deltaZ * deltaZ;
 
-            //TODO: setting
-            if (distanceTo < 70 * 70) {
-                if (mc.world.getDimensionKey().getValue().getPath().equals(position.dimension)) {
-                    // Don't render
+            int viewDistance = (mc.options.getClampedViewDistance() / 2 - 2) * 16;
+            if (toRender.containsKey(user.getId())) {
+                renderPlayer(user, interpolatedX, interpolatedY, interpolatedZ);
+            }
+            //TODO: distance setting
+            if (mc.world.getDimensionKey().getValue().getPath().equals(position.dimension)) {
+                if (distanceToIgnoringY < viewDistance * viewDistance) {
+                    // Don't render player
+                    this.removePlayerRender(user.getId());
+                }
+
+                // Don't render waypoint
+                if (distanceTo < viewDistance * viewDistance) {
                     continue;
                 }
             }
+
 
             double yaw = Math.atan2(deltaZ, deltaX);
             double pitch = Math.atan2(Math.sqrt(deltaZ * deltaZ + deltaX * deltaX), deltaY);
@@ -107,6 +132,46 @@ public class WaypointRenderer {
                     renderPos.z + 0.3 * dir.z).subtract(renderPos);
 
             renderWaypoint(user.getName(), pos.x, pos.y, pos.z, stack, camera, distanceTo, position.dimension);
+        }
+    }
+
+    private void removePlayerRender(int userId) {
+        if (!Snow.instance.xaeroLoaded || mc.world == null || mc.getNetworkHandler() == null) return;
+        final UUID id = Helper.uuidFromId(userId);
+
+        mc.getNetworkHandler().onPlayerRemove(new PlayerRemoveS2CPacket(List.of(id)));
+
+        List<AbstractClientPlayerEntity> players = mc.world.getPlayers();
+        Optional<AbstractClientPlayerEntity> player = players.stream()
+                .filter(pl -> pl.getUuid().equals(id))
+                .findAny();
+
+        player.ifPresent(entity -> mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED));
+    }
+
+    private void renderPlayer(User user, double x, double y, double z) {
+        if (Snow.instance.xaeroLoaded && mc.world != null && mc.getNetworkHandler() != null) {
+            final String name = user.getName();
+            final UUID id = Helper.uuidFromId(user.getId());
+
+            ((ClientPlayNetworkHandlerAccessor) mc.getNetworkHandler()).getPlayerListEntries().putIfAbsent(
+                    id,
+                    new PlayerListEntry(new GameProfile(id, name), false)
+            );
+
+            AbstractClientPlayerEntity ent;
+            List<AbstractClientPlayerEntity> players = mc.world.getPlayers();
+            Optional<AbstractClientPlayerEntity> player = players.stream()
+                    .filter(pl -> pl.getUuid().equals(id))
+                    .findAny();
+
+            if (!player.isPresent()) {
+                ent = new OtherClientPlayerEntity(mc.world, new GameProfile(id, name));
+                mc.world.addEntity(ent);
+            } else {
+                ent = player.get();
+            }
+            ent.setPosition(x, y - mc.player.getHeight(), z);
         }
     }
 
