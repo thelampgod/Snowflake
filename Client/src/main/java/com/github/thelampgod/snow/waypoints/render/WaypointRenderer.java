@@ -79,7 +79,6 @@ public class WaypointRenderer {
 
 
     public void render(MatrixStack stack, float tickDelta, Camera camera) {
-        if (mc.options.hudHidden) return;
         if (mc.world == null || toRender.isEmpty()) return;
 
         for (Map.Entry<Integer, PositionData> entry : toRender.entrySet()) {
@@ -188,6 +187,8 @@ public class WaypointRenderer {
     }
 
     private void renderWaypoint(String text, double x, double y, double z, MatrixStack stack, Camera camera, double distance, String dimension) {
+        if (mc.options.hudHidden) return;
+
         final EntityRenderDispatcher dispatcher = mc.getEntityRenderDispatcher();
         final VertexConsumerProvider.Immediate consumers = mc.getBufferBuilders().getEntityVertexConsumers();
 
