@@ -42,6 +42,12 @@ public class GroupWindow extends ChatWindow {
 
         locationShareButton = addHeaderButton("!", 7, "Start Location Share", Color.RED,
                 () -> this.toggleSharing(group));
+
+        if (Snow.instance.getSharer().getSelectedGroup() == null) return;
+        if (this.getId() == Snow.instance.getSharer().getSelectedGroup().getId()) {
+            locationShareButton.setColor(Color.GREEN.getRGB());
+            locationShareButton.setTooltip("Stop Location Share");
+        }
     }
 
     private void toggleSharing(Group group) {

@@ -6,6 +6,7 @@ import com.github.thelampgod.snow.packets.impl.EncryptedDataPacket;
 import com.github.thelampgod.snow.packets.impl.LocationPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
@@ -61,6 +62,7 @@ public class WaypointSharer {
         selectedGroup = null;
     }
 
+    @Nullable
     public Group getSelectedGroup() {
         return selectedGroup;
     }
