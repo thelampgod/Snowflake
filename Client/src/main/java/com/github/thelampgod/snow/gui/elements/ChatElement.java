@@ -5,10 +5,14 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
 
 import java.awt.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ChatElement {
@@ -34,19 +38,20 @@ public class ChatElement {
 
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         String prevSender = "";
+        DateFormat timeFormat = new SimpleDateFormat(" <HH:mm>");
         int textY = y + PADDING;
         for (int i = scrollPosition; i < messages.size(); ++i) {
             ChatMessage message = messages.get(i);
-            boolean sameSender = prevSender == null || prevSender.equals(message.sender) || message.sender == null;
+            Date date = new Date(message.timestamp);
+            String timestamp = Formatting.GRAY + timeFormat.format(date) + Formatting.RESET;
 
-            if (prevSender == null && message.sender != null) {
-                sameSender = false;
-            }
-            prevSender = message.sender;
+            String sender = message.sender + timestamp;
+            boolean sameSender = prevSender.equals(sender);
+            prevSender = sender;
 
             // Draw sender name
             if (!sameSender && inBounds(textY)) {
-                DrawUtil.drawText(this.textRenderer, message.sender, x + PADDING, textY, Color.YELLOW.getRGB(), false, ctx);
+                DrawUtil.drawText(this.textRenderer, sender, x + PADDING, textY, Color.YELLOW.getRGB(), false, ctx);
                 textY += textRenderer.fontHeight;
             }
 
@@ -90,14 +95,15 @@ public class ChatElement {
     private int getHeight(List<ChatMessage> messages) {
         int height = PADDING;
         String prevSender = "";
+        DateFormat timeFormat = new SimpleDateFormat("<HH:mm>");
         for (ChatMessage message : messages) {
-            boolean sameSender = prevSender == null || prevSender.equals(message.sender) || message.sender == null;
-            if (prevSender == null && message.sender != null) {
-                sameSender = false;
-            }
+            Date date = new Date(message.timestamp);
+            String timestamp = Formatting.GRAY + timeFormat.format(date) + Formatting.RESET + " ";
+            String sender = message.sender + timestamp;
+            boolean sameSender = prevSender.equals(sender);
 
             height += (sameSender ? textRenderer.fontHeight : textRenderer.fontHeight * 2);
-            prevSender = message.sender;
+            prevSender = sender;
 
             if (textRenderer.getWidth(message.message) > width - PADDING * 2) {
                 List<OrderedText> wrapped = textRenderer.wrapLines(Text.of(message.message), width - PADDING * 2);
