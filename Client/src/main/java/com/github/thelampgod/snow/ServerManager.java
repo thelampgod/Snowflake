@@ -53,6 +53,9 @@ public class ServerManager {
             receiver.start();
             talker.start();
             listenForReceive();
+            listenForReceive();
+            listenForReceive();
+            listenForReceive();
             this.isRunning = true;
             Snow.instance.load(this.ip + ":" + this.port);
         } catch (IOException e) {
@@ -67,14 +70,8 @@ public class ServerManager {
                 while (isRunning) {
                     receiveComm((out, in) -> {
                         SnowflakePacket packet = SnowflakePacket.fromId(in.readByte(), in);
-                        if (packet instanceof KeepAlivePacket p) {
-                            lastKeepAlive = p.getTimestamp();
-                        }
                         packet.handle();
                     });
-                    if (lastKeepAlive != 0 && System.currentTimeMillis() - lastKeepAlive > TimeUnit.SECONDS.toMillis(30)) {
-                        close();
-                    }
                     Thread.sleep(10);
                 }
             } catch (InterruptedException e) {
@@ -157,6 +154,7 @@ public class ServerManager {
             try (DataOutputStream out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
                  DataInputStream in = new DataInputStream(new BufferedInputStream(socket.getInputStream()))) {
 
+                socket.setSoTimeout(15000);
                 if (!receiver) {
                     Helper.addToast("Connected");
                 }

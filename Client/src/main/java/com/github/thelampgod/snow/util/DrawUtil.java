@@ -2,6 +2,7 @@ package com.github.thelampgod.snow.util;
 
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 
@@ -24,4 +25,10 @@ public class DrawUtil {
                 ctx.getMatrices().peek().getPositionMatrix(),
                 ctx.getVertexConsumers(), TextRenderer.TextLayerType.SEE_THROUGH, 0, 255);
     }
+
+//    public static void fill(int x1, int x2, int y1, int y2, int color) {
+//        BufferBuilder builder = new BufferBuilder(0);
+//
+//        builder.
+//    }
 }

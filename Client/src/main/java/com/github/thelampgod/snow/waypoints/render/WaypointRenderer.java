@@ -15,7 +15,6 @@ import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 
 import java.awt.*;
-import java.awt.desktop.PreferencesEvent;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -127,7 +126,7 @@ public class WaypointRenderer {
 
     private void renderWaypoint(String text, double x, double y, double z, MatrixStack stack, Camera camera, double distance, String dimension) {
         final EntityRenderDispatcher dispatcher = mc.getEntityRenderDispatcher();
-        final VertexConsumerProvider consumers = mc.getBufferBuilders().getEntityVertexConsumers();
+        final VertexConsumerProvider.Immediate consumers = mc.getBufferBuilders().getEntityVertexConsumers();
 
         stack.push();
         stack.translate(x, y, z);
@@ -146,6 +145,7 @@ public class WaypointRenderer {
         //draw text
         final float nameWidth = (float) mc.textRenderer.getWidth(text) / 2;
         Color color = new Color(-1);
+//        DrawUtil.fill((int) (-nameWidth - 5), -5, (int) (nameWidth + 5), mc.textRenderer.fontHeight * 3 + 5, new Color(0,0,0,50).getRGB());
         mc.textRenderer.drawWithOutline(Text.literal(text).asOrderedText(), -nameWidth, 0, color.getRGB(), new Color(0, 0, 0, 0).getRGB(), matrix, consumers, 255);
         int yPos = 1;
         this.drawText(distanceString, yPos++, matrix, consumers);
