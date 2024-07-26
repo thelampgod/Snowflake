@@ -63,17 +63,20 @@ public class EncryptedDataPacket extends SnowflakePacket {
         @Override
         public void handle() {
             final com.github.thelampgod.snow.groups.Group group = Snow.instance.getGroupManager().get(super.id);
-
+            WrappedPacket packet;
             try {
                 byte[] decrypted = EncryptionUtil.decryptByPassword(super.encryptedPacket, group.getPassword());
-
-                WrappedPacket packet = EncryptionUtil.toPacket(decrypted);
-                packet.setSender(super.senderId);
-                packet.handle();
+                packet = EncryptionUtil.toPacket(decrypted);
             } catch (Exception e) {
                 Snow.instance.getLog().error("Failed to decrypt (outdated password?) - leaving group: " + e.getMessage(), e);
                 Snow.getServerManager().sendPacket(new GroupLeavePacket(group.getId()));
-                e.printStackTrace();
+                return;
+            }
+            try {
+                packet.setSender(super.senderId);
+                packet.handle();
+            } catch (Exception e) {
+                Snow.instance.getLog().error("Error handling packet: " + e.getMessage(), e);
             }
         }
     }
@@ -96,8 +99,7 @@ public class EncryptedDataPacket extends SnowflakePacket {
                 packet.setSender(super.senderId);
                 packet.handle();
             } catch (Exception e) {
-                printModMessage("Failed to decrypt");
-                e.printStackTrace();
+                Snow.instance.getLog().error("Failed to decrypt: " + e.getMessage(), e);
             }
         }
     }

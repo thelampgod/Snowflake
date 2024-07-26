@@ -72,8 +72,7 @@ public class WaypointRenderer {
         if (toProcess.isEmpty()) return;
 
         for (Map.Entry<Integer, PositionData> entry : toProcess.entrySet()) {
-            toRender.computeIfAbsent(entry.getKey(), k -> entry.getValue());
-            PositionData data = toRender.get(entry.getKey());
+            PositionData data = toRender.computeIfAbsent(entry.getKey(), k -> entry.getValue());
             data.tick(entry.getValue());
         }
     }
@@ -120,7 +119,6 @@ public class WaypointRenderer {
                     continue;
                 }
             }
-
 
             double yaw = Math.atan2(deltaZ, deltaX);
             double pitch = Math.atan2(Math.sqrt(deltaZ * deltaZ + deltaX * deltaX), deltaY);
