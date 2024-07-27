@@ -15,6 +15,7 @@ import java.io.IOException;
 public class GroupLeavePacket extends SnowflakePacket {
 
     private final int groupId;
+
     public GroupLeavePacket(DataInputStream in, ClientHandler sender) throws IOException {
         super(sender);
         this.groupId = in.readInt();
@@ -35,10 +36,21 @@ public class GroupLeavePacket extends SnowflakePacket {
         final Group group = Snowflake.INSTANCE.getGroupManager().get(groupId);
         if (!group.containsUser(clientId)) return;
 
+        boolean ownerPicked = false;
         for (int client : group.getUsers()) {
             final ClientHandler user = Snowflake.INSTANCE.getServer().getClientReceiver(client);
             if (user == null) continue;
 
+            if (!ownerPicked && group.getOwnerId() == clientId) {
+                // Pick new group owner
+                if (client != clientId) {
+                    user.sendPacket(new GroupInfoPacket(group.getName(), groupId, true, group.getUsers()));
+                    group.setOwner(client);
+                    DatabaseUtil.updateOwner(client, groupId, Snowflake.INSTANCE.getDb());
+                    ownerPicked = true;
+                }
+            }
+            // Notify group users of user group leave
             user.sendPacket(new GroupConnectionPacket.Removed(groupId, clientId));
         }
         group.removeUser(clientId);
@@ -48,17 +60,5 @@ public class GroupLeavePacket extends SnowflakePacket {
             return;
         }
         DatabaseUtil.removeUserFromGroup(clientId, group, Snowflake.INSTANCE.getDb());
-
-        if (group.getOwnerId() == clientId) {
-            // Pick new group owner
-            int id = group.getUsers().get(0);
-            final ClientHandler user = Snowflake.INSTANCE.getServer().getClientReceiver(id);
-            if (user == null) return;
-
-            user.sendPacket(new GroupInfoPacket(group.getName(), groupId, true, group.getUsers()));
-            group.setOwner(id);
-            DatabaseUtil.updateOwner(id, groupId, Snowflake.INSTANCE.getDb());
-        }
-
     }
 }

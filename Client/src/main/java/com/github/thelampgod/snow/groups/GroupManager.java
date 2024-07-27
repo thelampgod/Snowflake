@@ -46,6 +46,7 @@ public class GroupManager {
 
     public void remove(Group group) {
         groups.remove(group);
+        if (group == null) return;
 
         WaypointSharer sharer = Snow.instance.getSharer();
         if (group.equals(sharer.getSelectedGroup())) {

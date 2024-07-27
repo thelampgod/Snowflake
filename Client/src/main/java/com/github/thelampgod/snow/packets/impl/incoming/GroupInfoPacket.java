@@ -36,11 +36,13 @@ public class GroupInfoPacket extends SnowflakePacket {
     public void handle() {
         final GroupManager man = Snow.instance.getGroupManager();
         final Group group = man.get(id);
+        Group newGroup = new Group(name, id, isOwner, users);
 
         if (group != null) {
             man.remove(group);
+            newGroup.setPassword(group.getPassword());
         }
 
-        man.add(new Group(name, id, isOwner, users));
+        man.add(newGroup);
     }
 }
