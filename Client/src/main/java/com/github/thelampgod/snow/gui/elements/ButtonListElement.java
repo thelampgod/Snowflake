@@ -51,7 +51,7 @@ public class ButtonListElement {
             }
 
             ListButton button = buttons.get(i);
-            button.mouseClicked(mouseX, mouseY, yPosition);
+            button.mouseClicked(mouseX, mouseY, buttonId, yPosition);
             yPosition += BUTTON_HEIGHT + PADDING;
         }
     }
@@ -75,8 +75,12 @@ public class ButtonListElement {
         buttons.clear();
     }
 
-    public void addButton(String text, int size, Runnable runnable) {
-        buttons.add(new ListButton(text, size, runnable));
+    public void addButton(String text, int size, Runnable leftClick) {
+        this.addButton(text, size, leftClick, () -> {});
+    }
+
+    public void addButton(String text, int size, Runnable leftClick, Runnable rightClick) {
+        buttons.add(new ListButton(text, size, leftClick, rightClick));
         int buttonWidth = textRenderer.getWidth(text) + 30;
         if (this.width < buttonWidth) {
             this.width = buttonWidth;
@@ -109,12 +113,14 @@ public class ButtonListElement {
     protected class ListButton {
         private final String name;
         private final int size;
-        private final Runnable onClick;
+        private final Runnable leftClick;
+        private final Runnable rightClick;
 
-        public ListButton(String name, int size, Runnable onClick) {
+        public ListButton(String name, int size, Runnable leftClick, Runnable rightClick) {
             this.name = name;
             this.size = size;
-            this.onClick = onClick;
+            this.leftClick = leftClick;
+            this.rightClick = rightClick;
         }
 
         public void render(DrawContext ctx, int mouseX, int mouseY, int x, int y) {
@@ -143,9 +149,13 @@ public class ButtonListElement {
             return mouseX > x && mouseX < x + width && mouseY > by && mouseY < by + BUTTON_HEIGHT;
         }
 
-        public void mouseClicked(double mouseX, double mouseY, int y) {
+        public void mouseClicked(double mouseX, double mouseY, int buttonId, int y) {
             if (mouseHover(mouseX, mouseY, y)) {
-                onClick.run();
+                if (buttonId == 0) {
+                    leftClick.run();
+                    return;
+                }
+                rightClick.run();
             }
         }
     }

@@ -84,7 +84,8 @@ public class GroupListWindow extends ListWindow {
             buttonListElement.addButton(
                     group.getName(),
                     group.getUsers().size(),
-                    () -> Snow.instance.getOrCreateSnowScreen().focusWindow(group)
+                    () -> Snow.instance.getOrCreateSnowScreen().focusWindow(group),
+                    () -> Snow.instance.getOrCreateSnowScreen().focusWindow(new GroupUsersWindow(group.getName(), group.getUsers()))
             );
         }
         this.width = buttonListElement.getWidth();

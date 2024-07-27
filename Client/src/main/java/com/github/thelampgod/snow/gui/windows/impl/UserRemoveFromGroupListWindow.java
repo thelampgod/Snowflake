@@ -34,14 +34,23 @@ public class UserRemoveFromGroupListWindow extends ListWindow {
             // can't remove yourself
             if (userId == Snow.instance.getUserManager().getMe()) continue;
             final User user = Snow.instance.getUserManager().get(userId);
-            if (user == null) continue;
-            buttonListElement.addButton(
-                    user.getName(), 0,
-                    () -> {
-                        Snow.getServerManager().sendPacket(new GroupUserRemovePacket(group.getId(), user.getId()));
-                        Snow.instance.getOrCreateSnowScreen().remove(this);
-                    }
-            );
+            if (user == null) {
+                buttonListElement.addButton(
+                        "UserID:" + userId, 0,
+                        () -> {
+                            Snow.getServerManager().sendPacket(new GroupUserRemovePacket(group.getId(), userId));
+                            Snow.instance.getOrCreateSnowScreen().remove(this);
+                        }
+                );
+            } else {
+                buttonListElement.addButton(
+                        user.getName(), 0,
+                        () -> {
+                            Snow.getServerManager().sendPacket(new GroupUserRemovePacket(group.getId(), user.getId()));
+                            Snow.instance.getOrCreateSnowScreen().remove(this);
+                        }
+                );
+            }
             ++j;
         }
 
