@@ -166,4 +166,24 @@ public class DatabaseUtil {
             e.printStackTrace();
         }
     }
+
+    public static void updateOwner(int id, int groupId, Database db) {
+        try (Connection conn = db.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                try (PreparedStatement statement = conn.prepareStatement("update groups set owner_id=? where id=?")) {
+                    statement.setInt(1, id);
+                    statement.setInt(2, groupId);
+                    statement.execute();
+                }
+            } catch (Throwable th) {
+                conn.rollback();
+                throw th;
+            }
+            conn.commit();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

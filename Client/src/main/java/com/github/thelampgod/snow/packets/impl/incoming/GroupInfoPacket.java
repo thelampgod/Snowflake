@@ -2,6 +2,7 @@ package com.github.thelampgod.snow.packets.impl.incoming;
 
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.groups.Group;
+import com.github.thelampgod.snow.groups.GroupManager;
 import com.github.thelampgod.snow.packets.SnowflakePacket;
 import com.google.common.collect.Sets;
 
@@ -33,6 +34,13 @@ public class GroupInfoPacket extends SnowflakePacket {
 
     @Override
     public void handle() {
-        Snow.instance.getGroupManager().add(new Group(name, id, isOwner, users));
+        final GroupManager man = Snow.instance.getGroupManager();
+        final Group group = man.get(id);
+
+        if (group != null) {
+            man.remove(group);
+        }
+
+        man.add(new Group(name, id, isOwner, users));
     }
 }

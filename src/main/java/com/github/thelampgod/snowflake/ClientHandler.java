@@ -77,6 +77,7 @@ public class ClientHandler extends Thread {
         } catch (Throwable ignored) {
             try {
                 getServer().removeClient(client);
+//                getLog().error("Error in packet handle: " + ignored.getMessage(), ignored);
             } catch (IOException e) {
 
             }

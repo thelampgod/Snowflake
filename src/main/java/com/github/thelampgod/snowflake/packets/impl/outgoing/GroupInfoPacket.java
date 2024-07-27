@@ -4,15 +4,15 @@ import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Set;
+import java.util.List;
 
 public class GroupInfoPacket extends SnowflakePacket {
 
     private final String name;
     private final int id;
     private final boolean isOwner;
-    private final Set<Integer> users;
-    public GroupInfoPacket(String name, int id, boolean isOwner, Set<Integer> users) {
+    private final List<Integer> users;
+    public GroupInfoPacket(String name, int id, boolean isOwner, List<Integer> users) {
         this.name = name;
         this.id = id;
         this.isOwner = isOwner;

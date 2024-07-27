@@ -1,10 +1,10 @@
 package com.github.thelampgod.snowflake.groups;
 
 import com.github.thelampgod.snowflake.SocketClient;
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 public class Group {
 
@@ -12,7 +12,7 @@ public class Group {
     private int groupId = -1;
     private int ownerId;
 
-    private final Set<Integer> users = Sets.newHashSet();
+    private final List<Integer> users = Lists.newArrayList();
 
     public Group(String name, int groupId, int ownerId) {
         this.name = name;
@@ -60,14 +60,14 @@ public class Group {
     }
 
     public void removeUser(int id) {
-        users.remove(id);
+        users.removeIf(userId -> userId == id);
     }
 
     public boolean containsUser(int id) {
         return users.contains(id);
     }
 
-    public Set<Integer> getUsers() {
+    public List<Integer> getUsers() {
         return users;
     }
 

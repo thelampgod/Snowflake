@@ -2,10 +2,10 @@ package com.github.thelampgod.snowflake.packets.impl.incoming;
 
 import com.github.thelampgod.snowflake.ClientHandler;
 import com.github.thelampgod.snowflake.Snowflake;
-import com.github.thelampgod.snowflake.SocketClient;
 import com.github.thelampgod.snowflake.groups.Group;
 import com.github.thelampgod.snowflake.packets.SnowflakePacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.GroupConnectionPacket;
+import com.github.thelampgod.snowflake.packets.impl.outgoing.GroupInfoPacket;
 import com.github.thelampgod.snowflake.util.DatabaseUtil;
 
 import java.io.DataInputStream;
@@ -30,22 +30,35 @@ public class GroupLeavePacket extends SnowflakePacket {
         if (!super.isAuthenticated()) {
             return;
         }
-        final Group group = Snowflake.INSTANCE.getGroupManager().get(groupId);
-        if (!group.containsUser(super.getSender().client.getId())) return;
+        int clientId = super.getSender().client.getId();
 
-        for (int clientId : group.getUsers()) {
-            final ClientHandler user = Snowflake.INSTANCE.getServer().getClientReceiver(clientId);
+        final Group group = Snowflake.INSTANCE.getGroupManager().get(groupId);
+        if (!group.containsUser(clientId)) return;
+
+        for (int client : group.getUsers()) {
+            final ClientHandler user = Snowflake.INSTANCE.getServer().getClientReceiver(client);
             if (user == null) continue;
 
-            user.sendPacket(new GroupConnectionPacket.Removed(groupId, super.getSender().client.getId()));
+            user.sendPacket(new GroupConnectionPacket.Removed(groupId, clientId));
         }
-        group.removeUser(super.getSender().client.getId());
+        group.removeUser(clientId);
         if (group.getUsers().isEmpty()) {
             Snowflake.INSTANCE.getGroupManager().remove(group);
             DatabaseUtil.removeGroup(group, Snowflake.INSTANCE.getDb());
             return;
         }
-        DatabaseUtil.removeUserFromGroup(super.getSender().client.getId(), group, Snowflake.INSTANCE.getDb());
+        DatabaseUtil.removeUserFromGroup(clientId, group, Snowflake.INSTANCE.getDb());
+
+        if (group.getOwnerId() == clientId) {
+            // Pick new group owner
+            int id = group.getUsers().get(0);
+            final ClientHandler user = Snowflake.INSTANCE.getServer().getClientReceiver(id);
+            if (user == null) return;
+
+            user.sendPacket(new GroupInfoPacket(group.getName(), groupId, true, group.getUsers()));
+            group.setOwner(id);
+            DatabaseUtil.updateOwner(id, groupId, Snowflake.INSTANCE.getDb());
+        }
 
     }
 }
