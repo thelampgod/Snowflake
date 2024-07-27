@@ -24,7 +24,7 @@ public class ServerManager {
 
     private final String password;
 
-    private static final String PROTOCOL_VERSION = "UHHFDIUS89UNfdsj5";
+    private static final String PROTOCOL_VERSION = "uRedLELysIsMAndEt";
 
     public ServerManager(String ip, int port, String password) {
         this.ip = ip;
