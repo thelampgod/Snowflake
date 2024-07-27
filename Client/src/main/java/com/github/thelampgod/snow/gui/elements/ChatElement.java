@@ -46,7 +46,7 @@ public class ChatElement {
             String timestamp = Formatting.GRAY + timeFormat.format(date) + Formatting.RESET;
 
             String sender = message.sender + timestamp;
-            boolean sameSender = prevSender.equals(sender);
+            boolean sameSender = message.sender == null || prevSender.equals(sender);
             prevSender = sender;
 
             // Draw sender name
