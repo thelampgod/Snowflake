@@ -2,7 +2,6 @@ package com.github.thelampgod.snow;
 
 import com.github.thelampgod.snow.packets.SnowflakePacket;
 import com.github.thelampgod.snow.packets.impl.DisconnectPacket;
-import com.github.thelampgod.snow.packets.impl.KeepAlivePacket;
 import com.github.thelampgod.snow.util.Helper;
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -11,7 +10,6 @@ import java.net.Socket;
 import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 public class ServerManager {
     private final LinkedBlockingQueue<Comm> talkComms = new LinkedBlockingQueue<>();
@@ -70,7 +68,13 @@ public class ServerManager {
                 while (isRunning) {
                     receiveComm((out, in) -> {
                         SnowflakePacket packet = SnowflakePacket.fromId(in.readByte(), in);
-                        packet.handle();
+//                        Snow.instance.getLog().info("[IN] " + packet.getClass().getSimpleName());
+                        try {
+                            packet.handle();
+                        } catch (Exception e) {
+                            Snow.instance.getLog().error("Error in handling packet: " + e.getMessage(), e);
+//                            this.close();
+                        }
                     });
                     Thread.sleep(10);
                 }
@@ -120,6 +124,7 @@ public class ServerManager {
     }
 
     public void sendPacket(SnowflakePacket packet) {
+//        Snow.instance.getLog().info("[OUT] " + packet.getClass().getSimpleName());
         sendComm((out, in) -> {
             packet.writeData(out);
             out.flush();
