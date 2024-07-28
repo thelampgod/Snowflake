@@ -1,6 +1,8 @@
 package com.github.thelampgod.snow;
 
-import com.google.common.collect.Maps;
+import com.github.thelampgod.snow.config.IntSetting;
+import com.github.thelampgod.snow.config.Setting;
+import com.github.thelampgod.snow.config.StringSetting;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -8,28 +10,38 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ConfigManager {
 
-    private final static Path CONFIG_PATH = Path.of(".snow","config.txt");
+    private final static Path CONFIG_PATH = Path.of(".snow", "config.txt");
 
-    private final Map<String, String> options = Maps.newHashMap();
+    private final Map<String, OptionInfo> optionCache = new HashMap<>();
+
+    public <T> String iAmSetting(String name, Setting<T> tSetting) {
+        // ideally this is saved more suffisticated and says what type of value it is...
+        OptionInfo info = optionCache.computeIfAbsent(name, k -> new OptionInfo(tSetting.getDefaultAsString()));
+        info.foundSetting = tSetting;
+        return info.value;
+    }
+
+    private static class OptionInfo {
+
+        public OptionInfo(String value) {
+            this.value = value;
+        }
+
+        String value;
+        Setting<?> foundSetting;
+    }
+
+    public Setting<String> lastAddress = new StringSetting(this).defaultValue("127.0.0.1:2147");
+    public Setting<String> serverPassword = new StringSetting(this);
+    public Setting<Integer> maxRange = new IntSetting(this).defaultValue(100_000).sliderRange(0, 60_000_000);// you kinda always have to give this
 
     public ConfigManager() {
         this.load();
-    }
-
-    public <T> void addOption(String option, T value) {
-        this.addOption(option, value.toString());
-    }
-
-    public void addOption(String option, String value) {
-        options.put(option, value);
-    }
-
-    public String getOption(String option) {
-        return options.get(option);
     }
 
     private void load() {
@@ -38,16 +50,13 @@ public class ConfigManager {
                 Files.readAllLines(CONFIG_PATH).stream()
                         .map(line -> line.split(","))
                         .forEach(line -> {
-                            options.put(line[0], line.length < 2 ? "" : line[1]);
+                            optionCache.put(line[0], new OptionInfo(line.length < 2 ? "" : line[1]));
                         });
             } catch (IOException e) {
                 Snow.instance.getLog().error("Error reading config: " + e.getMessage(), e);
             }
             return;
         }
-        // Defaults
-        this.addOption("maxRange", 100_000);
-        this.addOption("lastAddress", "127.0.0.1:2147");
     }
 
     public void save() throws IOException {
@@ -56,8 +65,13 @@ public class ConfigManager {
         }
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(CONFIG_PATH.toFile()))) {
-            for (Map.Entry<String, String> option : options.entrySet()) {
-                writer.write(option.getKey() + "," + option.getValue() + "\n");
+            for (Map.Entry<String, OptionInfo> option : optionCache.entrySet()) {
+                OptionInfo info = option.getValue();
+                String value = info.value;
+                if (info.foundSetting != null) {
+                    value = info.foundSetting.getForSave();
+                }// alert otherwise?
+                writer.write(option.getKey() + "," + value + "\n");
             }
         }
     }

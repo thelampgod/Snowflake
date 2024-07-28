@@ -3,9 +3,9 @@ package com.github.thelampgod.snow;
 import com.github.thelampgod.snow.groups.GroupManager;
 import com.github.thelampgod.snow.gui.SnowScreen;
 import com.github.thelampgod.snow.identities.IdentityManager;
+import com.github.thelampgod.snow.users.UserManager;
 import com.github.thelampgod.snow.util.Helper;
 import com.github.thelampgod.snow.waypoints.render.WaypointRenderer;
-import com.github.thelampgod.snow.users.UserManager;
 import com.github.thelampgod.snow.waypoints.share.WaypointSharer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -35,6 +35,7 @@ public class Snow implements ModInitializer {
     private WaypointSharer sharer;
     private IdentityManager identityManager;
     private SnowScreen snowScreen;
+
     @Override
     public void onInitialize() {
         LOGGER.info("Loading...");
@@ -107,7 +108,7 @@ public class Snow implements ModInitializer {
 
     public static synchronized ServerManager getServerManager() {
         if (serverManager == null) {
-            serverManager = new ServerManager(instance.configManager.getOption("lastAddress"));
+            serverManager = new ServerManager(instance.configManager.lastAddress.get());
         }
         return serverManager;
     }
@@ -147,8 +148,8 @@ public class Snow implements ModInitializer {
             if (parts.length < 2) return;
             serverManager = new ServerManager(parts[0], Integer.parseInt(parts[1]), password);
             serverManager.connect();
-            configManager.addOption("lastAddress", address);
-            configManager.addOption("serverPassword", password);
+            configManager.lastAddress.set("we connect there rn", address);
+            configManager.serverPassword.set("we inputted it", password);
         } catch (Exception e) {
             Helper.addToast("Couldn't connect to server");
             this.getLog().error("Error parsing IP: " + e.getMessage(), e);
@@ -177,7 +178,7 @@ public class Snow implements ModInitializer {
         }
     }
 
-    public String getOption(String option) {
-        return configManager.getOption(option);
+    public ConfigManager getConfig() {
+        return configManager;
     }
 }

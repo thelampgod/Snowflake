@@ -1,9 +1,9 @@
 package com.github.thelampgod.snow.waypoints.render;
 
-import com.github.thelampgod.snow.mixins.impl.ClientPlayNetworkHandlerAccessor;
-import com.github.thelampgod.snow.util.DrawUtil;
 import com.github.thelampgod.snow.Snow;
+import com.github.thelampgod.snow.mixins.impl.ClientPlayNetworkHandlerAccessor;
 import com.github.thelampgod.snow.users.User;
+import com.github.thelampgod.snow.util.DrawUtil;
 import com.github.thelampgod.snow.util.Helper;
 import com.google.common.collect.Maps;
 import com.mojang.authlib.GameProfile;
@@ -22,7 +22,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -58,7 +58,7 @@ public class WaypointRenderer {
         if (Snow.instance.getUserManager().getMe() == userId) return;
 
         Vec3d pos = new Vec3d(x, y, z);
-        if (pos.distanceTo(Vec3d.ZERO) > Integer.parseInt(Snow.instance.getOption("maxRange"))) {
+        if (pos.distanceTo(Vec3d.ZERO) > Snow.instance.getConfig().maxRange.get()) {
             return;
         }
 

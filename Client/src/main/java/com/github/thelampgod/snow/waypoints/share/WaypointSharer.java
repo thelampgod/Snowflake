@@ -34,7 +34,7 @@ public class WaypointSharer {
             return;
         }
 
-        if (pos.distanceTo(Vec3d.ZERO) > Integer.parseInt(Snow.instance.getConfigManager().getOption("maxRange"))) {
+        if (pos.distanceTo(Vec3d.ZERO) > Snow.instance.getConfigManager().maxRange.get()) {
             return;
         }
 
