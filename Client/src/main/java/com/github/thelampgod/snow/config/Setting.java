@@ -1,6 +1,6 @@
 package com.github.thelampgod.snow.config;
 
-import com.github.thelampgod.snow.Snow;
+import com.github.thelampgod.snow.ConfigManager;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
@@ -9,15 +9,17 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public abstract class Setting<T> {
-    public Setting(Object owner, T defaultValue, Function<String, T> load, Function<T, String> save) {
-        this.owner = owner;// do we need to enforce default value?
+    public Setting(ConfigManager owner, T defaultValue, Function<String, T> load, Function<T, String> save) {
+        this.inMod = owner;// do we need to enforce default value?
+        this.owner = owner;
         defaultValue(defaultValue);
         this.load = load;
         this.save = save;
 
     }
 
-    private final Object owner;
+    private final ConfigManager inMod;// to be able to have same setting names in different mods
+    private Object owner;
     private final Function<String, T> load;
     private final Function<T, String> save;
     private String name;
@@ -58,6 +60,11 @@ public abstract class Setting<T> {
             COMMAND,
             MOD
         }
+    }
+
+    public Setting<T> owner(Object settingIsInThere) {
+        owner = settingIsInThere;
+        return this;
     }
 
     public Setting<T> name(String name) {
@@ -109,15 +116,15 @@ public abstract class Setting<T> {
 
     public T get() {
         if (valueIs == null) {
-            String value = Snow.instance.getConfig().iAmSetting(getName(), this);
+            String value = inMod.giveSettingReference(getName(), this);// this needs to be reworked anyway when saving will be improved...
             // ideally we would know now if the setting is actual custom or reference to the default value...
-            valueIs = new ValueIsCustom<>("load", load.apply(value));
+            valueIs = new ValueIsCustom<>(load.apply(value));
         }
         return valueIs.get(this);// should also give it a context variable?
     }
 
-    public void set(String why, T value) {
-        set(ChangeInfo.Source.COMMAND, new ValueIsCustom<>(why, value));
+    public void set(T value) {
+        set(ChangeInfo.Source.MOD, new ValueIsCustom<>(value));
     }
 
     public void set(ChangeInfo.Source source, ValueIs<T> what) {
@@ -153,10 +160,9 @@ public abstract class Setting<T> {
     }
 
     public static class ValueIsCustom<T> implements ValueIs<T> {
-        String source;// for debug / maybe to display?
+        // for debug / or maybe to display also save source
 
-        public ValueIsCustom(String source, T is) {
-            this.source = source;
+        public ValueIsCustom(T is) {
             custom = is;
         }
 

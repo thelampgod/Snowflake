@@ -19,7 +19,7 @@ public class ConfigManager {
 
     private final Map<String, OptionInfo> optionCache = new HashMap<>();
 
-    public <T> String iAmSetting(String name, Setting<T> tSetting) {
+    public <T> String giveSettingReference(String name, Setting<T> tSetting) {
         // ideally this is saved more suffisticated and says what type of value it is...
         OptionInfo info = optionCache.computeIfAbsent(name, k -> new OptionInfo(tSetting.getDefaultAsString()));
         info.foundSetting = tSetting;

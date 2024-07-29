@@ -148,8 +148,8 @@ public class Snow implements ModInitializer {
             if (parts.length < 2) return;
             serverManager = new ServerManager(parts[0], Integer.parseInt(parts[1]), password);
             serverManager.connect();
-            configManager.lastAddress.set("we connect there rn", address);
-            configManager.serverPassword.set("we inputted it", password);
+            configManager.lastAddress.set(address);
+            configManager.serverPassword.set(password);
         } catch (Exception e) {
             Helper.addToast("Couldn't connect to server");
             this.getLog().error("Error parsing IP: " + e.getMessage(), e);
