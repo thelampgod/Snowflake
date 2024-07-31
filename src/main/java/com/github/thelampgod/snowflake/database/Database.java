@@ -4,6 +4,7 @@ import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 import static com.github.thelampgod.snowflake.util.Helper.getLog;
 
@@ -13,6 +14,9 @@ public class Database {
 
     public Database(String url) {
         this.database = connect(url);
+        database.setConnectionInitSqls(List.of(
+                "PRAGMA foreign_keys = ON;"
+        ));
     }
 
     private BasicDataSource connect(String url) {
