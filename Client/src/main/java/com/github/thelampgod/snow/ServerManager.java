@@ -68,7 +68,7 @@ public class ServerManager {
                 while (isRunning) {
                     receiveComm((out, in) -> {
                         SnowflakePacket packet = SnowflakePacket.fromId(in.readByte(), in);
-//                        Snow.instance.getLog().info("[IN] " + packet.getClass().getSimpleName());
+                        Snow.instance.getLog().info("[IN] " + packet.getClass().getSimpleName());
                         try {
                             packet.handle();
                         } catch (Exception e) {
@@ -124,7 +124,7 @@ public class ServerManager {
     }
 
     public void sendPacket(SnowflakePacket packet) {
-//        Snow.instance.getLog().info("[OUT] " + packet.getClass().getSimpleName());
+        Snow.instance.getLog().info("[OUT] " + packet.getClass().getSimpleName());
         sendComm((out, in) -> {
             packet.writeData(out);
             out.flush();
