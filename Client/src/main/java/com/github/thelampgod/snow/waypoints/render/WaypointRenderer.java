@@ -107,7 +107,7 @@ public class WaypointRenderer {
                 renderPlayer(user, interpolatedX, interpolatedY, interpolatedZ);
             }
             //TODO: distance setting
-            if (mc.world.getDimensionKey().getValue().getPath().equals(position.dimension)) {
+            if (mc.world.getDimensionEntry().getIdAsString().endsWith(position.dimension)) {
                 if (distanceToIgnoringY < viewDistance * viewDistance) {
                     // Don't render player
                     this.removePlayerRender(user.getId());
@@ -173,13 +173,13 @@ public class WaypointRenderer {
     }
 
     private PositionData transformPosition(PositionData positionData) {
-        final String myDimension = mc.world.getDimensionKey().getValue().getPath();
+        final String myDimension = mc.world.getDimensionEntry().getIdAsString();
 
-        if (myDimension.equals("overworld") && positionData.dimension.equals("the_nether")) {
+        if (myDimension.endsWith("overworld") && positionData.dimension.endsWith("the_nether")) {
             return positionData.toOverworld();
         }
 
-        if (myDimension.equals("the_nether") && positionData.dimension.equals("overworld")) {
+        if (myDimension.endsWith("the_nether") && positionData.dimension.endsWith("overworld")) {
             return positionData.toNether();
         }
 
@@ -194,7 +194,7 @@ public class WaypointRenderer {
 
         stack.push();
         stack.translate(x, y, z);
-        stack.multiply(dispatcher.getRotation());
+        stack.multiply(camera.getRotation());
 
         Vec3d pos = camera.getPos();
 
@@ -203,7 +203,7 @@ public class WaypointRenderer {
 
         //TODO: setting
         float scale = (float) MathHelper.clamp(camDistance * 0.03f / 10, 0.001, Double.MAX_VALUE);
-        stack.scale(-scale, -scale, scale);
+        stack.scale(scale, -scale, scale);
         Matrix4f matrix = stack.peek().getPositionMatrix();
 
         //draw text
@@ -214,7 +214,7 @@ public class WaypointRenderer {
         int yPos = 1;
         this.drawText(distanceString, yPos++, matrix, consumers);
 
-        if (!mc.world.getDimensionKey().getValue().getPath().equals(dimension)) {
+        if (!mc.world.getDimensionEntry().getIdAsString().endsWith(dimension)) {
             this.drawText("(" + dimension + ")", yPos, matrix, consumers);
         }
 

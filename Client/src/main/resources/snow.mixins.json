@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.github.thelampgod.snow.mixins",
-  "compatibilityLevel": "JAVA_17",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [
     "impl.ClientConnectionMixin"
   ],
@@ -10,8 +10,7 @@
     "impl.ClientPlayNetworkHandlerAccessor",
     "impl.DrawContextMixin",
     "impl.GameRendererMixin",
-    "impl.MinecraftClientMixin",
-    "impl.WorldRendererMixin"
+    "impl.MinecraftClientMixin"
   ],
   "injectors": {
     "defaultRequire": 1
