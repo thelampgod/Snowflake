@@ -28,8 +28,7 @@ public class KeepAlivePacket extends SnowflakePacket {
 
   @Override
   public void handle() {
-    final ServerManager man = Snow.instance.getServerManager();
-    man.sendPacket(this);
+    Snow.getServerManager().sendPacket(this);
   }
 
   public long getTimestamp() {

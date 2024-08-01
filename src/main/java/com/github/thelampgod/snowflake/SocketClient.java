@@ -28,13 +28,6 @@ public class SocketClient {
         this.in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
     }
 
-    public SocketClient() {
-    }
-
-    public static SocketClient Snowflake() {
-        return new SocketClient();
-    }
-
     public Socket getSocket() {
         return socket;
     }

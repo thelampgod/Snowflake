@@ -2,6 +2,7 @@ package com.github.thelampgod.snow;
 
 import com.github.thelampgod.snow.packets.SnowflakePacket;
 import com.github.thelampgod.snow.packets.impl.DisconnectPacket;
+import com.github.thelampgod.snow.packets.impl.KeepAlivePacket;
 import com.github.thelampgod.snow.util.Helper;
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -10,6 +11,7 @@ import java.net.Socket;
 import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class ServerManager {
     private final LinkedBlockingQueue<Comm> talkComms = new LinkedBlockingQueue<>();
@@ -24,7 +26,7 @@ public class ServerManager {
 
     private final String password;
 
-    private static final String PROTOCOL_VERSION = "uRedLELysIsMAndEt";
+    private static final String PROTOCOL_VERSION = "QKn5U7BVcSDkV8xEZ";
 
     public ServerManager(String ip, int port, String password) {
         this.ip = ip;
@@ -68,14 +70,21 @@ public class ServerManager {
                 while (isRunning) {
                     receiveComm((out, in) -> {
                         SnowflakePacket packet = SnowflakePacket.fromId(in.readByte(), in);
-//                        Snow.instance.getLog().info("[IN] " + packet.getClass().getSimpleName());
+                        Snow.instance.getLog().info("[IN] " + packet.getClass().getSimpleName());
                         try {
                             packet.handle();
                         } catch (Exception e) {
                             Snow.instance.getLog().error("Error in handling packet: " + e.getMessage(), e);
 //                            this.close();
                         }
+
+                        if (packet instanceof KeepAlivePacket ka) {
+                            lastKeepAlive = ka.getTimestamp();
+                        }
                     });
+                    if (lastKeepAlive != 0 && System.currentTimeMillis() - lastKeepAlive > TimeUnit.SECONDS.toMillis(20)) {
+                        this.close();
+                    }
                     Thread.sleep(10);
                 }
             } catch (InterruptedException e) {
@@ -124,7 +133,7 @@ public class ServerManager {
     }
 
     public void sendPacket(SnowflakePacket packet) {
-//        Snow.instance.getLog().info("[OUT] " + packet.getClass().getSimpleName());
+        Snow.instance.getLog().info("[OUT] " + packet.getClass().getSimpleName());
         sendComm((out, in) -> {
             packet.writeData(out);
             out.flush();
@@ -143,14 +152,14 @@ public class ServerManager {
         private boolean isRunning = false;
         private final boolean receiver;
 
-        ServerHandler(Socket socket, boolean receiver, LinkedBlockingQueue<Comm> comms, String password) {
+        private ServerHandler(Socket socket, boolean receiver, LinkedBlockingQueue<Comm> comms, String password) {
             this.socket = socket;
             this.receiver = receiver;
             this.comms = comms;
             this.password = password;
         }
 
-        ServerHandler(Socket socket, boolean receiver, LinkedBlockingQueue<Comm> comms) {
+        private ServerHandler(Socket socket, boolean receiver, LinkedBlockingQueue<Comm> comms) {
             this(socket, receiver, comms, "");
         }
 
@@ -159,7 +168,6 @@ public class ServerManager {
             try (DataOutputStream out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
                  DataInputStream in = new DataInputStream(new BufferedInputStream(socket.getInputStream()))) {
 
-                socket.setSoTimeout(15000);
                 if (!receiver) {
                     Helper.addToast("Connected");
                 }
