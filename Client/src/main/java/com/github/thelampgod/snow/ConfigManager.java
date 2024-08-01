@@ -10,6 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +20,10 @@ public class ConfigManager {
 
     private final Map<String, OptionInfo> optionCache = new HashMap<>();
 
+    public Collection<OptionInfo> getOptions() {
+        return optionCache.values();
+    }
+
     public <T> String giveSettingReference(String name, Setting<T> tSetting) {
         // ideally this is saved more suffisticated and says what type of value it is...
         OptionInfo info = optionCache.computeIfAbsent(name, k -> new OptionInfo(tSetting.getDefaultAsString()));
@@ -26,14 +31,14 @@ public class ConfigManager {
         return info.value;
     }
 
-    private static class OptionInfo {
+    public static class OptionInfo {
 
         public OptionInfo(String value) {
             this.value = value;
         }
 
-        String value;
-        Setting<?> foundSetting;
+        public String value;
+        public Setting<?> foundSetting;
     }
 
     public Setting<String> lastAddress = new StringSetting(this).defaultValue("127.0.0.1:2147");

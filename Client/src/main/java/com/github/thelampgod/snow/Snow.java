@@ -1,6 +1,7 @@
 package com.github.thelampgod.snow;
 
 import com.github.thelampgod.snow.groups.GroupManager;
+import com.github.thelampgod.snow.gui.SettingsScreen;
 import com.github.thelampgod.snow.gui.SnowScreen;
 import com.github.thelampgod.snow.identities.IdentityManager;
 import com.github.thelampgod.snow.users.UserManager;
@@ -56,9 +57,19 @@ public class Snow implements ModInitializer {
                 "Snow"
         ));
 
+        KeyBinding settings = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "Open Snow Settings",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_U,
+                "Snow"
+        ));
+
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (keyBinding.wasPressed()) {
                 client.setScreen(getOrCreateSnowScreen());
+            }
+            while (settings.wasPressed()) {
+                client.setScreen(new SettingsScreen(Text.literal("Settings")));
             }
         });
 
