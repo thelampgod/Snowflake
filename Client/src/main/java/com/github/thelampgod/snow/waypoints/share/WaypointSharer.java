@@ -22,10 +22,9 @@ public class WaypointSharer {
     public void onLocationSend(PlayerMoveC2SPacket packet) {
         if (mc.world == null) return;
         if (selectedGroup == null) return;
-        float height = mc.player.getHeight();
 
         double x = packet.getX(0);
-        double y = packet.getY(0) + height;
+        double y = packet.getY(0);
         double z = packet.getZ(0);
         byte dimension = getDimensionId(mc.world.getDimensionEntry().getIdAsString());
 

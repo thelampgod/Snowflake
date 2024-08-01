@@ -286,6 +286,8 @@ public class SnowScreen extends Screen {
     public void groupLeave(int groupId, int userId) {
         GroupWindow window = getOrCreateGroupWindow(groupId);
         focusWindow(window);
-        window.addMessage(Snow.instance.getUserManager().get(userId).getName() + " left the group.", Color.RED);
+        User user = Snow.instance.getUserManager().get(userId);
+        String userName = (user == null ? "UserID: " + userId : user.getName());
+        window.addMessage(userName + " left the group.", Color.RED);
     }
 }
