@@ -7,6 +7,7 @@ import com.github.thelampgod.snow.users.User;
 import com.github.thelampgod.snow.util.Helper;
 import com.google.common.collect.Maps;
 import com.mojang.authlib.GameProfile;
+import io.netty.buffer.Unpooled;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.OtherClientPlayerEntity;
@@ -16,6 +17,8 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRemoveS2CPacket;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
@@ -38,6 +41,8 @@ public class WaypointRenderer {
     private final Map<Integer, PositionData> toProcess = Maps.newConcurrentMap();
     private final Map<Integer, PositionData> toRender = Maps.newConcurrentMap();
     private final Map<Integer, Long> lastUpdateMap = Maps.newConcurrentMap();
+
+    private static final double LABEL_HEIGHT = 1.8 + 0.5;
 
     // Cleanup for new connection or disconnect
     public void clear() {
@@ -64,7 +69,7 @@ public class WaypointRenderer {
 
         String dimension = getDimensionFromId(dimensionId);
 
-        toProcess.put(userId, new PositionData(x, y, z, dimension));
+        toProcess.put(userId, new PositionData(x, y + LABEL_HEIGHT, z, dimension));
         lastUpdateMap.put(userId, System.currentTimeMillis());
     }
 
@@ -133,7 +138,7 @@ public class WaypointRenderer {
     }
 
     private void removePlayerRender(int userId) {
-        if (!Snow.instance.xaeroLoaded || mc.world == null || mc.getNetworkHandler() == null) return;
+        if (mc.world == null || mc.getNetworkHandler() == null) return;
         final UUID id = Helper.uuidFromId(userId);
 
         mc.getNetworkHandler().onPlayerRemove(new PlayerRemoveS2CPacket(List.of(id)));
@@ -143,13 +148,17 @@ public class WaypointRenderer {
                 .filter(pl -> pl.getUuid().equals(id))
                 .findAny();
 
-        player.ifPresent(entity -> mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED));
+        player.ifPresent(entity -> {
+            if (!mc.world.getEntityById(entity.getId()).getUuid().equals(id)) return;
+            mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED);
+        });
     }
 
     private void renderPlayer(User user, double x, double y, double z) {
-        if (Snow.instance.xaeroLoaded && mc.world != null && mc.getNetworkHandler() != null) {
+        if (mc.world != null && mc.getNetworkHandler() != null) {
             final String name = user.getName();
             final UUID id = Helper.uuidFromId(user.getId());
+            double tempY = y - LABEL_HEIGHT;
 
             ((ClientPlayNetworkHandlerAccessor) mc.getNetworkHandler()).getPlayerListEntries().putIfAbsent(
                     id,
@@ -165,10 +174,20 @@ public class WaypointRenderer {
             if (!player.isPresent()) {
                 ent = new OtherClientPlayerEntity(mc.world, new GameProfile(id, name));
                 mc.world.addEntity(ent);
+                ent.setPosition(x,tempY,z);
             } else {
                 ent = player.get();
             }
-            ent.setPosition(x, y - mc.player.getHeight(), z);
+
+            PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+            buf.writeVarInt(ent.getId());
+            buf.writeDouble(x);
+            buf.writeDouble(tempY);
+            buf.writeDouble(z);
+            buf.writeByte(0);
+            buf.writeByte(0);
+            buf.writeBoolean(true);
+            mc.getNetworkHandler().onEntityPosition(new EntityPositionS2CPacket(buf));
         }
     }
 
