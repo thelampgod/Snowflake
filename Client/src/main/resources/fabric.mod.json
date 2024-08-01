@@ -1,6 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "snow",
+  "accessWidener": "snow.accesswidener",
   "version": "${version}",
   "name": "Snow",
   "description": "Live coordinate sharing mod",

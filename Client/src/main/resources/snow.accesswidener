@@ -1,0 +1,2 @@
+accessWidener v2 named
+accessible method net/minecraft/network/packet/s2c/play/EntityPositionS2CPacket <init> (Lnet/minecraft/network/PacketByteBuf;)V
