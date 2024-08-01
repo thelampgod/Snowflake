@@ -37,7 +37,6 @@ public class ClientHandler extends Thread {
             out = client.getOutputStream();
             in = client.getInputStream();
 
-            client.getSocket().setSoTimeout(15000);
             boolean receiver = in.readBoolean();
             String secret = in.readUTF();
             client.setLinker(secret);
