@@ -49,6 +49,12 @@ public class ChatElement {
             boolean sameSender = message.sender == null || prevSender.equals(sender);
             prevSender = sender;
 
+            String chatMessage = message.message;
+            if (message.sender == null) {
+                // Draw timestamp with connection message
+                chatMessage += timestamp;
+            }
+
             // Draw sender name
             if (!sameSender && inBounds(textY)) {
                 DrawUtil.drawText(this.textRenderer, sender, x + PADDING, textY, Color.YELLOW.getRGB(), false, ctx);
@@ -57,8 +63,8 @@ public class ChatElement {
 
             // Draw message
             if (inBounds(textY)) {
-                if (textRenderer.getWidth(message.message) > width - PADDING * 2) {
-                    List<OrderedText> wrapped = textRenderer.wrapLines(Text.of(message.message), width - PADDING * 2);
+                if (textRenderer.getWidth(chatMessage) > width - PADDING * 2) {
+                    List<OrderedText> wrapped = textRenderer.wrapLines(Text.of(chatMessage), width - PADDING * 2);
                     for (OrderedText text : wrapped) {
                         if (inBounds(textY)) {
                             DrawUtil.drawText(this.textRenderer, text, x + PADDING, textY, message.color, false, ctx);
@@ -66,7 +72,7 @@ public class ChatElement {
                         }
                     }
                 } else {
-                    DrawUtil.drawText(this.textRenderer, message.message, x + PADDING, textY, message.color, false, ctx);
+                    DrawUtil.drawText(this.textRenderer, chatMessage, x + PADDING, textY, message.color, false, ctx);
                     textY += textRenderer.fontHeight;
                 }
             }

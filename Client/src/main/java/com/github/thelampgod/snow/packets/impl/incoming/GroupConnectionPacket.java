@@ -79,7 +79,7 @@ public class GroupConnectionPacket extends SnowflakePacket {
 
         @Override
         public void handle() {
-            //todo
+            Snow.instance.getOrCreateSnowScreen().groupConnection(Action.CONNECT, groupId, clientId);
         }
     }
 
@@ -90,7 +90,14 @@ public class GroupConnectionPacket extends SnowflakePacket {
 
         @Override
         public void handle() {
-            //todo
+            Snow.instance.getOrCreateSnowScreen().groupConnection(Action.DISCONNECT, groupId, clientId);
         }
+    }
+
+    public static enum Action {
+        JOIN,
+        LEAVE,
+        CONNECT,
+        DISCONNECT
     }
 }

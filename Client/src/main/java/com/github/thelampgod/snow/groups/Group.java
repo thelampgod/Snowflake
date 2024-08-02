@@ -3,8 +3,12 @@ package com.github.thelampgod.snow.groups;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.gui.SnowScreen;
 import com.github.thelampgod.snow.users.User;
+import net.minecraft.client.realms.gui.RealmsWorldSlotButton;
 
 import java.util.Set;
+
+import static com.github.thelampgod.snow.packets.impl.incoming.GroupConnectionPacket.Action.JOIN;
+import static com.github.thelampgod.snow.packets.impl.incoming.GroupConnectionPacket.Action.LEAVE;
 
 public class Group {
 
@@ -37,7 +41,7 @@ public class Group {
     public void addUser(int id) {
         users.add(id);
         SnowScreen snowScreen = Snow.instance.getOrCreateSnowScreen();
-        snowScreen.groupJoin(this.groupId, id);
+        snowScreen.groupConnection(JOIN, this.groupId, id);
         snowScreen.updateGroupButtons();
     }
 
@@ -48,7 +52,7 @@ public class Group {
     public void removeUser(int id) {
         users.remove(id);
         SnowScreen snowScreen = Snow.instance.getOrCreateSnowScreen();
-        snowScreen.groupLeave(this.groupId, id);
+        snowScreen.groupConnection(LEAVE, this.groupId, id);
         snowScreen.updateGroupButtons();
     }
 

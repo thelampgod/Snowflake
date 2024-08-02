@@ -4,22 +4,18 @@ import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.groups.Group;
 import com.github.thelampgod.snow.gui.windows.SnowWindow;
 import com.github.thelampgod.snow.gui.windows.impl.*;
+import com.github.thelampgod.snow.packets.impl.incoming.GroupConnectionPacket;
 import com.github.thelampgod.snow.users.User;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.debug.DebugRenderer;
-import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.text.Text;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.github.thelampgod.snow.packets.impl.incoming.GroupConnectionPacket.Action.*;
 import static com.github.thelampgod.snow.util.Helper.mc;
 
 public class SnowScreen extends Screen {
@@ -277,17 +273,19 @@ public class SnowScreen extends Screen {
         return new GroupWindow(Snow.instance.getGroupManager().get(groupId));
     }
 
-    public void groupJoin(int groupId, int userId) {
+    public void groupConnection(GroupConnectionPacket.Action action, int groupId, int userId) {
         GroupWindow window = getOrCreateGroupWindow(groupId);
         focusWindow(window);
-        window.addMessage(Snow.instance.getUserManager().get(userId).getName() + " joined the group.", Color.GREEN);
-    }
-
-    public void groupLeave(int groupId, int userId) {
-        GroupWindow window = getOrCreateGroupWindow(groupId);
-        focusWindow(window);
-        User user = Snow.instance.getUserManager().get(userId);
+        final User user = Snow.instance.getUserManager().get(userId);
         String userName = (user == null ? "UserID: " + userId : user.getName());
-        window.addMessage(userName + " left the group.", Color.RED);
+        String actionString =
+                (action == JOIN ? " joined the group."
+                        : action == LEAVE ? " left the group."
+                        : action == CONNECT ? " connected."
+                        : " disconnected.");
+
+        Color color = (action == JOIN || action == CONNECT ? Color.GREEN : Color.RED);
+
+        window.addMessage(userName + actionString, color);
     }
 }
