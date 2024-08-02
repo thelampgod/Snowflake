@@ -5,6 +5,8 @@ plugins {
 
 version = project.mod_version
 group = project.maven_group
+def destArchiveVersion = "v${ project.version }+MC${minecraft_version}"
+
 
 repositories {
     exclusiveContent {
@@ -72,6 +74,12 @@ java {
 jar {
     from("LICENSE") {
         rename { "${it}_${project.archivesBaseName}" }
+    }
+}
+
+tasks {
+    remapJar {
+        archiveVersion = destArchiveVersion
     }
 }
 
