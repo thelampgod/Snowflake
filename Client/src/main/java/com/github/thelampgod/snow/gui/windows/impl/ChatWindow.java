@@ -75,9 +75,9 @@ public class ChatWindow extends SnowWindow {
                     chatElement.addMessage(Snow.instance.getUserManager().getMeUser().getName(), chatInput.getText());
                 }
             } catch (Exception e) {
-                Helper.addToast("Failed to send message");
-                Snow.instance.getLog().info("Failed to send message");
-                e.printStackTrace();
+                String ex = "Failed to send message";
+                Helper.addToast(ex, e.getMessage());
+                Snow.instance.getLog().error(ex + e.getMessage(), e);
             }
             chatInput.setText("");
         }

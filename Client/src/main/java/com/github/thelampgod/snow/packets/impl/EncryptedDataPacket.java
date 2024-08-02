@@ -68,7 +68,9 @@ public class EncryptedDataPacket extends SnowflakePacket {
                 byte[] decrypted = EncryptionUtil.decryptByPassword(super.encryptedPacket, group.getPassword());
                 packet = EncryptionUtil.toPacket(decrypted);
             } catch (Exception e) {
-                Snow.instance.getLog().error("Failed to decrypt (outdated password?) - leaving group: " + e.getMessage(), e);
+                String ex = "Failed to decrypt, leaving group ";
+                Helper.addToast(ex);
+                Snow.instance.getLog().error(ex + e.getMessage(), e);
                 Snow.getServerManager().sendPacket(new GroupLeavePacket(group.getId()));
                 return;
             }

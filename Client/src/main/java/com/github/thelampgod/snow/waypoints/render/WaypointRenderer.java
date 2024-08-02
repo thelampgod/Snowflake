@@ -54,9 +54,9 @@ public class WaypointRenderer {
     }
 
     public void removePoint(int userId) {
+        this.removePlayerRender(userId);
         toProcess.remove(userId);
         toRender.remove(userId);
-        this.removePlayerRender(userId);
     }
 
     public void updatePoint(int userId, double x, double y, double z, byte dimensionId, int groupId) {
@@ -139,9 +139,8 @@ public class WaypointRenderer {
 
     private void removePlayerRender(int userId) {
         if (mc.world == null || mc.getNetworkHandler() == null) return;
+        if (!toRender.containsKey(userId)) return;
         final UUID id = Helper.uuidFromId(userId);
-
-        mc.getNetworkHandler().onPlayerRemove(new PlayerRemoveS2CPacket(List.of(id)));
 
         List<AbstractClientPlayerEntity> players = mc.world.getPlayers();
         Optional<AbstractClientPlayerEntity> player = players.stream()
@@ -152,6 +151,8 @@ public class WaypointRenderer {
             if (!mc.world.getEntityById(entity.getId()).getUuid().equals(id)) return;
             mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED);
         });
+
+        mc.getNetworkHandler().onPlayerRemove(new PlayerRemoveS2CPacket(List.of(id)));
     }
 
     private void renderPlayer(User user, double x, double y, double z) {

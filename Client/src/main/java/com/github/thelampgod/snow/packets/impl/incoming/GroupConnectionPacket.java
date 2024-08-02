@@ -56,8 +56,8 @@ public class GroupConnectionPacket extends SnowflakePacket {
                 Snow.instance.getGroupManager().remove(group);
                 return;
             }
-            Snow.instance.getRenderer().removePoint(clientId);
             group.removeUser(clientId);
+            Snow.instance.getRenderer().removePoint(clientId);
 
             try {
                 if (group.isOwner()) {

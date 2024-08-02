@@ -3,6 +3,7 @@ package com.github.thelampgod.snow.util;
 import com.github.thelampgod.snow.Snow;
 import com.github.thelampgod.snow.groups.Group;
 import com.github.thelampgod.snow.packets.WrappedPacket;
+import com.github.thelampgod.snow.packets.impl.outgoing.GroupLeavePacket;
 import com.github.thelampgod.snow.users.User;
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -100,6 +101,11 @@ public class EncryptionUtil {
         final Group group = Snow.instance.getGroupManager().get(groupId);
 
         byte[] packetBytes = packet.data();
+        byte[] pass = group.getPassword();
+        if (pass == null) {
+            Snow.getServerManager().sendPacket(new GroupLeavePacket(groupId));
+            throw new RuntimeException("Couldn't read group password, leaving group.");
+        }
 
         return encryptByPassword(packetBytes, group.getPassword());
     }
