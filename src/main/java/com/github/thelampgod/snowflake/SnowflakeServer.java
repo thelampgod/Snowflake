@@ -1,7 +1,9 @@
 package com.github.thelampgod.snowflake;
 
+import com.github.thelampgod.snowflake.groups.Group;
 import com.github.thelampgod.snowflake.packets.impl.DisconnectPacket;
 import com.github.thelampgod.snowflake.packets.impl.outgoing.ConnectionPacket;
+import com.github.thelampgod.snowflake.packets.impl.outgoing.GroupConnectionPacket;
 import com.google.common.collect.Maps;
 
 import java.io.*;
@@ -88,11 +90,18 @@ public class SnowflakeServer {
     }
 
     private void sendDisconnectMessage(SocketClient client) {
+        for (Group group : Snowflake.INSTANCE.getGroupManager().findUserGroups(client.getId())) {
+            for (int id : group.getUsers()) {
+                ClientHandler user = this.getClientReceiver(id);
+                if (user == null) continue;
+                user.sendPacket(new GroupConnectionPacket.Left(group.getId(), client.getId()));
+            }
+        }
+
         for (ConnectionPair pair : connections.values()) {
             if (!pair.getReceiver().client.isAuthenticated()) return;
             pair.getReceiver().sendPacket(new ConnectionPacket.Disconnect(client.getId(), client.getName()));
         }
-
     }
 
     public ClientHandler getClientReceiver(int id) {
