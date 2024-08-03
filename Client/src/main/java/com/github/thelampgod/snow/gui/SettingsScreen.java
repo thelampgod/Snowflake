@@ -15,8 +15,8 @@ public class SettingsScreen extends Screen {
     protected void init() {
         super.init();
 
-        for (ConfigManager.OptionInfo info : Snow.instance.getConfigManager().getOptions()) {
-            Setting<?> setting = info.foundSetting;
+        for (Setting<?> setting  : Snow.instance.getConfigManager().settings.values()) {
+             //= info.foundSetting;
 
             Snow.instance.getLog().info(setting.getName());
         }

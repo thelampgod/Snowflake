@@ -13,6 +13,7 @@ public abstract class Setting<T> {
         this.inMod = owner;// do we need to enforce default value?
         this.owner = owner;
         defaultValue(defaultValue);
+        valueIs = new ValueIsDefault<>();
         this.load = load;
         this.save = save;
 
@@ -34,7 +35,13 @@ public abstract class Setting<T> {
     }
 
     public String getForSave() {
+        if(valueIs instanceof Setting.ValueIsDefault<T>)return null;// we dont need to save this...
         return save.apply(get());
+    }
+
+    public void load(String s) {
+        set(Setting.ChangeInfo.Source.LOAD, new ValueIsCustom<>(load.apply(s)));
+
     }
 
     public static class ChangeInfo<T> {
@@ -56,6 +63,7 @@ public abstract class Setting<T> {
         }
 
         public enum Source {
+            LOAD,
             GUI,
             COMMAND,
             MOD
@@ -84,7 +92,7 @@ public abstract class Setting<T> {
     }
 
     public String getName() {
-        if (name == null) {
+        if (name == null) {// TODO we shouldnt need to do this! so warn the user if this is the case!
             // find field where we are saved in to get name... by going thru all the fields of owner with reflection
             Class<?> clazz = owner.getClass();
             while (clazz != Object.class) {
@@ -105,6 +113,7 @@ public abstract class Setting<T> {
             }
 
             name = "unknown";// alert or something bc we couldnt find the name somehow...
+
         }
 
         return name;
@@ -115,11 +124,11 @@ public abstract class Setting<T> {
     }
 
     public T get() {
-        if (valueIs == null) {
-            String value = inMod.giveSettingReference(getName(), this);// this needs to be reworked anyway when saving will be improved...
+        //if (valueIs == null) {
+         //   String value = inMod.giveSettingReference(getName(), this);// this needs to be reworked anyway when saving will be improved...
             // ideally we would know now if the setting is actual custom or reference to the default value...
-            valueIs = new ValueIsCustom<>(load.apply(value));
-        }
+          //  valueIs = new ValueIsCustom<>(load.apply(value));
+        //}
         return valueIs.get(this);// should also give it a context variable?
     }
 
@@ -142,10 +151,6 @@ public abstract class Setting<T> {
         return this;
     }
 
-    private static class DefaultValues<T> {
-        T defaultDefault;
-        // maybe also other default values depending on server/player/dimension... anything...
-    }
 
     public interface ValueIs<T> {
         T get(Setting<T> setting);
